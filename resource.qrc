@@ -1,0 +1,18 @@
+<RCC>
+    <qresource prefix="/">
+        <file>image/cat.ico</file>
+        <file>image/app.qss</file>
+        <file>image/close.png</file>
+        <file>image/cn.png</file>
+        <file>image/us.png</file>
+        <file>image/about.png</file>
+        <file>image/auto.png</file>
+        <file>image/manual.png</file>
+        <file>image/bk.png</file>
+        <file>image/max.png</file>
+        <file>image/min.png</file>
+        <file>image/normal.png</file>
+        <file>image/help.png</file>
+        <file>image/logo.png</file>
+    </qresource>
+</RCC>
