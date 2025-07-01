@@ -1,12 +1,12 @@
 # veye_viewer
 
-### 介绍
-UI采用Qt5进行交换，视频获取基于v4l2开发相机配套demo，兼容MV 系列相机和 RAW 系列相机，支持平台RK3566/RK3568/RK3588 系列、Jetson Orin 和 Xavier 系列、raspberry4、5 系列
+### Installation
+The UI is developed using Qt5, and the video acquisition is based on the v4l2 camera demo development. It is compatible with the MV series cameras and RAW series cameras, and supports the platforms RK3566/RK3568/RK3588 series, Jetson Orin and Xavier series, raspberry4, and 5 series.
 
-### 编译教程
+### Compilation Tutorial
+The source code is built using CMake. If you need to compile the source code, you can use the following two methods for compilation. Before compiling, you need to install the basic environment and script authorization to avoid affecting the operation.
 
-源码采用CMake进行构建，如果需要编译源码，可以采用以下两种方式进行编译，在编译之前需要安装基础环境和脚本授权，以免影响运行。
-#### 基础环境安装 
+#### Basic Environment Installation
     sudo apt update
     sudo apt-get install gawk
     sudo apt-get install qtcreator
@@ -15,20 +15,20 @@ UI采用Qt5进行交换，视频获取基于v4l2开发相机配套demo，兼容M
     sudo apt-get install cmake
     sudo apt-get install g++
     sudo apt-get install gdb
-#### 脚本授权 
+#### Script Authorization
     cd veye_viewer
-    chmod 755 ./config/*.sh   
-
-#### CMake编译运行   
+    chmod 755 
+    ./config/*.sh
+#### CMake Compilation and Execution
     cd build
     cmake ..
     make
     ./start_veye_viewer.sh
-#### qtcreator编译
-1. 启动 Qt Creator：打开 Qt Creator。
-2. 打开项目：在 Qt Creator 中，选择 File > Open File or Project，然后浏览到你的 CMakeLists.txt 文件的位置。确保选择的是项目根目录下的 CMakeLists.txt 文件。
-3. 选择 Kit：在打开项目之前，Qt Creator 会要求你选择一个 Kit。Kit 是指开发环境中预配置的一组工具链，包括编译器和 Qt 版本。如果你还没有配置 Kit，你可以点击 Manage Kits... 来添加或配置新的 Kit。通常，你需要至少配置一个包含正确编译器和 Qt 版本的 Kit。
-4. 配置项目：选择 Kit 后，Qt Creator 将尝试加载项目。如果一切设置正确，它将自动识别为 CMake 项目
-5. 构建和运行：配置完成后，你可以点击左下角的绿色播放按钮来构建并运行你的项目。
+#### Qt Creator Compilation
+1. Launch Qt Creator: Open Qt Creator.
+2. Open Project: In Qt Creator, select File > Open File or Project, then navigate to the location of your CMakeLists.txt file. Make sure to select the CMakeLists.txt file in the root directory of the project.
+3. Choose Kit: Before opening the project, Qt Creator will ask you to select a Kit. A Kit refers to a set of pre-configured toolchains in the development environment, including compilers and Qt versions. If you haven't configured a Kit yet, you can click Manage Kits... to add or configure a new Kit. Typically, you need to configure at least one Kit with the correct compiler and Qt version.
+4. Configure Project: After selecting a Kit, Qt Creator will try to load the project. If everything is set up correctly, it will automatically recognize it as a CMake project.
+5. Build and Run: Once configured, you can click the green play button in the lower left corner to build and run your project.
 
-##### 特别说明：采用qtcreator编译源码，第一次编译完成后，需要使用./start_veye_viewer.sh运行。
+#### Special Note: When compiling the source code using qtcreator, after the first compilation is complete, you need to use `./start_veye_viewer.sh` to run.
