@@ -4,6 +4,7 @@
 #include <QTranslator>
 #include "mainwidget.h"
 #include "qxhelp.h"
+#include "version.h"
 
 #define LOG_PATH QCoreApplication::applicationDirPath() + "/log/"
 
@@ -68,6 +69,8 @@ int main(int argc, char *argv[])
 #endif
     qInstallMessageHandler(logMessageHandler);
     QApplication a(argc, argv);
+    a.setApplicationName(APP_NAME);
+    a.setApplicationVersion(APP_VERSION);
     QThread::currentThread()->setPriority(QThread::TimeCriticalPriority);
     QFont font("Noto Sans CJK SC"); // 指定简体中文字体
     a.setFont(font);

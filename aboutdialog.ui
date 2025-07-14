@@ -165,7 +165,7 @@
          <item>
           <widget class="QLabel" name="labelName">
            <property name="text">
-            <string>veye_viewer V0.1.0</string>
+            <string>veye_viewer</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>

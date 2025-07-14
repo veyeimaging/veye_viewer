@@ -961,6 +961,15 @@ void MainWidget::rcvRoiAndFps(const StImgAttrInfo &info)
             m_optCmd->runSystemCmd(strCmd);
             strCmd = QString("v4l2-ctl --set-ctrl frame_rate=%1").arg(strFps);
             m_optCmd->runSystemCmd(strCmd);
+
+            int width = strW.toInt();
+            if (0 != width % 256) {
+                width = (width / 256 + 1) * 256;
+            }
+            strCmd
+                = QString("v4l2-ctl -d %1 --set-ctrl preferred_stride=%2").arg(videoNode).arg(width);
+            m_optCmd->runSystemCmd(strCmd);
+
         } break;
         default:
             break;
@@ -972,11 +981,21 @@ void MainWidget::rcvRoiAndFps(const StImgAttrInfo &info)
 
 void MainWidget::openCam()
 {
-    QString vidoNode = ui->lineEditVideoNode->text();
+    QString videoNode = ui->lineEditVideoNode->text();
     QString subNode = ui->lineEditSubNode->text();
 
+    if (Jetson == m_platform) {
+        int width = m_roiW;
+        if (0 != width % 256) {
+            width = (width / 256 + 1) * 256;
+        }
+        QString strCmd
+            = QString("v4l2-ctl -d %1 --set-ctrl preferred_stride=%2").arg(videoNode).arg(width);
+        m_optCmd->runSystemCmd(strCmd);
+    }
+
     StCamParam camParam;
-    camParam.videoNode = vidoNode;
+    camParam.videoNode = videoNode;
     camParam.subNode = subNode;
     camParam.x = m_roiX;
     camParam.y = m_roiY;

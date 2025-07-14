@@ -1,5 +1,6 @@
 #include "aboutdialog.h"
 #include "ui_aboutdialog.h"
+#include "version.h"
 
 AboutDialog::AboutDialog(QWidget *parent)
     : QWidget(parent)
@@ -33,6 +34,8 @@ void AboutDialog::initUIStyle()
     ui->pushButtonPlaceholder->setEnabled(false);
     ui->pushButtonPlaceholder->setFixedHeight(20);
     setFixedSize(550, 300);
+    QString strVersion = APP_VERSION;
+    ui->labelName->setText("veye_viewer V" + strVersion);
 }
 
 void AboutDialog::initSigSlot()

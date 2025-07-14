@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(veye_viewer VERSION 0.1 LANGUAGES CXX)
+project(veye_viewer VERSION 0.1.1 LANGUAGES CXX)
+
 
 # add_compile_definitions(QT_NO_INFO_OUTPUT)
 # add_compile_definitions(QT_NO_DEBUG_OUTPUT)
@@ -9,7 +10,11 @@ project(veye_viewer VERSION 0.1 LANGUAGES CXX)
 file(COPY config/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/config/)
 file(COPY config/start_veye_viewer.sh DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-
+configure_file(
+    ${CMAKE_SOURCE_DIR}/version.h.in
+    ${CMAKE_SOURCE_DIR}/version.h
+    @ONLY
+)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -77,6 +82,7 @@ else()
             curattrdlg.h curattrdlg.cpp curattrdlg.ui
             codemap.h codemap.cpp
             framelesswidget.cpp framelesswidget.h
+            version.h.in
           )
     endif()
 

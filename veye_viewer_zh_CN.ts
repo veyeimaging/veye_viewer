@@ -18,8 +18,8 @@
     <message>
         <location filename="aboutdialog.ui" line="168"/>
         <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_aboutdialog.h" line="164"/>
-        <source>veye_viewer V0.1.0</source>
-        <oldsource>veye_viewer</oldsource>
+        <source>veye_viewer</source>
+        <oldsource>veye_viewer V0.1.0</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -389,15 +389,15 @@
     <message>
         <location filename="mainwidget.ui" line="548"/>
         <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="860"/>
-        <location filename="mainwidget.cpp" line="1456"/>
+        <location filename="mainwidget.cpp" line="1475"/>
         <source>开始采集</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="mainwidget.ui" line="555"/>
         <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="861"/>
-        <location filename="mainwidget.cpp" line="1014"/>
-        <location filename="mainwidget.cpp" line="1457"/>
+        <location filename="mainwidget.cpp" line="1033"/>
+        <location filename="mainwidget.cpp" line="1476"/>
         <source>开始显示</source>
         <translation type="unfinished"></translation>
     </message>
@@ -618,7 +618,7 @@
     </message>
     <message>
         <location filename="mainwidget.cpp" line="395"/>
-        <location filename="mainwidget.cpp" line="1719"/>
+        <location filename="mainwidget.cpp" line="1738"/>
         <source>提示</source>
         <translation type="unfinished"></translation>
     </message>
@@ -639,19 +639,19 @@
     </message>
     <message>
         <location filename="mainwidget.cpp" line="592"/>
-        <location filename="mainwidget.cpp" line="1708"/>
+        <location filename="mainwidget.cpp" line="1727"/>
         <source>当前路径无写权限</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="mainwidget.cpp" line="629"/>
-        <location filename="mainwidget.cpp" line="1676"/>
+        <location filename="mainwidget.cpp" line="1695"/>
         <source>导出</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="mainwidget.cpp" line="658"/>
-        <location filename="mainwidget.cpp" line="1705"/>
+        <location filename="mainwidget.cpp" line="1724"/>
         <source>导出完成</source>
         <translation type="unfinished"></translation>
     </message>
@@ -662,78 +662,78 @@
     </message>
     <message>
         <location filename="mainwidget.cpp" line="896"/>
-        <location filename="mainwidget.cpp" line="1165"/>
+        <location filename="mainwidget.cpp" line="1184"/>
         <source>状态为采集中，不支持该操作</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1006"/>
+        <location filename="mainwidget.cpp" line="1025"/>
         <source>停止显示</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1152"/>
-        <location filename="mainwidget.cpp" line="1187"/>
+        <location filename="mainwidget.cpp" line="1171"/>
+        <location filename="mainwidget.cpp" line="1206"/>
         <source>i2c序号不能为空</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1168"/>
+        <location filename="mainwidget.cpp" line="1187"/>
         <source>只读寄存器,不支持该操作</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1235"/>
+        <location filename="mainwidget.cpp" line="1254"/>
         <source>i2cbus 不能为空</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1242"/>
+        <location filename="mainwidget.cpp" line="1261"/>
         <source>media node 不能为空</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1249"/>
+        <location filename="mainwidget.cpp" line="1268"/>
         <source>video node 不能为空</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1256"/>
+        <location filename="mainwidget.cpp" line="1275"/>
         <source>subNode 不能为空</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1441"/>
+        <location filename="mainwidget.cpp" line="1460"/>
         <source>保存图像完成</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1449"/>
+        <location filename="mainwidget.cpp" line="1468"/>
         <source>停止采集</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1650"/>
+        <location filename="mainwidget.cpp" line="1669"/>
         <source>请输入正确的寄存器地址</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1678"/>
+        <location filename="mainwidget.cpp" line="1697"/>
         <source>文本文件 (*.json);;所有文件 (*)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1720"/>
+        <location filename="mainwidget.cpp" line="1739"/>
         <source>状态为采集中，是否停止采集，继续导入数据？</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1726"/>
+        <location filename="mainwidget.cpp" line="1745"/>
         <source>导入</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1809"/>
+        <location filename="mainwidget.cpp" line="1828"/>
         <source>导入完成</source>
         <translation type="unfinished"></translation>
     </message>
