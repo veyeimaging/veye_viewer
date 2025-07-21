@@ -58,6 +58,7 @@ signals:
     void sndSaveImg(QString strPath, int count);
     void sndPixmap(const QPixmap &pix, QString strTS);
 
+    void sndSetROI();
     void sndImgAttrCmdRet(const StCmdRet &ret);
     void sndRet2EG(EuCMD cmd, uint32_t &data);
     void sndExpAndGainCmdRet(const StCmdRet &ret);

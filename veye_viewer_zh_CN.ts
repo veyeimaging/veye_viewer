@@ -19,14 +19,12 @@
         <location filename="aboutdialog.ui" line="168"/>
         <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_aboutdialog.h" line="164"/>
         <source>veye_viewer</source>
-        <oldsource>veye_viewer V0.1.0</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="aboutdialog.ui" line="178"/>
         <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_aboutdialog.h" line="165"/>
         <source>基于 Qt 5.15 构建</source>
-        <oldsource>V1.0.0.1 Qt 5.15</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -253,7 +251,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="imgattrdlg.cpp" line="74"/>
+        <location filename="imgattrdlg.cpp" line="79"/>
         <source>请设置合理的ROI和PFS</source>
         <translation type="unfinished"></translation>
     </message>
@@ -389,15 +387,15 @@
     <message>
         <location filename="mainwidget.ui" line="548"/>
         <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="860"/>
-        <location filename="mainwidget.cpp" line="1475"/>
+        <location filename="mainwidget.cpp" line="1487"/>
         <source>开始采集</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="mainwidget.ui" line="555"/>
         <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="861"/>
-        <location filename="mainwidget.cpp" line="1033"/>
-        <location filename="mainwidget.cpp" line="1476"/>
+        <location filename="mainwidget.cpp" line="1045"/>
+        <location filename="mainwidget.cpp" line="1488"/>
         <source>开始显示</source>
         <translation type="unfinished"></translation>
     </message>
@@ -435,7 +433,24 @@
         <location filename="mainwidget.ui" line="718"/>
         <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="867"/>
         <source>显示方式:</source>
-        <oldsource>调整显示帧率:</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwidget.ui" line="728"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="868"/>
+        <source>一次软触发显示帧数:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwidget.ui" line="735"/>
+        <location filename="mainwidget.ui" line="791"/>
+        <location filename="mainwidget.ui" line="826"/>
+        <location filename="mainwidget.ui" line="861"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="869"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="873"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="876"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="879"/>
+        <source>0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -454,19 +469,6 @@
         <location filename="mainwidget.ui" line="784"/>
         <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="872"/>
         <source>采集帧率:</source>
-        <oldsource>采集帧率: </oldsource>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwidget.ui" line="735"/>
-        <location filename="mainwidget.ui" line="791"/>
-        <location filename="mainwidget.ui" line="826"/>
-        <location filename="mainwidget.ui" line="861"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="869"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="873"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="876"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="879"/>
-        <source>0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -481,19 +483,12 @@
         <location filename="mainwidget.ui" line="819"/>
         <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="875"/>
         <source>播放帧率:</source>
-        <oldsource>播放帧率: </oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="mainwidget.ui" line="854"/>
         <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="878"/>
         <source>时间戳:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwidget.ui" line="728"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="868"/>
-        <source>一次软触发显示帧数:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -527,213 +522,210 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="188"/>
+        <location filename="mainwidget.cpp" line="189"/>
         <source>帮助</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwidget.cpp" line="211"/>
-        <location filename="mainwidget.cpp" line="345"/>
-        <source>30帧/秒</source>
-        <oldsource>30 帧/秒</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="mainwidget.cpp" line="212"/>
         <location filename="mainwidget.cpp" line="346"/>
-        <source>60帧/秒</source>
-        <oldsource>60 帧/秒</oldsource>
+        <source>30帧/秒</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="245"/>
-        <location filename="mainwidget.cpp" line="333"/>
+        <location filename="mainwidget.cpp" line="213"/>
+        <location filename="mainwidget.cpp" line="347"/>
+        <source>60帧/秒</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwidget.cpp" line="246"/>
+        <location filename="mainwidget.cpp" line="334"/>
         <source>序号</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="245"/>
-        <location filename="mainwidget.cpp" line="333"/>
+        <location filename="mainwidget.cpp" line="246"/>
+        <location filename="mainwidget.cpp" line="334"/>
         <source>结果</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="245"/>
-        <location filename="mainwidget.cpp" line="333"/>
+        <location filename="mainwidget.cpp" line="246"/>
+        <location filename="mainwidget.cpp" line="334"/>
         <source>操作记录</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="256"/>
-        <location filename="mainwidget.cpp" line="329"/>
+        <location filename="mainwidget.cpp" line="257"/>
+        <location filename="mainwidget.cpp" line="330"/>
         <source>请输入主板密码</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="316"/>
+        <location filename="mainwidget.cpp" line="317"/>
         <source>简体中文</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="318"/>
-        <location filename="mainwidget.cpp" line="336"/>
+        <location filename="mainwidget.cpp" line="319"/>
+        <location filename="mainwidget.cpp" line="337"/>
         <source>关于</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="357"/>
+        <location filename="mainwidget.cpp" line="358"/>
         <source>Enter motherboard pwd</source>
-        <oldsource>Enter motherboard password</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="361"/>
+        <location filename="mainwidget.cpp" line="362"/>
         <source>Num</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="361"/>
+        <location filename="mainwidget.cpp" line="362"/>
         <source>Result</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="361"/>
+        <location filename="mainwidget.cpp" line="362"/>
         <source>Operation Log</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="364"/>
+        <location filename="mainwidget.cpp" line="365"/>
         <source>About</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="373"/>
+        <location filename="mainwidget.cpp" line="374"/>
         <source>30 fps</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="374"/>
+        <location filename="mainwidget.cpp" line="375"/>
         <source>60 fps</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="395"/>
-        <location filename="mainwidget.cpp" line="1738"/>
+        <location filename="mainwidget.cpp" line="396"/>
+        <location filename="mainwidget.cpp" line="1750"/>
         <source>提示</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="395"/>
+        <location filename="mainwidget.cpp" line="396"/>
         <source>确定退出?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="470"/>
+        <location filename="mainwidget.cpp" line="471"/>
         <source>密码错误</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="586"/>
+        <location filename="mainwidget.cpp" line="587"/>
         <source>路径</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="592"/>
-        <location filename="mainwidget.cpp" line="1727"/>
+        <location filename="mainwidget.cpp" line="593"/>
+        <location filename="mainwidget.cpp" line="1739"/>
         <source>当前路径无写权限</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="629"/>
-        <location filename="mainwidget.cpp" line="1695"/>
+        <location filename="mainwidget.cpp" line="630"/>
+        <location filename="mainwidget.cpp" line="1707"/>
         <source>导出</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="658"/>
-        <location filename="mainwidget.cpp" line="1724"/>
+        <location filename="mainwidget.cpp" line="659"/>
+        <location filename="mainwidget.cpp" line="1736"/>
         <source>导出完成</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="662"/>
+        <location filename="mainwidget.cpp" line="663"/>
         <source>操作记录为空</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="896"/>
-        <location filename="mainwidget.cpp" line="1184"/>
+        <location filename="mainwidget.cpp" line="897"/>
+        <location filename="mainwidget.cpp" line="1196"/>
         <source>状态为采集中，不支持该操作</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1025"/>
+        <location filename="mainwidget.cpp" line="1037"/>
         <source>停止显示</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1171"/>
-        <location filename="mainwidget.cpp" line="1206"/>
+        <location filename="mainwidget.cpp" line="1183"/>
+        <location filename="mainwidget.cpp" line="1218"/>
         <source>i2c序号不能为空</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1187"/>
+        <location filename="mainwidget.cpp" line="1199"/>
         <source>只读寄存器,不支持该操作</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1254"/>
+        <location filename="mainwidget.cpp" line="1266"/>
         <source>i2cbus 不能为空</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1261"/>
+        <location filename="mainwidget.cpp" line="1273"/>
         <source>media node 不能为空</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1268"/>
+        <location filename="mainwidget.cpp" line="1280"/>
         <source>video node 不能为空</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1275"/>
+        <location filename="mainwidget.cpp" line="1287"/>
         <source>subNode 不能为空</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1460"/>
+        <location filename="mainwidget.cpp" line="1472"/>
         <source>保存图像完成</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1468"/>
+        <location filename="mainwidget.cpp" line="1480"/>
         <source>停止采集</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1669"/>
+        <location filename="mainwidget.cpp" line="1681"/>
         <source>请输入正确的寄存器地址</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1697"/>
+        <location filename="mainwidget.cpp" line="1709"/>
         <source>文本文件 (*.json);;所有文件 (*)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1739"/>
+        <location filename="mainwidget.cpp" line="1751"/>
         <source>状态为采集中，是否停止采集，继续导入数据？</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1745"/>
+        <location filename="mainwidget.cpp" line="1757"/>
         <source>导入</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1828"/>
+        <location filename="mainwidget.cpp" line="1840"/>
         <source>导入完成</source>
         <translation type="unfinished"></translation>
     </message>
@@ -759,15 +751,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="msgbox.ui" line="211"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_msgbox.h" line="164"/>
-        <source>取消</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="msgbox.ui" line="204"/>
         <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_msgbox.h" line="163"/>
         <source>确定</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="msgbox.ui" line="211"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_msgbox.h" line="164"/>
+        <source>取消</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -912,21 +904,18 @@
         <location filename="triggerdlg.ui" line="101"/>
         <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_triggerdlg.h" line="224"/>
         <source>触发延迟(μs):</source>
-        <oldsource>触发延迟(us):</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="triggerdlg.ui" line="122"/>
         <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_triggerdlg.h" line="225"/>
         <source>曝光延迟(μs):</source>
-        <oldsource>曝光延迟(us):</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="triggerdlg.ui" line="143"/>
         <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_triggerdlg.h" line="226"/>
         <source>触发滤波(μs):</source>
-        <oldsource>触发滤波(us):</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -963,14 +952,12 @@
         <location filename="triggerdlg.cpp" line="52"/>
         <location filename="triggerdlg.cpp" line="212"/>
         <source>软触发</source>
-        <oldsource>软33触发</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="triggerdlg.cpp" line="53"/>
         <location filename="triggerdlg.cpp" line="213"/>
         <source>硬触发</source>
-        <oldsource>硬33触发</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>

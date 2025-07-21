@@ -18,6 +18,11 @@ ImgAttrDlg::~ImgAttrDlg()
     delete ui;
 }
 
+void ImgAttrDlg::rcvSetROI()
+{
+    emit ui->pushButtonSetRoiAndFps->clicked();
+}
+
 void ImgAttrDlg::rcvUpdateUi()
 {
     ui->retranslateUi(this);

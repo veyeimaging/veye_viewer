@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(veye_viewer VERSION 0.1.1 LANGUAGES CXX)
+project(veye_viewer VERSION 0.1.2 LANGUAGES CXX)
 
 
 # add_compile_definitions(QT_NO_INFO_OUTPUT)

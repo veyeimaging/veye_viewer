@@ -18,6 +18,7 @@ public:
 signals:
     void sndData(StImgAttrInfo &info);
 public slots:
+    void rcvSetROI();
     void rcvUpdateUi();
     void rcvCmdRet(const StCmdRet &ret);
 

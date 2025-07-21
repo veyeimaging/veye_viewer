@@ -48,6 +48,7 @@ void MainWidget::initObj()
     connect(m_optCmd, &OperateCmd::sndCmdRet, this, &MainWidget::rcvCmdRet);
 
     m_pImgAttr = new ImgAttrDlg(this);
+    connect(this, &MainWidget::sndSetROI, m_pImgAttr, &ImgAttrDlg::rcvSetROI);
     connect(this, &MainWidget::sndUpdateUI, m_pImgAttr, &ImgAttrDlg::rcvUpdateUi);
     connect(this, &MainWidget::sndImgAttrCmdRet, m_pImgAttr, &ImgAttrDlg::rcvCmdRet);
     connect(m_pImgAttr, &ImgAttrDlg::sndData, this, &MainWidget::rcvRoiAndFps);
@@ -984,7 +985,15 @@ void MainWidget::openCam()
     QString videoNode = ui->lineEditVideoNode->text();
     QString subNode = ui->lineEditSubNode->text();
 
-    if (Jetson == m_platform) {
+    switch (m_platform) {
+    case Rockchip: {
+    } break;
+    case RaspberryPi: {
+    } break;
+    case RaspberryPi5: {
+        emit sndSetROI();
+    } break;
+    case Jetson: {
         int width = m_roiW;
         if (0 != width % 256) {
             width = (width / 256 + 1) * 256;
@@ -992,6 +1001,9 @@ void MainWidget::openCam()
         QString strCmd
             = QString("v4l2-ctl -d %1 --set-ctrl preferred_stride=%2").arg(videoNode).arg(width);
         m_optCmd->runSystemCmd(strCmd);
+    } break;
+    default:
+        break;
     }
 
     StCamParam camParam;
