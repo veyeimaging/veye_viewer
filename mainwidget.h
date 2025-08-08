@@ -65,7 +65,7 @@ signals:
     void sndExpGainValue(int expValue, int gainValue);
     void sndExpGainMode(int exp, int gain);
     void setRetExpAndGain(int exp, int gain, bool needCmd);
-    void sndRetTrg(EuCMD cmd, uint32_t &data);
+    // void sndRetTrg(EuCMD cmd, uint32_t &data);
     void sndTriggerCmdRet(const StCmdRet &ret);
     void sndRet2Reg(const QString strRet);
     void sndRegisterCmdRet(const StCmdRet &ret);

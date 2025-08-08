@@ -66,7 +66,7 @@ void MainWidget::initObj()
 
     m_pTrigger = new TriggerDlg(this);
     connect(this, &MainWidget::sndUpdateUI, m_pTrigger, &TriggerDlg::rcvUpdateUi);
-    connect(this, &MainWidget::sndRetTrg, m_pTrigger, &TriggerDlg::rcvRet);
+    //connect(this, &MainWidget::sndRetTrg, m_pTrigger, &TriggerDlg::rcvRet);
     connect(this, &MainWidget::sndTriggerCmdRet, m_pTrigger, &TriggerDlg::rcvCmdRet);
     connect(m_pTrigger, &TriggerDlg::sndCmd, this, [this](EuCMD cmd, uint32_t data, bool bShow) {
         writeCmd(cmd, data, bShow);
@@ -394,7 +394,9 @@ void MainWidget::initCNT()
 
     connect(ui->pushButtonClose, &QPushButton::clicked, this, [this]() {
         if (QxHelp::showMsgBoxQuesion(tr("提示"), tr("确定退出?"))) {
+            hide();
             saveSysCfg();
+            closeCam();
             close();
         }
     });
@@ -962,7 +964,6 @@ void MainWidget::rcvRoiAndFps(const StImgAttrInfo &info)
             m_optCmd->runSystemCmd(strCmd);
             strCmd = QString("v4l2-ctl --set-ctrl frame_rate=%1").arg(strFps);
             m_optCmd->runSystemCmd(strCmd);
-
             int width = strW.toInt();
             if (0 != width % 256) {
                 width = (width / 256 + 1) * 256;
@@ -1001,6 +1002,8 @@ void MainWidget::openCam()
         QString strCmd
             = QString("v4l2-ctl -d %1 --set-ctrl preferred_stride=%2").arg(videoNode).arg(width);
         m_optCmd->runSystemCmd(strCmd);
+        strCmd = QString("v4l2-ctl --set-ctrl vi_time_out_disable=1");
+        m_optCmd->runSystemCmd(strCmd);
     } break;
     default:
         break;
@@ -1021,10 +1024,28 @@ void MainWidget::openCam()
 
 void MainWidget::closeCam()
 {
-    m_camRunning = false;
-    m_cam->CloseDevice();
-    ui->pushButtonCapture->setChecked(false);
-    closeShow();
+    switch (m_platform) {
+    case Rockchip: {
+    } break;
+    case RaspberryPi: {
+    } break;
+    case RaspberryPi5: {
+        emit sndSetROI();
+    } break;
+    case Jetson: {
+        QString strCmd = QString("v4l2-ctl --set-ctrl vi_time_out_disable=0");
+        m_optCmd->runSystemCmd(strCmd);
+    } break;
+    default:
+        break;
+    }
+
+    if (m_camRunning) {
+        m_camRunning = false;
+        m_cam->CloseDevice();
+        ui->pushButtonCapture->setChecked(false);
+        closeShow();
+    }
 }
 
 void MainWidget::openShow()
@@ -1452,6 +1473,7 @@ void MainWidget::rcvPixmap(const QPixmap &pix, QString strTS)
 
         if (0 == m_showFps) {
             timerFps.restart();
+            timestamps.clear();
             m_bFps = true;
         }
         m_showFps++;

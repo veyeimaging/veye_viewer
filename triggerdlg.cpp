@@ -82,34 +82,34 @@ void TriggerDlg::rcvCmdRet(const StCmdRet &ret)
     updateStatus();
 }
 
-void TriggerDlg::rcvRet(EuCMD cmd, uint32_t data)
-{
-    switch (cmd) {
-    case trgmode:
-        ui->comboBox_trgmode->setCurrentIndex(data);
-        break;
-    case trgsrc:
-        ui->comboBox_trgsrc->setCurrentIndex(data);
-        break;
-    case trgexp_delay:
-        ui->spinBox_trgexp_delay->setValue(data);
-        break;
-    case trgnum:
-        ui->spinBox_trgnum->setValue(data);
-        break;
-    case trginterval:
-        ui->spinBox_trginterval->setValue(data);
-        break;
-    case trgfilter_time:
-        ui->spinBox_trgfilter_time->setValue(data);
-        break;
-    case trgdelay:
-        ui->spinBox_trgdelay->setValue(data);
-        break;
-    default:
-        break;
-    }
-}
+// void TriggerDlg::rcvRet(EuCMD cmd, uint32_t data)
+// {
+//     switch (cmd) {
+//     case trgmode:
+//         ui->comboBox_trgmode->setCurrentIndex(data);
+//         break;
+//     case trgsrc:
+//         ui->comboBox_trgsrc->setCurrentIndex(data);
+//         break;
+//     case trgexp_delay:
+//         ui->spinBox_trgexp_delay->setValue(data);
+//         break;
+//     case trgnum:
+//         ui->spinBox_trgnum->setValue(data);
+//         break;
+//     case trginterval:
+//         ui->spinBox_trginterval->setValue(data);
+//         break;
+//     case trgfilter_time:
+//         ui->spinBox_trgfilter_time->setValue(data);
+//         break;
+//     case trgdelay:
+//         ui->spinBox_trgdelay->setValue(data);
+//         break;
+//     default:
+//         break;
+//     }
+// }
 
 bool TriggerDlg::eventFilter(QObject *obj, QEvent *event)
 {

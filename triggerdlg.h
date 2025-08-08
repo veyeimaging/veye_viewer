@@ -19,7 +19,7 @@ public:
 public slots:
     void rcvUpdateUi();
     void rcvCmdRet(const StCmdRet &ret);
-    void rcvRet(EuCMD cmd, uint32_t data);
+    //void rcvRet(EuCMD cmd, uint32_t data);
 signals:
     void sndCmd(EuCMD cmd, uint32_t data, bool bShow = true);
 

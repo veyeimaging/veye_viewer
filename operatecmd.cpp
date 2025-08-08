@@ -446,6 +446,9 @@ void OperateCmd::cmdThread()
                 if (cmd.cmd == def_cmd) {
                     cmdSleep(10);
                 }
+                if (cmd.cmd == trgmode) {
+                    QThread::msleep(100);
+                }
             } else {
                 readData(cmd.i2c, cmd.addr, cmd.reg, cmd.data, cmd.showlog);
                 StCmdRet ret;

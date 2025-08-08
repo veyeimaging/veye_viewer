@@ -129,11 +129,13 @@ void CaptureSPlane::run()
     timerFps.start();
     int seconds = 0;
     int nFps = 0;
-    double m_frameCounter; // 浮点型计数器，用于非整数倍丢帧
-    double m_dropInterval; // 每隔多少帧保留一帧
+
+    qint64 lastFrameTS = 0;
     while (m_bRunning) {
         FD_ZERO(&readfds);
         FD_SET(m_fd, &readfds);
+
+        double m_frameInterval = 1000.0 / m_showFPS;
 
         timeout.tv_sec = 1;
         timeout.tv_usec = 0;
@@ -171,17 +173,11 @@ void CaptureSPlane::run()
                         emit sndFrameInfo(info);
                     }
 
-                    bool shouldDisplay = true;
-
-                    m_dropInterval = m_stCamParam.fps * 1.0 / m_showFPS;
-
-                    m_frameCounter += 1.0;
-                    if (m_frameCounter >= m_dropInterval) {
-                        m_frameCounter -= m_dropInterval;
-
+                    bool shouldDisplay = false;
+                    qint64 curFrameTS = ts.tv_sec * 1000 + ts.tv_usec / 1000;
+                    if (curFrameTS - lastFrameTS > m_frameInterval) {
+                        lastFrameTS = curFrameTS;
                         shouldDisplay = true;
-                    } else {
-                        shouldDisplay = false;
                     }
 
                     if (m_bShow) {
