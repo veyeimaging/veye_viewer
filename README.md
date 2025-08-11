@@ -14,7 +14,7 @@ Supported platforms include:
 - Raspberry Pi 4 and 5 series
 
 ### Download and Run
-You can either download the executable file from the [Releases](./releases) section of this project or build it from source.
+You can either download the executable file from the [Releases](https://github.com/veyeimaging/veye_viewer/releases) section of this project or build it from source.
 
 #### Run
 
