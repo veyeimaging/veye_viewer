@@ -14,7 +14,14 @@ Supported platforms include:
 - Raspberry Pi 4 and 5 series
 
 ### Download and Run
-You can either download the executable file from the [Releases](https://github.com/veyeimaging/veye_viewer/releases) section of this project or build it from source.
+You can either download the executable file from the **Releases** section of this project or build it from source.
+
+#### Install dependencies
+
+```bash
+    sudo apt update
+    sudo apt-get install gawk
+```
 
 #### Run
 
@@ -63,4 +70,10 @@ make
 4. **Configure the Project**: Once a Kit is selected, Qt Creator will recognize the project as a CMake project.
 5. **Build**: Click the green "Run" button in the bottom left corner to build the project.
 
+#### Running After Source Code Compilation  
 
+```bash  
+	cd veye_viewer/build  
+	chmod 755 ./config/*.sh  
+	./start_veye_viewer.sh  
+```
