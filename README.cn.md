@@ -68,10 +68,10 @@ veye_viewer是一个开源的，基于QT的，为VEYE IMAGING的相机模组而�
 4. 配置项目：选择 Kit 后，Qt Creator 将尝试加载项目。如果一切设置正确，它将自动识别为 CMake 项目
 5. 构建和运行：配置完成后，你可以点击左下角的绿色播放按钮来构建并运行你的项目。
 
-#### 源码编译完成之后运行
+#### 源码编译完成之后的运行
 
 ```bash
-	cd build
+	cd veye_viewer/build
 	chmod 755 ./config/*.sh   
     ./start_veye_viewer.sh
 ```

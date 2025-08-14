@@ -51,6 +51,22 @@ fi
 if ! command -v qmake-qt5 >/dev/null 2>&1 && ! dpkg -l | grep -q "qt5"; then
     echo "Qt5 is not installed. Please install it using:"
     echo "  sudo apt install qt5-default"
+	echo "or:"
+	echo "  sudo apt install qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools"
+    exit 1
+fi
+
+# Check if v4l-utils is installed (look for v4l2-ctl)
+if ! command -v v4l2-ctl >/dev/null 2>&1 && ! dpkg -l | grep -q "v4l-utils"; then
+    echo "v4l-utils is not installed. Please install it using:"
+    echo "  sudo apt install v4l-utils"
+    exit 1
+fi
+
+# Check if gawk is installed
+if ! command -v gawk >/dev/null 2>&1 && ! dpkg -l | grep -q "gawk"; then
+    echo "gawk is not installed. Please install it using:"
+    echo "  sudo apt install gawk"
     exit 1
 fi
 
