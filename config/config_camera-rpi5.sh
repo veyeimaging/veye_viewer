@@ -33,13 +33,13 @@ print_usage() {
     echo "$0 <camera_name> -fmt <format> -x <roi_x> -y <roi_y> -w <width> -h <height> \\"
     echo "   -bus <i2c_bus> -media <media_dev> -subdev <subdev_dev> -video <video_dev>"
     echo ""
-    echo "Supported camera_name: veyecam2m | csimx307 | cssc132 | mvcam"
+    echo "Supported camera_name: veyecam2m | csimx307 | cssc132 | mvcam | gxcam"
     echo "Supported format: UYVY | RAW8 | RAW10 | RAW12"
 }
 
 check_camera_name() {
     case $1 in
-        veyecam2m|csimx307|cssc132)
+        veyecam2m|csimx307|cssc132|gxcam)
             g_camera_name=$1
             g_camera_type="YUV_type"
             ;;
@@ -94,7 +94,7 @@ parse_fmt() {
 parse_arguments() {
     while [ "$#" -gt 0 ]; do
         case "$1" in
-            veyecam2m|csimx307|cssc132|mvcam)
+            veyecam2m|csimx307|cssc132|mvcam|gxcam)
                 check_camera_name "$1"
                 ;;
             -fmt) shift; parse_fmt "$1" ;;
@@ -142,8 +142,10 @@ validate_required_parameters() {
 set_camera_entity() {
     media-ctl -d "$g_media_device" -r
     media-ctl -d "$g_media_device" -l "'csi2':4 -> 'rp1-cfe-csi2_ch0':0 [1]"
-    v4l2-ctl --set-ctrl roi_x=$g_roi_x -d "$g_video_subdevice"
-    v4l2-ctl --set-ctrl roi_y=$g_roi_y -d "$g_video_subdevice"
+    if [ "$g_camera_name" = "mvcam" ]; then
+        v4l2-ctl --set-ctrl roi_x=$g_roi_x -d $g_video_subdevice
+        v4l2-ctl --set-ctrl roi_y=$g_roi_y -d $g_video_subdevice
+    fi
     media-ctl -d "$g_media_device" --set-v4l2 "'$g_camera_name $g_i2c_bus-003b':0[fmt:${g_media_fmt}/${g_width}x${g_height} field:none]"
     media-ctl -d "$g_media_device" -V "'csi2':0 [fmt:${g_media_fmt}/${g_width}x${g_height} field:none]"
     media-ctl -d "$g_media_device" -V "'csi2':4 [fmt:${g_media_fmt}/${g_width}x${g_height} field:none]"
@@ -163,5 +165,5 @@ parse_arguments "$@"
 validate_required_parameters
 set_camera_entity
 
-echo "Camera setup complete. Get frame from $g_video_device and use $g_video_subdevice for settings."
+#echo "Camera setup complete. Get frame from $g_video_device and use $g_video_subdevice for settings."
 exit 0

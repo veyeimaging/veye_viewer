@@ -49,6 +49,7 @@ sudo apt-get install gawk
 sudo apt-get install qtcreator
 sudo apt-get install qtbase5-dev
 sudo apt-get install qttools5-dev 
+sudo apt-get install libqt5opengl5-dev
 sudo apt-get install cmake
 sudo apt-get install g++
 sudo apt-get install gdb

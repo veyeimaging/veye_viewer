@@ -46,6 +46,7 @@ veye_viewer是一个开源的，基于QT的，为VEYE IMAGING的相机模组而�
     sudo apt-get install qtcreator
     sudo apt-get install qtbase5-dev
     sudo apt-get install qttools5-dev 
+    sudo apt-get install libqt5opengl5-dev
     sudo apt-get install cmake
     sudo apt-get install g++
     sudo apt-get install gdb

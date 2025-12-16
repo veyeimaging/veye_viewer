@@ -1,8 +1,7 @@
 {
-   "cache_frame_size" : 5,
-   "cur_dev" : "/dev/video22",
-   "img_path" : "/home/orangepi/bin/image",
+   "cache_frame_size" : 3,
+   "img_path" : "",
    "language" : 1,
-   "platform" : 0
+   "show_fps" : 0
 }
 

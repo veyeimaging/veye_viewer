@@ -1,6 +1,7 @@
 #!/bin/bash
 
-OUTPUT_JSON="./config/auto_camera_index.json"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+OUTPUT_JSON="$SCRIPT_DIR/auto_camera_index.json"
 > "$OUTPUT_JSON"
 
 if ! command -v gawk >/dev/null 2>&1; then

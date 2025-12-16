@@ -1,7 +1,7 @@
 #!/bin/bash
 
-OUTPUT_JSON="./config/auto_camera_index.json"
-> "$OUTPUT_JSON"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+OUTPUT_JSON="$SCRIPT_DIR/auto_camera_index.json"
 
 camera_infos=()
 

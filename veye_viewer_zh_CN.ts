@@ -4,204 +4,291 @@
 <context>
     <name>AboutDialog</name>
     <message>
-        <location filename="aboutdialog.ui" line="14"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_aboutdialog.h" line="159"/>
+        <location filename="AboutDialog.ui" line="14"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_aboutdialog.h" line="159"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_AboutDialog.h" line="159"/>
         <source>QWidget</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="91"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_aboutdialog.h" line="161"/>
+        <location filename="AboutDialog.ui" line="91"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_aboutdialog.h" line="161"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_AboutDialog.h" line="161"/>
         <source>关于</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="168"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_aboutdialog.h" line="164"/>
+        <location filename="AboutDialog.ui" line="168"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_aboutdialog.h" line="164"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_AboutDialog.h" line="164"/>
         <source>veye_viewer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="178"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_aboutdialog.h" line="165"/>
+        <location filename="AboutDialog.ui" line="178"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_aboutdialog.h" line="165"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_AboutDialog.h" line="165"/>
         <source>基于 Qt 5.15 构建</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="204"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_aboutdialog.h" line="166"/>
+        <location filename="AboutDialog.ui" line="204"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_aboutdialog.h" line="166"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_AboutDialog.h" line="166"/>
         <source>版权所有 © 2024–2025 天津市中安亿嘉科技有限公司</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="214"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_aboutdialog.h" line="167"/>
+        <location filename="AboutDialog.ui" line="214"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_aboutdialog.h" line="167"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_AboutDialog.h" line="167"/>
         <source>根据 MIT 许可证授权发布</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="224"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_aboutdialog.h" line="168"/>
+        <location filename="AboutDialog.ui" line="224"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_aboutdialog.h" line="168"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_AboutDialog.h" line="168"/>
         <source>官方网站：www.veye.cc</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CodeMap</name>
+    <message>
+        <location filename="CodeMap.cpp" line="71"/>
+        <source>流模式</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="CodeMap.cpp" line="72"/>
+        <source>普通触发</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="CodeMap.cpp" line="73"/>
+        <source>滚动快门多帧触发</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="CodeMap.cpp" line="74"/>
+        <source>电平触发</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="CodeMap.cpp" line="80"/>
+        <source>软触发</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="CodeMap.cpp" line="80"/>
+        <source>硬触发</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>CurAttrDlg</name>
     <message>
-        <location filename="curattrdlg.ui" line="14"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_curattrdlg.h" line="139"/>
+        <location filename="CurAttrDlg.ui" line="14"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_curattrdlg.h" line="139"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_CurAttrDlg.h" line="175"/>
         <source>Dialog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="curattrdlg.ui" line="31"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_curattrdlg.h" line="140"/>
+        <location filename="CurAttrDlg.ui" line="31"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_curattrdlg.h" line="140"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_CurAttrDlg.h" line="176"/>
         <source>分辨率:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="curattrdlg.ui" line="45"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_curattrdlg.h" line="141"/>
-        <source>帧率:</source>
+        <location filename="CurAttrDlg.ui" line="45"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_CurAttrDlg.h" line="177"/>
+        <source>当前帧率:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="curattrdlg.ui" line="59"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_curattrdlg.h" line="142"/>
+        <location filename="CurAttrDlg.ui" line="59"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_CurAttrDlg.h" line="178"/>
+        <source>最大帧率:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="CurAttrDlg.ui" line="73"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_curattrdlg.h" line="142"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_CurAttrDlg.h" line="179"/>
         <source>数据格式:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="curattrdlg.ui" line="73"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_curattrdlg.h" line="143"/>
+        <location filename="CurAttrDlg.ui" line="87"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_curattrdlg.h" line="143"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_CurAttrDlg.h" line="180"/>
         <source>工作模式:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="curattrdlg.ui" line="87"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_curattrdlg.h" line="144"/>
+        <location filename="CurAttrDlg.ui" line="101"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_curattrdlg.h" line="144"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_CurAttrDlg.h" line="181"/>
         <source>触发源:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="curattrdlg.cpp" line="47"/>
+        <location filename="CurAttrDlg.ui" line="115"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_CurAttrDlg.h" line="182"/>
+        <source>读取方式:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_curattrdlg.h" line="141"/>
+        <source>帧率:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="CurAttrDlg.cpp" line="54"/>
         <source>流模式</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="curattrdlg.cpp" line="50"/>
+        <location filename="CurAttrDlg.cpp" line="57"/>
         <source>普通触发</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="curattrdlg.cpp" line="53"/>
+        <location filename="CurAttrDlg.cpp" line="60"/>
         <source>滚动快门多帧触发</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="curattrdlg.cpp" line="56"/>
+        <location filename="CurAttrDlg.cpp" line="63"/>
         <source>电平触发</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="curattrdlg.cpp" line="66"/>
+        <location filename="CurAttrDlg.cpp" line="66"/>
+        <source>多相机同步模式</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="CurAttrDlg.cpp" line="76"/>
         <source>软触发</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="curattrdlg.cpp" line="68"/>
+        <location filename="CurAttrDlg.cpp" line="78"/>
         <source>硬触发</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="CurAttrDlg.cpp" line="87"/>
+        <source>普通</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>ExpGainDlg</name>
     <message>
-        <location filename="expgaindlg.ui" line="17"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_expgaindlg.h" line="280"/>
+        <location filename="ExpGainDlg.ui" line="17"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_expgaindlg.h" line="280"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ExpGainDlg.h" line="290"/>
         <source>Dialog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="expgaindlg.ui" line="37"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_expgaindlg.h" line="281"/>
+        <location filename="ExpGainDlg.ui" line="37"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_expgaindlg.h" line="281"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ExpGainDlg.h" line="291"/>
         <source>曝光模式:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="expgaindlg.ui" line="51"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_expgaindlg.h" line="282"/>
+        <location filename="ExpGainDlg.ui" line="51"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_expgaindlg.h" line="282"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ExpGainDlg.h" line="292"/>
         <source>增益模式:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="expgaindlg.ui" line="68"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_expgaindlg.h" line="283"/>
+        <location filename="ExpGainDlg.ui" line="68"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_expgaindlg.h" line="283"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ExpGainDlg.h" line="293"/>
         <source>当前曝光时间(μs):</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="expgaindlg.ui" line="75"/>
-        <location filename="expgaindlg.ui" line="106"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_expgaindlg.h" line="284"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_expgaindlg.h" line="286"/>
+        <location filename="ExpGainDlg.ui" line="75"/>
+        <location filename="ExpGainDlg.ui" line="106"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_expgaindlg.h" line="284"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_expgaindlg.h" line="286"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ExpGainDlg.h" line="294"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ExpGainDlg.h" line="296"/>
         <source>0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="expgaindlg.ui" line="99"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_expgaindlg.h" line="285"/>
+        <location filename="ExpGainDlg.ui" line="99"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_expgaindlg.h" line="285"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ExpGainDlg.h" line="295"/>
         <source>当前增益(dB):</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="expgaindlg.ui" line="145"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_expgaindlg.h" line="287"/>
+        <location filename="ExpGainDlg.ui" line="145"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_expgaindlg.h" line="287"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ExpGainDlg.h" line="297"/>
         <source>目标亮度:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="expgaindlg.ui" line="166"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_expgaindlg.h" line="288"/>
+        <location filename="ExpGainDlg.ui" line="166"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_expgaindlg.h" line="288"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ExpGainDlg.h" line="298"/>
         <source>最大曝光时间(μs):</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="expgaindlg.ui" line="187"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_expgaindlg.h" line="289"/>
+        <location filename="ExpGainDlg.ui" line="187"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_expgaindlg.h" line="289"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ExpGainDlg.h" line="299"/>
         <source>最大增益(dB):</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="expgaindlg.ui" line="211"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_expgaindlg.h" line="290"/>
+        <location filename="ExpGainDlg.ui" line="226"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_expgaindlg.h" line="290"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ExpGainDlg.h" line="300"/>
         <source>手动曝光时间(μs):</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="expgaindlg.ui" line="232"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_expgaindlg.h" line="291"/>
+        <location filename="ExpGainDlg.ui" line="247"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_expgaindlg.h" line="291"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ExpGainDlg.h" line="301"/>
         <source>手动增益(dB):</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="expgaindlg.ui" line="251"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_expgaindlg.h" line="292"/>
+        <location filename="ExpGainDlg.ui" line="269"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_expgaindlg.h" line="292"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ExpGainDlg.h" line="302"/>
         <source>单次自动</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="expgaindlg.cpp" line="37"/>
-        <location filename="expgaindlg.cpp" line="38"/>
+        <location filename="ExpGainDlg.cpp" line="39"/>
+        <location filename="ExpGainDlg.cpp" line="40"/>
         <source>手动</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="expgaindlg.cpp" line="42"/>
-        <location filename="expgaindlg.cpp" line="43"/>
-        <location filename="expgaindlg.cpp" line="51"/>
-        <location filename="expgaindlg.cpp" line="52"/>
+        <location filename="ExpGainDlg.cpp" line="45"/>
+        <location filename="ExpGainDlg.cpp" line="46"/>
+        <location filename="ExpGainDlg.cpp" line="54"/>
+        <location filename="ExpGainDlg.cpp" line="55"/>
+        <location filename="ExpGainDlg.cpp" line="59"/>
+        <location filename="ExpGainDlg.cpp" line="60"/>
         <source>自动</source>
         <translation type="unfinished"></translation>
     </message>
@@ -209,523 +296,634 @@
 <context>
     <name>ImgAttrDlg</name>
     <message>
-        <location filename="imgattrdlg.ui" line="14"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_imgattrdlg.h" line="147"/>
+        <location filename="ImgAttrDlg.ui" line="14"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_imgattrdlg.h" line="211"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ImgAttrDlg.h" line="275"/>
         <source>Dialog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="imgattrdlg.ui" line="31"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_imgattrdlg.h" line="148"/>
+        <location filename="ImgAttrDlg.ui" line="49"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_imgattrdlg.h" line="212"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ImgAttrDlg.h" line="276"/>
         <source>水平起始坐标:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="imgattrdlg.ui" line="48"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_imgattrdlg.h" line="149"/>
+        <location filename="ImgAttrDlg.ui" line="66"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_imgattrdlg.h" line="213"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ImgAttrDlg.h" line="277"/>
         <source>垂直起始坐标:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="imgattrdlg.ui" line="62"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_imgattrdlg.h" line="150"/>
+        <location filename="ImgAttrDlg.ui" line="80"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_imgattrdlg.h" line="214"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ImgAttrDlg.h" line="278"/>
         <source>ROI宽度:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="imgattrdlg.ui" line="80"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_imgattrdlg.h" line="152"/>
+        <location filename="ImgAttrDlg.ui" line="98"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_imgattrdlg.h" line="216"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ImgAttrDlg.h" line="280"/>
         <source>ROI高度:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="imgattrdlg.ui" line="98"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_imgattrdlg.h" line="154"/>
+        <location filename="ImgAttrDlg.ui" line="116"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_imgattrdlg.h" line="218"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_imgattrdlg.h" line="221"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ImgAttrDlg.h" line="282"/>
         <source>帧率:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="imgattrdlg.ui" line="110"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_imgattrdlg.h" line="155"/>
+        <location filename="ImgAttrDlg.ui" line="148"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ImgAttrDlg.h" line="283"/>
+        <source>序号:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ImgAttrDlg.ui" line="162"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ImgAttrDlg.h" line="284"/>
+        <source>当前帧率:</source>
+        <oldsource>设置帧率:</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ImgAttrDlg.ui" line="176"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ImgAttrDlg.h" line="285"/>
+        <source>宽 ∗ 高:</source>
+        <oldsource>宽 X 高:</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ImgAttrDlg.ui" line="183"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ImgAttrDlg.h" line="286"/>
+        <source>0 ∗ 0</source>
+        <oldsource>0 X 0</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ImgAttrDlg.ui" line="207"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ImgAttrDlg.h" line="287"/>
+        <source>最大帧率:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ImgAttrDlg.ui" line="214"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_imgattrdlg.h" line="222"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ImgAttrDlg.h" line="288"/>
+        <source>0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ImgAttrDlg.ui" line="238"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ImgAttrDlg.h" line="289"/>
+        <source>读取方式:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ImgAttrDlg.ui" line="245"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ImgAttrDlg.h" line="290"/>
+        <location filename="ImgAttrDlg.cpp" line="108"/>
+        <source>普通</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ImgAttrDlg.ui" line="270"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_imgattrdlg.h" line="219"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ImgAttrDlg.h" line="291"/>
         <source>设置ROI和帧率</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="imgattrdlg.cpp" line="79"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_imgattrdlg.h" line="220"/>
+        <source>相机分辨率:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ImgAttrDlg.cpp" line="62"/>
+        <source>模式 </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ImgAttrDlg.cpp" line="148"/>
+        <source>设置分辨率和帧率</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ImgAttrDlg.cpp" line="168"/>
         <source>请设置合理的ROI和PFS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ImgAttrDlg.cpp" line="186"/>
+        <source>请设置合理的ROI和FFS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ImgAttrDlg.cpp" line="199"/>
+        <source>.............</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ImgProcDlg</name>
+    <message>
+        <location filename="ImgProcDlg.ui" line="14"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ImgProcDlg.h" line="125"/>
+        <source>Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ImgProcDlg.ui" line="31"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ImgProcDlg.h" line="126"/>
+        <source>饱和度:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ImgProcDlg.ui" line="52"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ImgProcDlg.h" line="127"/>
+        <source>对比度:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ImgProcDlg.ui" line="73"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_ImgProcDlg.h" line="128"/>
+        <source>色度:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>MainWidget</name>
     <message>
-        <location filename="mainwidget.ui" line="14"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="829"/>
+        <location filename="MainWidget.ui" line="14"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="760"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="762"/>
         <source>Widget</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="203"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="836"/>
+        <location filename="MainWidget.ui" line="211"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="767"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="770"/>
         <source>选择平台:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="217"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="837"/>
+        <location filename="MainWidget.ui" line="218"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="768"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="771"/>
         <source>设备列表:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="233"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="838"/>
+        <location filename="MainWidget.ui" line="225"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="769"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="772"/>
         <source>图像节点:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="243"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="839"/>
+        <location filename="MainWidget.ui" line="238"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="770"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="773"/>
         <source>i2c序号:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="253"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="840"/>
+        <location filename="MainWidget.ui" line="251"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="771"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="774"/>
         <source>media节点:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="263"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="841"/>
-        <source>参数节点:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwidget.ui" line="273"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="842"/>
+        <location filename="MainWidget.ui" line="267"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="773"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="775"/>
         <source>entity名称:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="308"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="843"/>
+        <location filename="MainWidget.ui" line="286"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="772"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="776"/>
+        <source>参数节点:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="MainWidget.ui" line="301"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="774"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="777"/>
         <source>检索相机</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="315"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="844"/>
-        <source>手动填写</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwidget.ui" line="326"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="845"/>
-        <source>手动添加</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwidget.ui" line="333"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="846"/>
-        <source>手动删除</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwidget.ui" line="357"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="847"/>
-        <source>i2c授权</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwidget.ui" line="371"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="848"/>
-        <source>测试节点</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwidget.ui" line="393"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="849"/>
+        <location filename="MainWidget.ui" line="310"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="775"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="778"/>
         <source>获取相机参数</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="402"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="850"/>
+        <location filename="MainWidget.ui" line="319"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="776"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="779"/>
         <source>相机型号:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="420"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="852"/>
+        <location filename="MainWidget.ui" line="337"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="778"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="781"/>
         <source>Ctrl Ver:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="441"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="854"/>
+        <location filename="MainWidget.ui" line="358"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="780"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="783"/>
         <source>Logic Ver:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="462"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="856"/>
+        <location filename="MainWidget.ui" line="379"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="782"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="785"/>
         <source>序列号:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="496"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="858"/>
+        <location filename="MainWidget.ui" line="413"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="784"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="787"/>
         <source>导出记录</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="503"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="859"/>
+        <location filename="MainWidget.ui" line="420"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="785"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="788"/>
         <source>清空记录</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="548"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="860"/>
-        <location filename="mainwidget.cpp" line="1509"/>
+        <location filename="MainWidget.ui" line="465"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="786"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="789"/>
+        <location filename="MainWidget.cpp" line="1608"/>
         <source>开始采集</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="555"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="861"/>
-        <location filename="mainwidget.cpp" line="1066"/>
-        <location filename="mainwidget.cpp" line="1510"/>
+        <location filename="MainWidget.ui" line="472"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="787"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="790"/>
+        <location filename="MainWidget.cpp" line="999"/>
+        <location filename="MainWidget.cpp" line="1609"/>
         <source>开始显示</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="562"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="862"/>
+        <location filename="MainWidget.ui" line="479"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="788"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="791"/>
         <source>自适应</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="569"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="863"/>
+        <location filename="MainWidget.ui" line="486"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="789"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="792"/>
         <source>1:1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="596"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="864"/>
+        <location filename="MainWidget.ui" line="500"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="790"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="793"/>
         <source>保存图像</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="603"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="865"/>
+        <location filename="MainWidget.ui" line="507"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="791"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="794"/>
         <source>张数</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="613"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="866"/>
+        <location filename="MainWidget.ui" line="517"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="792"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="795"/>
         <source>设置路径</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="718"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="867"/>
+        <location filename="MainWidget.ui" line="643"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="793"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="796"/>
         <source>显示方式:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="728"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="868"/>
-        <source>一次软触发显示帧数:</source>
+        <location filename="MainWidget.ui" line="667"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="797"/>
+        <source>宽∗高:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="735"/>
-        <location filename="mainwidget.ui" line="791"/>
-        <location filename="mainwidget.ui" line="826"/>
-        <location filename="mainwidget.ui" line="861"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="869"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="873"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="876"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="879"/>
-        <source>0</source>
+        <location filename="MainWidget.ui" line="674"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="798"/>
+        <source>0∗0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="756"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="870"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="794"/>
         <source>宽*高:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="763"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="871"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="795"/>
         <source>0*0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="784"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="872"/>
+        <location filename="MainWidget.ui" line="695"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="796"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="799"/>
         <source>采集帧率:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="798"/>
-        <location filename="mainwidget.ui" line="833"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="874"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="877"/>
+        <location filename="MainWidget.ui" line="702"/>
+        <location filename="MainWidget.ui" line="737"/>
+        <location filename="MainWidget.ui" line="772"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="797"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="800"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="803"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="800"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="803"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="806"/>
+        <source>0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="MainWidget.ui" line="709"/>
+        <location filename="MainWidget.ui" line="744"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="798"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="801"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="801"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="804"/>
         <source> fps</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="819"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="875"/>
+        <location filename="MainWidget.ui" line="730"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="799"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="802"/>
         <source>播放帧率:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="854"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="878"/>
+        <location filename="MainWidget.ui" line="765"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="802"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="805"/>
         <source>时间戳:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="921"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="880"/>
-        <source>图像属性</source>
+        <location filename="MainWidget.ui" line="852"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="807"/>
+        <source>工作模式</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="926"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="881"/>
+        <location filename="MainWidget.ui" line="859"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="807"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="808"/>
         <source>曝光增益</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="931"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="882"/>
-        <source>触发模式</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwidget.ui" line="936"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="883"/>
+        <location filename="MainWidget.ui" line="866"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="806"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="809"/>
         <source>寄存器</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.ui" line="941"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_mainwidget.h" line="884"/>
+        <location filename="MainWidget.ui" line="873"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="809"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="810"/>
+        <source>白平衡</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="MainWidget.ui" line="880"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="811"/>
+        <source>分辨率</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="MainWidget.ui" line="887"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="808"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="812"/>
         <source>当前属性</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="189"/>
+        <location filename="MainWidget.ui" line="894"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="813"/>
+        <source>图像处理</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="804"/>
+        <source>图像属性</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_mainwidget.h" line="805"/>
+        <source>触发模式</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="MainWidget.cpp" line="258"/>
         <source>帮助</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="212"/>
-        <location filename="mainwidget.cpp" line="346"/>
+        <location filename="MainWidget.cpp" line="273"/>
+        <location filename="MainWidget.cpp" line="705"/>
         <source>30帧/秒</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="213"/>
-        <location filename="mainwidget.cpp" line="347"/>
+        <location filename="MainWidget.cpp" line="274"/>
+        <location filename="MainWidget.cpp" line="706"/>
         <source>60帧/秒</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="246"/>
-        <location filename="mainwidget.cpp" line="334"/>
+        <location filename="MainWidget.cpp" line="307"/>
+        <location filename="MainWidget.cpp" line="694"/>
         <source>序号</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="246"/>
-        <location filename="mainwidget.cpp" line="334"/>
+        <location filename="MainWidget.cpp" line="307"/>
+        <location filename="MainWidget.cpp" line="694"/>
         <source>结果</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="246"/>
-        <location filename="mainwidget.cpp" line="334"/>
+        <location filename="MainWidget.cpp" line="307"/>
+        <location filename="MainWidget.cpp" line="694"/>
         <source>操作记录</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="257"/>
-        <location filename="mainwidget.cpp" line="330"/>
-        <source>请输入主板密码</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwidget.cpp" line="317"/>
-        <source>简体中文</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwidget.cpp" line="319"/>
-        <location filename="mainwidget.cpp" line="337"/>
-        <source>关于</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwidget.cpp" line="358"/>
-        <source>Enter motherboard pwd</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwidget.cpp" line="362"/>
-        <source>Num</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwidget.cpp" line="362"/>
-        <source>Result</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwidget.cpp" line="362"/>
-        <source>Operation Log</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwidget.cpp" line="365"/>
-        <source>About</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwidget.cpp" line="374"/>
-        <source>30 fps</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwidget.cpp" line="375"/>
-        <source>60 fps</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwidget.cpp" line="396"/>
-        <location filename="mainwidget.cpp" line="1772"/>
+        <location filename="MainWidget.cpp" line="385"/>
+        <location filename="MainWidget.cpp" line="1881"/>
         <source>提示</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="396"/>
+        <location filename="MainWidget.cpp" line="385"/>
         <source>确定退出?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="473"/>
-        <source>密码错误</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwidget.cpp" line="589"/>
+        <location filename="MainWidget.cpp" line="520"/>
         <source>路径</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="595"/>
-        <location filename="mainwidget.cpp" line="1761"/>
+        <location filename="MainWidget.cpp" line="526"/>
+        <location filename="MainWidget.cpp" line="1870"/>
         <source>当前路径无写权限</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="632"/>
-        <location filename="mainwidget.cpp" line="1729"/>
+        <location filename="MainWidget.cpp" line="554"/>
+        <location filename="MainWidget.cpp" line="1839"/>
         <source>导出</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="661"/>
-        <location filename="mainwidget.cpp" line="1758"/>
+        <location filename="MainWidget.cpp" line="582"/>
+        <location filename="MainWidget.cpp" line="1867"/>
         <source>导出完成</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="665"/>
+        <location filename="MainWidget.cpp" line="586"/>
         <source>操作记录为空</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="899"/>
-        <location filename="mainwidget.cpp" line="1217"/>
+        <location filename="MainWidget.cpp" line="678"/>
+        <source>Num</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="MainWidget.cpp" line="678"/>
+        <source>Result</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="MainWidget.cpp" line="678"/>
+        <source>Operation Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="MainWidget.cpp" line="689"/>
+        <source>30 fps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="MainWidget.cpp" line="690"/>
+        <source>60 fps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="MainWidget.cpp" line="826"/>
+        <location filename="MainWidget.cpp" line="1258"/>
         <source>状态为采集中，不支持该操作</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1058"/>
+        <location filename="MainWidget.cpp" line="991"/>
         <source>停止显示</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1204"/>
-        <location filename="mainwidget.cpp" line="1239"/>
+        <location filename="MainWidget.cpp" line="1245"/>
+        <location filename="MainWidget.cpp" line="1281"/>
         <source>i2c序号不能为空</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1220"/>
+        <location filename="MainWidget.cpp" line="1261"/>
         <source>只读寄存器,不支持该操作</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1287"/>
+        <location filename="MainWidget.cpp" line="1311"/>
         <source>i2cbus 不能为空</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1294"/>
+        <location filename="MainWidget.cpp" line="1318"/>
         <source>media node 不能为空</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1301"/>
+        <location filename="MainWidget.cpp" line="1325"/>
         <source>video node 不能为空</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1308"/>
+        <location filename="MainWidget.cpp" line="1332"/>
         <source>subNode 不能为空</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1494"/>
+        <location filename="MainWidget.cpp" line="1593"/>
         <source>保存图像完成</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1502"/>
+        <location filename="MainWidget.cpp" line="1601"/>
         <source>停止采集</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1703"/>
+        <location filename="MainWidget.cpp" line="1813"/>
         <source>请输入正确的寄存器地址</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1731"/>
+        <location filename="MainWidget.cpp" line="1841"/>
         <source>文本文件 (*.json);;所有文件 (*)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1773"/>
+        <location filename="MainWidget.cpp" line="1882"/>
         <source>状态为采集中，是否停止采集，继续导入数据？</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1779"/>
+        <location filename="MainWidget.cpp" line="1888"/>
         <source>导入</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwidget.cpp" line="1862"/>
+        <location filename="MainWidget.cpp" line="1971"/>
         <source>导入完成</source>
         <translation type="unfinished"></translation>
     </message>
@@ -733,32 +931,37 @@
 <context>
     <name>MsgBox</name>
     <message>
-        <location filename="msgbox.ui" line="14"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_msgbox.h" line="158"/>
+        <location filename="MsgBox.ui" line="14"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_msgbox.h" line="158"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MsgBox.h" line="158"/>
         <source>Dialog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="msgbox.ui" line="91"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_msgbox.h" line="160"/>
+        <location filename="MsgBox.ui" line="91"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_msgbox.h" line="160"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MsgBox.h" line="160"/>
         <source>标题</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="msgbox.ui" line="157"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_msgbox.h" line="162"/>
+        <location filename="MsgBox.ui" line="157"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_msgbox.h" line="162"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MsgBox.h" line="162"/>
         <source>内容</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="msgbox.ui" line="204"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_msgbox.h" line="163"/>
+        <location filename="MsgBox.ui" line="204"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_msgbox.h" line="163"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MsgBox.h" line="163"/>
         <source>确定</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="msgbox.ui" line="211"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_msgbox.h" line="164"/>
+        <location filename="MsgBox.ui" line="211"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_msgbox.h" line="164"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MsgBox.h" line="164"/>
         <source>取消</source>
         <translation type="unfinished"></translation>
     </message>
@@ -766,14 +969,16 @@
 <context>
     <name>QxToast</name>
     <message>
-        <location filename="qxtoast.ui" line="14"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_qxtoast.h" line="49"/>
+        <location filename="QxToast.ui" line="14"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_qxtoast.h" line="49"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_QxToast.h" line="49"/>
         <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="qxtoast.ui" line="35"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_qxtoast.h" line="50"/>
+        <location filename="QxToast.ui" line="35"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_qxtoast.h" line="50"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_QxToast.h" line="50"/>
         <source>TextLabel</source>
         <translation type="unfinished"></translation>
     </message>
@@ -781,89 +986,101 @@
 <context>
     <name>RegisterDlg</name>
     <message>
-        <location filename="registerdlg.ui" line="14"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_registerdlg.h" line="225"/>
+        <location filename="RegisterDlg.ui" line="14"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_registerdlg.h" line="225"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_RegisterDlg.h" line="225"/>
         <source>Dialog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="registerdlg.ui" line="31"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_registerdlg.h" line="226"/>
+        <location filename="RegisterDlg.ui" line="31"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_registerdlg.h" line="226"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_RegisterDlg.h" line="226"/>
         <source>寄存器:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="registerdlg.ui" line="45"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_registerdlg.h" line="227"/>
+        <location filename="RegisterDlg.ui" line="45"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_registerdlg.h" line="227"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_RegisterDlg.h" line="227"/>
         <source>寄存器地址(HEX):</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="registerdlg.ui" line="59"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_registerdlg.h" line="228"/>
+        <location filename="RegisterDlg.ui" line="59"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_registerdlg.h" line="228"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_RegisterDlg.h" line="228"/>
         <source>寄存器值(HEX):</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="registerdlg.ui" line="73"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_registerdlg.h" line="229"/>
+        <location filename="RegisterDlg.ui" line="73"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_registerdlg.h" line="229"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_RegisterDlg.h" line="229"/>
         <source>读</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="registerdlg.ui" line="80"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_registerdlg.h" line="230"/>
+        <location filename="RegisterDlg.ui" line="80"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_registerdlg.h" line="230"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_RegisterDlg.h" line="230"/>
         <source>写</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="registerdlg.ui" line="91"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_registerdlg.h" line="231"/>
+        <location filename="RegisterDlg.ui" line="91"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_registerdlg.h" line="231"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_RegisterDlg.h" line="231"/>
         <source>寄存器解释:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="registerdlg.ui" line="121"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_registerdlg.h" line="232"/>
+        <location filename="RegisterDlg.ui" line="121"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_registerdlg.h" line="232"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_RegisterDlg.h" line="232"/>
         <source>恢复默认值</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="registerdlg.ui" line="128"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_registerdlg.h" line="233"/>
+        <location filename="RegisterDlg.ui" line="128"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_registerdlg.h" line="233"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_RegisterDlg.h" line="233"/>
         <source>保存参数</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="registerdlg.ui" line="173"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_registerdlg.h" line="234"/>
+        <location filename="RegisterDlg.ui" line="173"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_registerdlg.h" line="234"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_RegisterDlg.h" line="234"/>
         <source>设备当前寄存器值的导入和导出:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="registerdlg.ui" line="197"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_registerdlg.h" line="235"/>
+        <location filename="RegisterDlg.ui" line="197"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_registerdlg.h" line="235"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_RegisterDlg.h" line="235"/>
         <source>全部导入</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="registerdlg.ui" line="204"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_registerdlg.h" line="236"/>
+        <location filename="RegisterDlg.ui" line="204"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_registerdlg.h" line="236"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_RegisterDlg.h" line="236"/>
         <source>全部导出</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="registerdlg.cpp" line="111"/>
+        <location filename="RegisterDlg.cpp" line="116"/>
         <source>提示</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="registerdlg.cpp" line="112"/>
+        <location filename="RegisterDlg.cpp" line="117"/>
         <source>恢复默认值将停止预览并重启相机，是否继续？</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="registerdlg.cpp" line="181"/>
+        <location filename="RegisterDlg.cpp" line="186"/>
         <source>自定义</source>
         <translation type="unfinished"></translation>
     </message>
@@ -871,131 +1088,233 @@
 <context>
     <name>TriggerDlg</name>
     <message>
-        <location filename="triggerdlg.ui" line="14"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_triggerdlg.h" line="219"/>
+        <location filename="TriggerDlg.ui" line="14"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_triggerdlg.h" line="244"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_TriggerDlg.h" line="248"/>
         <source>Dialog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="triggerdlg.ui" line="31"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_triggerdlg.h" line="220"/>
+        <location filename="TriggerDlg.ui" line="31"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_triggerdlg.h" line="245"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_TriggerDlg.h" line="249"/>
         <source>工作模式:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="triggerdlg.ui" line="45"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_triggerdlg.h" line="221"/>
+        <location filename="TriggerDlg.ui" line="45"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_triggerdlg.h" line="246"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_TriggerDlg.h" line="250"/>
         <source>触发源:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="triggerdlg.ui" line="59"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_triggerdlg.h" line="222"/>
+        <location filename="TriggerDlg.ui" line="59"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_triggerdlg.h" line="247"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_TriggerDlg.h" line="251"/>
+        <source>主从模式:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="TriggerDlg.ui" line="88"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_triggerdlg.h" line="248"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_TriggerDlg.h" line="252"/>
         <source>触发帧数:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="triggerdlg.ui" line="80"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_triggerdlg.h" line="223"/>
-        <source>触发间隔:</source>
+        <location filename="TriggerDlg.ui" line="109"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_TriggerDlg.h" line="253"/>
+        <source>触发间隔(μs):</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="triggerdlg.ui" line="101"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_triggerdlg.h" line="224"/>
+        <location filename="TriggerDlg.ui" line="130"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_triggerdlg.h" line="250"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_TriggerDlg.h" line="254"/>
         <source>触发延迟(μs):</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="triggerdlg.ui" line="122"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_triggerdlg.h" line="225"/>
+        <location filename="TriggerDlg.ui" line="151"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_triggerdlg.h" line="251"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_TriggerDlg.h" line="255"/>
         <source>曝光延迟(μs):</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="triggerdlg.ui" line="143"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_triggerdlg.h" line="226"/>
+        <location filename="TriggerDlg.ui" line="172"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_triggerdlg.h" line="252"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_TriggerDlg.h" line="256"/>
         <source>触发滤波(μs):</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="triggerdlg.ui" line="175"/>
-        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_triggerdlg.h" line="227"/>
+        <location filename="TriggerDlg.ui" line="207"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_triggerdlg.h" line="253"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_TriggerDlg.h" line="257"/>
         <source>软件触发</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="triggerdlg.cpp" line="36"/>
-        <location filename="triggerdlg.cpp" line="203"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_triggerdlg.h" line="249"/>
+        <source>触发间隔:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="TriggerDlg.cpp" line="43"/>
+        <location filename="TriggerDlg.cpp" line="71"/>
+        <location filename="TriggerDlg.cpp" line="190"/>
         <source>流模式</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="triggerdlg.cpp" line="40"/>
-        <location filename="triggerdlg.cpp" line="205"/>
+        <location filename="TriggerDlg.cpp" line="47"/>
+        <location filename="TriggerDlg.cpp" line="75"/>
+        <location filename="TriggerDlg.cpp" line="192"/>
         <source>普通触发</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="triggerdlg.cpp" line="44"/>
-        <location filename="triggerdlg.cpp" line="207"/>
+        <location filename="TriggerDlg.cpp" line="51"/>
+        <location filename="TriggerDlg.cpp" line="196"/>
+        <source>多相机同步模式</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="TriggerDlg.cpp" line="79"/>
+        <location filename="TriggerDlg.cpp" line="200"/>
         <source>电平触发</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="triggerdlg.cpp" line="48"/>
-        <location filename="triggerdlg.cpp" line="209"/>
+        <location filename="TriggerDlg.cpp" line="83"/>
+        <location filename="TriggerDlg.cpp" line="202"/>
         <source>滚动快门多帧触发</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="triggerdlg.cpp" line="52"/>
-        <location filename="triggerdlg.cpp" line="212"/>
+        <location filename="TriggerDlg.cpp" line="26"/>
+        <location filename="TriggerDlg.cpp" line="206"/>
         <source>软触发</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="triggerdlg.cpp" line="53"/>
-        <location filename="triggerdlg.cpp" line="213"/>
+        <location filename="TriggerDlg.cpp" line="27"/>
+        <location filename="TriggerDlg.cpp" line="207"/>
         <source>硬触发</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="triggerdlg.cpp" line="243"/>
+        <location filename="TriggerDlg.cpp" line="29"/>
+        <location filename="TriggerDlg.cpp" line="209"/>
+        <source>主模式</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="TriggerDlg.cpp" line="30"/>
+        <location filename="TriggerDlg.cpp" line="210"/>
+        <source>从模式</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="TriggerDlg.cpp" line="247"/>
         <source>不支持该模式</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>codemap</name>
+    <name>WhiteBlanceDlg</name>
     <message>
-        <location filename="codemap.cpp" line="71"/>
-        <source>流模式</source>
+        <location filename="WhiteBlanceDlg.ui" line="20"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_WhiteBlanceDlg.h" line="238"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_WhiteBlanceDlg.h" line="261"/>
+        <source>Dialog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="codemap.cpp" line="72"/>
-        <source>普通触发</source>
+        <location filename="WhiteBlanceDlg.ui" line="37"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_WhiteBlanceDlg.h" line="239"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_WhiteBlanceDlg.h" line="262"/>
+        <source>白平衡类型:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="codemap.cpp" line="73"/>
-        <source>滚动快门多帧触发</source>
+        <location filename="WhiteBlanceDlg.ui" line="51"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_WhiteBlanceDlg.h" line="263"/>
+        <source>当前色温(K):</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="codemap.cpp" line="74"/>
-        <source>电平触发</source>
+        <location filename="WhiteBlanceDlg.ui" line="58"/>
+        <location filename="WhiteBlanceDlg.ui" line="89"/>
+        <location filename="WhiteBlanceDlg.ui" line="120"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_WhiteBlanceDlg.h" line="241"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_WhiteBlanceDlg.h" line="243"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_WhiteBlanceDlg.h" line="245"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_WhiteBlanceDlg.h" line="264"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_WhiteBlanceDlg.h" line="266"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_WhiteBlanceDlg.h" line="268"/>
+        <source>0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="codemap.cpp" line="80"/>
-        <source>软触发</source>
+        <location filename="WhiteBlanceDlg.ui" line="82"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_WhiteBlanceDlg.h" line="242"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_WhiteBlanceDlg.h" line="265"/>
+        <source>当前白平衡 R增益:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="codemap.cpp" line="80"/>
-        <source>硬触发</source>
+        <location filename="WhiteBlanceDlg.ui" line="113"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_WhiteBlanceDlg.h" line="244"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_WhiteBlanceDlg.h" line="267"/>
+        <source>当前白平衡 B增益:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="WhiteBlanceDlg.ui" line="165"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_WhiteBlanceDlg.h" line="246"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_WhiteBlanceDlg.h" line="269"/>
+        <source>白平衡最小色温(K):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="WhiteBlanceDlg.ui" line="186"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_WhiteBlanceDlg.h" line="247"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_WhiteBlanceDlg.h" line="270"/>
+        <source>白平衡最大色温(K):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="WhiteBlanceDlg.ui" line="225"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_WhiteBlanceDlg.h" line="248"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_WhiteBlanceDlg.h" line="271"/>
+        <source>手动白平衡 R增益:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="WhiteBlanceDlg.ui" line="246"/>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_WhiteBlanceDlg.h" line="249"/>
+        <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_WhiteBlanceDlg.h" line="272"/>
+        <source>手动白平衡 B增益:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="build/RK3588-Debug/veye_viewer_autogen/include/ui_WhiteBlanceDlg.h" line="240"/>
+        <source>当前色温(k):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="WhiteBlanceDlg.cpp" line="27"/>
+        <location filename="WhiteBlanceDlg.cpp" line="143"/>
+        <source>手动白平衡</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="WhiteBlanceDlg.cpp" line="28"/>
+        <location filename="WhiteBlanceDlg.cpp" line="144"/>
+        <source>自动白平衡</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

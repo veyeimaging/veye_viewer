@@ -2,20 +2,25 @@
     font-family:Noto Sans CJK SC;
 }
 
-QDialog{
-    border: 0px solid #E0E0E0;
-}
-
 QWidget#widgetMain{
     background: #FFFFFF;
     border-radius: 8px;
     border: 1px solid #E0E0E0;
 }
+
 QWidget#widgetTitle{
     border-radius: 8px;
     border: 0px solid #E0E0E0;
 }
 QWidget#widgetBody{
+    border: 1px solid #E0E0E0;
+}
+
+QWidget#widgetLeft,
+QWidget#widgetCenter,
+QWidget#widgetRight{
+    background: #FFFFFF;
+    border-radius: 0px;
     border: 1px solid #E0E0E0;
 }
 
@@ -25,15 +30,14 @@ QWidget#widgetBottom{
     border-bottom-right-radius: 8px;
 }
 
+QDialog{
+    border: 0px solid #E0E0E0;
+}
+
 QWidget#widgetDialog{
     background: #FFFFFF;
     border-radius: 8px;
     border: 0px solid #E0E0E0;
-}
-QWidget#widgetLeft,#widgetCenter,#widgetRight{
-    background: #FFFFFF;
-    border-radius: 0px;
-    border: 1px solid #E0E0E0;
 }
 
 QWidget#widgetDlgHead{
@@ -46,9 +50,11 @@ QWidget#widgetDlgHead{
 QLabel{
     width:30px;
 }
-QLabel#labelTitle {
-    font-size: 16pt;
+
+QLabel#labelTitle{
+    font-size: 16px;
 }
+
 
 QLabel#labelI2cBus,#labelPlatform,#labelDevList,#labelI2cAddr,#labelVideo,#labelSubNode,#labelMediaNode,#labelEntityName,#labelModel,#labelLogincVersion,#labelControlVersion,#labelSerialNum,#labelX,#labelY,#labelW,#labelH,#labelFps,#labelPassword{
     min-width:116px;
@@ -57,33 +63,34 @@ QLabel#labelI2cBus,#labelPlatform,#labelDevList,#labelI2cAddr,#labelVideo,#label
     margin-right:10px;
 }
 
-QLabel#labelX,#labelY,#labelW,#labelH,#labelFps{
+QLabel#labelFps{
     min-width:110px;
     max-width:110px;
-    qproperty-alignment:AlignRight;
-    margin-right:10px;
+    qproperty-alignment:AlignLeft;
 }
 
-QLabel#label_exp,#label_gain,#labelCurExp,#labelCurGain,#labelAatarget,#labelMaxExp,#labelMaxGain,#labelManualExp,#labelManualGain{
-    min-width:140px;
-    max-width:140px;
-    qproperty-alignment:AlignRight;
-    margin-right:4px;
+QLabel#labelX,#labelY,#labelW,#labelH,#labelFpsMv,#labelFpsGx,#labelMaxFpsGx,#labelResolution,#labelReadMode,
+#labelCurExp,#labelCurGain,#labelAatarget,#labelMaxExp,#labelMaxGain,#labelManualExp,#labelManualGain,
+#label_trgexp_delay,#label_trgnum,#label_trginterval,#label_trgfilter_time,#label_trgdelay,
+#label_roi_w_h,#label_fps,#label_MaxFps,#label_pixelformat,#labelReadMode2,#labelAddr,#labelValue,
+#labelColorTemp,#labelCurRGain,#labelCurBGain,#labelAWbColorTempMin,#labelAWbColorTempMax,#labelMBbRGain,#labelMBbBGain,
+#labelSaturation,#labelContrast,#labelHue{
+   min-width: 120px;
+   max-width: 120px;
+   qproperty-alignment: AlignLeft;
+   qproperty-wordWrap: false;
+   padding-right: 4px;
 }
 
-QLabel#label_trgmode,#label_trgsrc,#label_trgexp_delay,#label_trgnum,#label_trginterval,#label_trgfilter_time,#label_trgdelay,#label_roi_w_h,#label_fps,#label_pixelformat{
-    min-width:120px;
-    max-width:120px;
-    qproperty-alignment:AlignRight;
-    margin-right:4px;
+QLabel#labelIndex,#label_exp,#label_gain,#label_trgmode,#label_trgsrc,#labelSlaveMode,#labelReg,#labelWbMode{
+   min-width: 120px;
+   max-width: 120px;
+   qproperty-alignment: AlignLeft;
+   qproperty-wordWrap: false;
+   padding-right: 4px;
+   padding-top: 4px;
 }
 
-QLabel#labelReg,#labelAddr,#labelValue{
-    min-width:150px;
-    max-width:150px;
-    qproperty-alignment:AlignRight;
-    margin-right:10px;
-}
 QLabel#labelExplain{
     min-width:140px;
     max-width:140px;
@@ -120,26 +127,12 @@ QSpinBox#spinBox_showFPS{
     min-width:50px;
     max-width:50px;
 }
-/*QLineEdit#lineEditI2cBus,#lineEditI2cAddr,#lineEditVideo,#lineEditSubNode,#lineEditMediaNode {
-    min-width:130px;
-    max-width:130px;
-}*/
+
 QComboBox{
     combobox-popup: 0;
 }
-QComboBox#comboBoxDev,#comboBoxPlatform{
-    min-width:170px;
-    max-width:170px;
-    /*background-color: yellow;*/
-    combobox-popup: 0;
-}
-QComboBox#comboBoxReg,#comboBox_exp,#comboBox_trgmode,#combobox_trgsrc,#comboBox_gain{
-    /*background-color: yellow;*/
-    combobox-popup: 0;
-}
 
-QFrame#line,#line_0,#line_1,#line_2,#line_3,#line_4,#line_5,#line_6,#line_7,#line_8
-{
+QFrame#line,#line_0,#line_1,#line_2,#line_3,#line_4,#line_5,#line_6,#line_7,#line_8{
     color:rgb(0, 0, 225)
 }
 
@@ -148,15 +141,20 @@ QPushButton#pushButtonPlaceholder_1,#pushButtonPlaceholder_2{
     border: 0px solid #DCDFE6;
 }
 
-QPushButton#pushButtonMin,#pushButtonMax,#pushButtonPlaceholder
-{
-    height: 32px;
-    background-color:#FFFFFF;
-    border-radius: 0px;
+QPushButton#pushButtonMin,#pushButtonMax,#pushButtonHelp,#pushButtonLanguage,#pushButtonPlaceholder{
+    text-align:center;
+    width:32px;
+    height:26px;
+    background:#FFFFFF;
+    border-radius: 4px;
 }
 
-QPushButton#pushButtonMin:hover,#pushButtonMax:hover,#pushButtonPlaceholder:hover
-{
+QPushButton#pushButtonHelp::menu-indicator {
+    image: none;
+    width: 0px;
+}
+
+QPushButton#pushButtonMin:hover,#pushButtonMax:hover,#pushButtonLanguage:hover,#pushButtonHelp:hover,#pushButtonPlaceholder:hover{
     height: 32px;
     background-color:#E8E8E8;
     border-radius: 0px;
@@ -180,18 +178,6 @@ QPushButton#pushButtonClose:hover
     border-bottom-right-radius: 0px;
 }
 
-QPushButton#pushButtonHelp{
-    text-align:center;
-    width:32px;
-    height:26px;
-    background:#FFFFFF;
-    border-radius: 4px;
-}
- QPushButton#pushButtonHelp:hover{
-   background:#FFFFFF;
-   border-radius: 4px;
-   color: #326CF3
-}
 QTabWidget::pane {
     border: none;               /* 去除内容区域边框 */
     background-color: transparent; /* 背景透明（可选） */

@@ -1,0 +1,794 @@
+[
+    {
+        "address": "0x0000",
+        "name": "Manufacturer Name",
+        "description": "String containing the self-describing name of the manufacturer. “VEYE”",
+        "data_type": "ascii",
+        "rd_wt": "RO",
+        "update_timing": "-",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0004",
+        "name": "Model Name",
+        "description": "Product Model Code.\n0x178 : MV-MIPI-IMX178M\n0x130 : MV-MIPI-SC130M\n0x265 : MV-MIPI-IMX265M\n0x264 : MV-MIPI-IMX264M\n0x296 : MV-MIPI-IMX296M\n0x287 : MV-MIPI-IMX287M\n0x4002 : MV-MIPI-GMAX4002M\n0x8132 : RAW-MIPI-SC132M\n0x8234 : RAW-MIPI-AR0234M\n0x8462 : RAW-MIPI-IMX462M\n0x8535 : RAW-MIPI-SC535M",
+        "data_type": "enum",
+        "rd_wt": "RO",
+        "update_timing": "-",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0008",
+        "name": "Sensor Name",
+        "description": "Sensor Model:\n0x178 : IMX178LLJ\n0x130 : SC130GS\n0x265 : IMX265LLR\n0x264 : IMX264LLR\n0x296 : IMX296LLR\n0x287 : IMX287LLR\n0x132 : SC132GS\n0x234 : AR0234CS\n0x462 : IMX462LLR\n0x535 : SC535HGS\n0x4002 : GMAX4002-AVM",
+        "data_type": "enum",
+        "rd_wt": "RO",
+        "update_timing": "-",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x000C",
+        "name": "Serial Number",
+        "description": "Unique product serial number",
+        "data_type": "uint",
+        "rd_wt": "RO",
+        "update_timing": "-",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0010",
+        "name": "Device Version",
+        "description": "Firmware version number. The high 16 bits are the Control version and the low 16 bits are the Logic version.\nFor example, 0x01020304 means Control version is 1.2 and Logic version is 3.4.",
+        "data_type": "uint",
+        "rd_wt": "RO",
+        "update_timing": "-",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0014",
+        "name": "Factory Param",
+        "description": "All parameters restored to factory default values.",
+        "data_type": "bool",
+        "rd_wt": "WO",
+        "update_timing": "A",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0018",
+        "name": "Param save to flash",
+        "description": "Save all parameters to flash, and they will not be lost when power off.\nThis operation will erase the system flash and rewrite it. Please ensure that the power is not interrupted during the operation.\nAdditionally, it is recommended not to perform frequent paramsave operations.",
+        "data_type": "bool",
+        "rd_wt": "WO",
+        "update_timing": "A",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x001C",
+        "name": "System reboot",
+        "description": "Reboot the camera.",
+        "data_type": "bool",
+        "rd_wt": "WO",
+        "update_timing": "A",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0020",
+        "name": "Time stamp",
+        "description": "Time after system startup in Milliseconds.",
+        "data_type": "uint",
+        "rd_wt": "RO",
+        "update_timing": "-",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0024",
+        "name": "Error Code",
+        "description": "System error code, each bit represents an error type.\nbit0: sensor error.\nbit1: Logic module startup error.\nbit2: Logic module communication error.\nbit5: AA(AE&AG) regulation cannot reach the target brightness.\nbit6: Authorization failure.",
+        "data_type": "uint",
+        "rd_wt": "RO",
+        "update_timing": "-",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0028",
+        "name": "Format Cap",
+        "description": "Capbility of data formats supported by the camera.\nbit0: Mono8\nbit1: Mono10\nbit2: Mono12\nbit3: Mono14\nbit4: UYVY\nbit5: Temperature sensor",
+        "data_type": "uint",
+        "rd_wt": "RO",
+        "update_timing": "-",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x002C",
+        "name": "ReadModeCap",
+        "description": "Capbility of read mode supported by the camera.\nbit0: Normal\nbit1: Binning\nbit2: Subsampling",
+        "data_type": "uint",
+        "rd_wt": "RO",
+        "update_timing": "-",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0030",
+        "name": "TriggerMode Cap",
+        "description": "Capbility of trigger mode supported by the camera.\nbit0：Video streaming mode\nbit1：Normal trigger mode.\nbit2：Rolling shutter multi-frame trigger mode\nbit3: Pulse trigger mode.",
+        "data_type": "uint",
+        "rd_wt": "RO",
+        "update_timing": "-",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0034",
+        "name": "LaneNumCap",
+        "description": "The number of MIPI lanes supported by the camera .\nThe lower to higher bits correspond to the supported capabilities for 1 lane, 2 lanes, 3 lanes, and 4 lanes, respectively.\nFor example, 0x2 indicates support for 2 lanes, and 0xA indicates support for both 2 lanes and 4 lanes.",
+        "data_type": "uint",
+        "rd_wt": "RO",
+        "update_timing": "",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0058",
+        "name": "Temperature K",
+        "description": "The sensor's temperature value, in Kelvin, is 100 times the current temperature.",
+        "data_type": "uint",
+        "rd_wt": "RO",
+        "update_timing": "",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0400",
+        "name": "Image Acquisition",
+        "description": "Start/Stop acquisition\nThere is no image output after the camera is powered on, which means it is in the standby state.\nAfter writing 1 to this register, it enters the running state and starts outputting images or waiting for the trigger signal.",
+        "data_type": "bool",
+        "rd_wt": "WO",
+        "update_timing": "A",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0404",
+        "name": "Trigger Mode",
+        "description": "0：Video streaming mode\n1：Normal trigger mode.\n2：Rolling shutter multi-frame trigger mode.\n3: Pulse trigger mode.\nSee product manual for details.",
+        "data_type": "enum",
+        "rd_wt": "RW",
+        "update_timing": "S",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0408",
+        "name": "Trigger Source",
+        "description": "0: Software trigger mode.\n1: Hardware trigger mode.\nEffective in Trigger mode 1 and 2 only.",
+        "data_type": "enum",
+        "rd_wt": "RW",
+        "update_timing": "S",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x040C",
+        "name": "Trigger Number",
+        "description": "The number of image frames output by one trigger signal in trigger mode. Range：[1.255]",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "S",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0410",
+        "name": "Trigger Interval",
+        "description": "Trigger interval in normal trigger mode, in microseconds. Range:[0.0xFFFFFF]",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "S",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0414",
+        "name": "Trigger Software",
+        "description": "Software trigger command, write 1 for one trigger.",
+        "data_type": "bool",
+        "rd_wt": "WO",
+        "update_timing": "A",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0418",
+        "name": "Trigger Count",
+        "description": "Trigger count statistics.\nThe high 16 bits indicate the number of trigger loss, and the low 16 bits indicate the total number of triggers.\nWrite 1 to clear the count.",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "A",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x041C",
+        "name": "I2C ADDR",
+        "description": "I2c address. Range[0x03,0x77].",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "A",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0424",
+        "name": "MCU bypass mode",
+        "description": "For RAW series ONLY! Once enabled, the mcu no longer controls the sensor and the user controls the sensor directly.\nAutomatic restart after change.",
+        "data_type": "bool",
+        "rd_wt": "RW",
+        "update_timing": "A",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x044C",
+        "name": "Non discontinuous mode",
+        "description": "Indicates whether the clock lan of the mipi signal is in continuous clock mode. 0 : discontinuous mode,1: continuous mode",
+        "data_type": "bool",
+        "rd_wt": "RO",
+        "update_timing": "A",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0450",
+        "name": "Sensor Register Addr",
+        "description": "Indirectly read the sensor register function. Write the address of the sensor register to be read to this register.",
+        "data_type": "uint",
+        "rd_wt": "WO",
+        "update_timing": "A",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0454",
+        "name": "Sensor Register Value",
+        "description": "Read the sensor register value.",
+        "data_type": "uint",
+        "rd_wt": "RO",
+        "update_timing": "A",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0460",
+        "name": "Slave mode",
+        "description": "Whether the sensor is operating in slave mode. Currently, only RAW-MIPI-IMX462M is supported.",
+        "data_type": "bool",
+        "rd_wt": "RW",
+        "update_timing": "S",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0464",
+        "name": "Sensor Frame Count",
+        "description": "The number of frames output by the sensor. Cyclic counting.",
+        "data_type": "uint",
+        "rd_wt": "RO",
+        "update_timing": "A",
+        "raw_support": "N"
+    },
+    {
+        "address": "0x0468",
+        "name": "Out Frame Count",
+        "description": "The number of frames output by the camera module. Cyclic counting.",
+        "data_type": "uint",
+        "rd_wt": "RO",
+        "update_timing": "A",
+        "raw_support": "N"
+    },
+    {
+        "address": "0x006C",
+        "name": "Min Trigger cycle",
+        "description": "Minimum trigger signal period, in microseconds (µs), with 0 indicating an invalid value.\nIn pulse trigger mode, it represents the minimum interval between the end of the previous trigger level and the next trigger signal.",
+        "data_type": "uint",
+        "rd_wt": "RO",
+        "update_timing": "A",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0070",
+        "name": "Max Trigger cycle",
+        "description": "Maximum trigger signal period, in microseconds (µs), with 0 indicating an invalid value. (Valid in continuous trigger mode of SC535).",
+        "data_type": "uint",
+        "rd_wt": "RO",
+        "update_timing": "A",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0800",
+        "name": "Test Image Selector",
+        "description": "Switch between normal image or test image\n0 : normal image\n1 : Test image 1\n2 : Test image 2",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "A",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0804",
+        "name": "Pixel Format",
+        "description": "0 : Mono8\n1 : Mono10\n2 : Mono12\n3 : Mono14(reserved)\n4 : UYVY",
+        "data_type": "enum",
+        "rd_wt": "RW",
+        "update_timing": "S",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0808",
+        "name": "Sensor Width",
+        "description": "The maximum width supported by the sensor",
+        "data_type": "uint",
+        "rd_wt": "RO",
+        "update_timing": "-",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x080C",
+        "name": "Sensor Height",
+        "description": "The maximum height supported by sensor",
+        "data_type": "uint",
+        "rd_wt": "RO",
+        "update_timing": "-",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0810",
+        "name": "MaxFrame Rate",
+        "description": "The maximum frame rate supported in the current mode.\nThe register value is 100 times the frame rate.",
+        "data_type": "uint",
+        "rd_wt": "RO",
+        "update_timing": "-",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0814",
+        "name": "Framerate",
+        "description": "The current framerate.\nThe register value is 100 times the frame rate.\nIn normal trigger mode, it is recommended to set the fps to the maxfps value to ensure the highest trigger signal responsiveness.",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "S",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0818",
+        "name": "ROI Width",
+        "description": "ROI Width",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "S",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x081C",
+        "name": "ROI Height",
+        "description": "ROI Height\nOf the four roi registers, please write this last.",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "S",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0820",
+        "name": "ROI Offset X",
+        "description": "ROI Offset X",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "S",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0824",
+        "name": "ROI Offset Y",
+        "description": "ROI Offset Y",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "S",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0828",
+        "name": "Image Direction",
+        "description": "0 : normal\n1 : mirror\n2 : flip\n3 : flip&mirror",
+        "data_type": "enum",
+        "rd_wt": "RW",
+        "update_timing": "A",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0830",
+        "name": "Black Level",
+        "description": "Black level",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "A",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0834",
+        "name": "BLC mode",
+        "description": "Black level calibration modes:\n0: Sensor automatic calibration or use default black level.\n1: Manually specify black level.",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "A",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0838",
+        "name": "Read Mode",
+        "description": "Read mode:\n0: Normal\n1: Binning\n2: Subsampling",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "A",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x083C",
+        "name": "Lane Num",
+        "description": "For modules that support lane number configuration, use this register to modify the lane number.",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "S",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0840",
+        "name": "MIPI Datarate",
+        "description": "The MIPI datarate for each lane, measured in Kbps.",
+        "data_type": "uint",
+        "rd_wt": "RO",
+        "update_timing": "-",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0844",
+        "name": "Min Width",
+        "description": "The minimum width supported by the camera.",
+        "data_type": "uint",
+        "rd_wt": "RO",
+        "update_timing": "A",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0848",
+        "name": "Min Height",
+        "description": "The minimum height supported by the camera.",
+        "data_type": "uint",
+        "rd_wt": "RO",
+        "update_timing": "A",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x084C",
+        "name": "Min Frame Rate",
+        "description": "The minimum framerate supported by the camera. The value is 10000 times the actual framerate.",
+        "data_type": "uint",
+        "rd_wt": "RO",
+        "update_timing": "A",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0850",
+        "name": "Framerate_EX",
+        "description": "The extended register of the Framerate register, where the value is 10,000 times the actual frame rate.",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "S",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0854",
+        "name": "OSD_Mode",
+        "description": "OSD mode bit definition:\n0: Disabled\n1: Crosshair enabled, overlays a crosshair at the center of the image for assisting with coordinate calibration.",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "A",
+        "raw_support": "N"
+    },
+    {
+        "address": "0x0C00",
+        "name": "ISP module ctrl",
+        "description": "The ISP module controls, each bit represents an isp function.\nbit0: Exposure Statistics\nbit1: reserved\nbit2: WB Statistics\nbit3: Focus Statistics\nbit4: DPC\nbit5: gamma\nbit6: denoise\nbit7: sharpen\nbit8: LUT\nothers: reserved",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "A",
+        "raw_support": "N"
+    },
+    {
+        "address": "0x0C04",
+        "name": "Exposure Mode",
+        "description": "Exposure Type\n0: Manual exposure\n1: Run automatic exposure once\n2: Automatic exposure",
+        "data_type": "enum",
+        "rd_wt": "RW",
+        "update_timing": "A",
+        "raw_support": "N"
+    },
+    {
+        "address": "0x0C08",
+        "name": "Target Brightness",
+        "description": "Target brightness for automatic exposure. Range[0,255]",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "A",
+        "raw_support": "N"
+    },
+    {
+        "address": "0x0C10",
+        "name": "ME Time",
+        "description": "Manual exposure time,effective in ME mode. Range[16,1000000]. Note1.Unit: microseconds.",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "A",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0C14",
+        "name": "AE MAX Time",
+        "description": "Maximum exposure time in AE mode.Range[16,1000000]. Note1.Unit: microseconds.",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "A",
+        "raw_support": "N"
+    },
+    {
+        "address": "0x0C18",
+        "name": "Exp Time",
+        "description": "Current exposure time. Note1.Unit: microseconds.",
+        "data_type": "uint",
+        "rd_wt": "RO",
+        "update_timing": "-",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0C1C",
+        "name": "Gain Mode",
+        "description": "Gain Type\n0: Manual gain\n1: Run automatic gain once\n2: Automatic gain",
+        "data_type": "enum",
+        "rd_wt": "RW",
+        "update_timing": "A",
+        "raw_support": "N"
+    },
+    {
+        "address": "0x0C20",
+        "name": "Manual Gain",
+        "description": "Manual gain, ,effective in MG mode. Note2.",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "A",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0C24",
+        "name": "AG Max Gain",
+        "description": "Maximum value of auto gain. Note2.",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "A",
+        "raw_support": "N"
+    },
+    {
+        "address": "0x0C28",
+        "name": "Cur Gain",
+        "description": "Current Gain. Note2.",
+        "data_type": "uint",
+        "rd_wt": "RO",
+        "update_timing": "-",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0C2C",
+        "name": "AAROIOffsetX",
+        "description": "AAROI offset X. Note4.",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "A",
+        "raw_support": "N"
+    },
+    {
+        "address": "0x0C30",
+        "name": "AAROIOffsetY",
+        "description": "AAROI offset Y. Note4.Of the four AAROI registers, please write this last.",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "A",
+        "raw_support": "N"
+    },
+    {
+        "address": "0x0C34",
+        "name": "AAROIWidth",
+        "description": "AAROI Width. Range: [16,ROI Width]",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "A",
+        "raw_support": "N"
+    },
+    {
+        "address": "0x0C38",
+        "name": "AAROIHeight",
+        "description": "AAROI Height. Range: [16,ROI Height]",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "A",
+        "raw_support": "N"
+    },
+    {
+        "address": "0x0C60",
+        "name": "Gamma",
+        "description": "gamma. The value is 100 times the actual gamma. 80 means gamma is 0.8.",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "A",
+        "raw_support": "N"
+    },
+    {
+        "address": "0x0C74",
+        "name": "LUT Count",
+        "description": "The length of the lut curve 1024 or 4096.",
+        "data_type": "uint",
+        "rd_wt": "RO",
+        "update_timing": "-",
+        "raw_support": "N"
+    },
+    {
+        "address": "0x0C78",
+        "name": "LUT Start",
+        "description": "lut curve start transmission.",
+        "data_type": "bool",
+        "rd_wt": "WO",
+        "update_timing": "A",
+        "raw_support": "N"
+    },
+    {
+        "address": "0x0C7C",
+        "name": "LUT Done",
+        "description": "lut curve writing finished.",
+        "data_type": "bool",
+        "rd_wt": "WO",
+        "update_timing": "A",
+        "raw_support": "N"
+    },
+    {
+        "address": "0x0C80",
+        "name": "AAROI enable",
+        "description": "Whether to enable AA statistics ROI function, not enable means full screen statistics.",
+        "data_type": "bool",
+        "rd_wt": "RW",
+        "update_timing": "A",
+        "raw_support": "N"
+    },
+    {
+        "address": "0x0C8C",
+        "name": "Max Exp Time",
+        "description": "Maximum exposure time in the current mode\nUnit: microseconds",
+        "data_type": "uint",
+        "rd_wt": "RO",
+        "update_timing": "A",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x0C90",
+        "name": "Min Exp Time",
+        "description": "Minimum exposure time in the current mode\nUnit: 0.1 microseconds",
+        "data_type": "uint",
+        "rd_wt": "RO",
+        "update_timing": "A",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x1000",
+        "name": "Trigger Delay",
+        "description": "Trigger delay. Effective in both soft trigger and hard trigger modes.\nrange: 0 to 1000000 (unit: microsecond)",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "S",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x1004",
+        "name": "Trigger Edge",
+        "description": "0: Rising edge\n1: Falling edge",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "S",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x1008",
+        "name": "Trigger Filter Enable",
+        "description": "0: No filtering\n1: Low-level filtering (Filtering of interference signals on low levels)\n2: High-level filtering (Filtering of interference signals on high levels)\n3 :Both Low-level and High-level filtering",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "S",
+        "raw_support": "N"
+    },
+    {
+        "address": "0x100c",
+        "name": "Trigger Filter Width",
+        "description": "Trigger signal filtering window width\nrange: 1 to 1000000 (unit: microsecond)",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "S",
+        "raw_support": "N"
+    },
+    {
+        "address": "0x1010",
+        "name": "Exposure Delay",
+        "description": "Exposure delay, i.e. the time to turn on the Strobe signal in advance.\nrange: 0 to 1000000 (unit: microsecond)",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "S",
+        "raw_support": "N"
+    },
+    {
+        "address": "0x1014",
+        "name": "TriggerIN IO status",
+        "description": "trigger in IO pin status.",
+        "data_type": "enum",
+        "rd_wt": "RO",
+        "update_timing": "-",
+        "raw_support": "S"
+    },
+    {
+        "address": "0x1020",
+        "name": "GPIO1_OutSelect",
+        "description": "0: Strobe\n1: UserOut",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "A",
+        "raw_support": "N"
+    },
+    {
+        "address": "0x1024",
+        "name": "GPIO1 UserOut",
+        "description": "User-defined output signal.",
+        "data_type": "enum",
+        "rd_wt": "RW",
+        "update_timing": "A",
+        "raw_support": "N"
+    },
+    {
+        "address": "0x1028",
+        "name": "GPIO1 Reverse",
+        "description": "Output signal reversal.",
+        "data_type": "bool",
+        "rd_wt": "RW",
+        "update_timing": "A",
+        "raw_support": "N"
+    },
+    {
+        "address": "0x102C",
+        "name": "GPIO1 OutStatus",
+        "description": "GPIO1 IO pin status.",
+        "data_type": "enum",
+        "rd_wt": "RO",
+        "update_timing": "-",
+        "raw_support": "N"
+    },
+    {
+        "address": "0x1030",
+        "name": "GPIO2_OutSelect",
+        "description": "0: Strobe\n1: UserOut\n2: TriggerWait; trigger wait status.\nIndicate that the camera is waiting for the trigger, ready to respond to the trigger signal.\n3: XVS\n4: XHS",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "A",
+        "raw_support": "N"
+    },
+    {
+        "address": "0x1034",
+        "name": "GPIO2 UserOut",
+        "description": "User-defined output signal.",
+        "data_type": "enum",
+        "rd_wt": "RW",
+        "update_timing": "A",
+        "raw_support": "N"
+    },
+    {
+        "address": "0x1038",
+        "name": "GPIO2 Reverse",
+        "description": "Output signal reversal.",
+        "data_type": "bool",
+        "rd_wt": "RW",
+        "update_timing": "A",
+        "raw_support": "N"
+    },
+    {
+        "address": "0x103C",
+        "name": "GPIO2 OutStatus",
+        "description": "GPIO2 IO pin status.",
+        "data_type": "enum",
+        "rd_wt": "RO",
+        "update_timing": "-",
+        "raw_support": "N"
+    }
+]

@@ -1,99 +1,166 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(veye_viewer VERSION 0.1.3 LANGUAGES CXX)
+project(veye_viewer VERSION 1.1.3 LANGUAGES CXX)
 
-
-# add_compile_definitions(QT_NO_INFO_OUTPUT)
-# add_compile_definitions(QT_NO_DEBUG_OUTPUT)
-# add_compile_definitions(QT_NO_WARNING_OUTPUT)
-
-file(COPY config/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/config/)
-file(COPY config/start_veye_viewer.sh DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
-configure_file(
-    ${CMAKE_SOURCE_DIR}/version.h.in
-    ${CMAKE_SOURCE_DIR}/version.h
-    @ONLY
-)
+# 基础编译配置
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
-
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools)
+add_definitions(-DQT_MESSAGELOGCONTEXT)
+# 复制配置文件到编译目录
+file(COPY  ${CMAKE_SOURCE_DIR}/config/ DESTINATION DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/config/
+    FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                     GROUP_READ GROUP_EXECUTE
+                     WORLD_READ WORLD_EXECUTE)
 
-set(TS_FILES veye_viewer_zh_CN.ts
-  veye_viewer_en_US.ts)
+file(COPY  ${CMAKE_SOURCE_DIR}/start_veye_viewer.sh DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
+    FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                     GROUP_READ GROUP_EXECUTE
+                     WORLD_READ WORLD_EXECUTE)
 
+# 生成版本头文件
+configure_file(
+    ${CMAKE_SOURCE_DIR}/Version.h.in
+    ${CMAKE_SOURCE_DIR}/Version.h
+    @ONLY
+)
+
+# -------------------------- Mali 库核心配置 --------------------------
+# set(SYSTEM_LIB_DIR "/opt/atk-dlrk3588-toolchain/aarch64-buildroot-linux-gnu/sysroot/usr/lib")
+# set(MALI_LIB_DIR "${SYSTEM_LIB_DIR}/mali")
+
+# # 强制指定 Mali 库绝对路径
+# set(GLES_LIB "${MALI_LIB_DIR}/libGLESv2.so")
+# set(EGL_LIB "${MALI_LIB_DIR}/libEGL.so")
+# set(MALI_LIB "${SYSTEM_LIB_DIR}/libmali.so")
+# set(MALI_HOOK_LIB "${SYSTEM_LIB_DIR}/libmali-hook.so")
+
+# # 库存在性验证
+# if(NOT EXISTS ${GLES_LIB})
+#     message(FATAL_ERROR "GLESv2 library not found: ${GLES_LIB}")
+# endif()
+# if(NOT EXISTS ${EGL_LIB})
+#     message(FATAL_ERROR "EGL library not found: ${EGL_LIB}")
+# endif()
+# if(NOT EXISTS ${MALI_LIB})
+#     message(FATAL_ERROR "Mali core library not found: ${MALI_LIB}")
+# endif()
+# if(NOT EXISTS ${MALI_HOOK_LIB})
+#     message(FATAL_ERROR "Mali hook library not found: ${MALI_HOOK_LIB}")
+# endif()
+
+# # 设置链接器搜索路径
+# link_directories(${MALI_LIB_DIR} ${SYSTEM_LIB_DIR})
+# ----------------------------------------------------------------------------
+
+# 查找 Qt 依赖库
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets OpenGL LinguistTools)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets OpenGL LinguistTools)
+
+# 翻译文件配置（关键修改1：指定绝对路径 + 确保文件存在）
+set(TS_FILES
+    ${CMAKE_SOURCE_DIR}/veye_viewer_zh_CN.ts
+    ${CMAKE_SOURCE_DIR}/veye_viewer_en_US.ts
+)
+# 首次构建时创建空TS文件，避免文件缺失导致覆盖
+foreach(ts_file ${TS_FILES})
+    if(NOT EXISTS ${ts_file})
+        file(WRITE ${ts_file} "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<!DOCTYPE TS>\n<TS version=\"2.1\"></TS>")
+        message(STATUS "📄 创建初始翻译文件: ${ts_file}")
+    endif()
+endforeach()
+
+# 头文件包含目录
 INCLUDE_DIRECTORIES(
     ${PROJECT_SOURCE_DIR}
 )
 
-set(PROJECT_SOURCES
-        main.cpp
-        mainwidget.cpp
-        mainwidget.h
-        mainwidget.ui
-        ${TS_FILES}
+# -------------------------- 目录自动搜索源文件（排除build目录） --------------------------
+set(PROJECT_SOURCES)
+
+# 1. 手动指定关键文件
+list(APPEND PROJECT_SOURCES
+    "Main.cpp"          # 主入口
+    "resource.qrc"      # 资源文件
+    "Version.h.in"      # 版本配置
 )
 
+# 2. 自动搜索业务代码文件（核心：排除build目录）
+file(GLOB_RECURSE BUSINESS_SOURCES
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.ui"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.inl"
+)
+
+# 关键优化：排除所有build目录及其子目录（编译生成文件存放地）
+list(FILTER BUSINESS_SOURCES EXCLUDE REGEX ".*/build/.*")
+list(FILTER BUSINESS_SOURCES EXCLUDE REGEX ".*/out/.*")
+list(FILTER BUSINESS_SOURCES EXCLUDE REGEX ".*/build-.*")
+# 关键修改2：过滤TS文件，避免被加入源文件列表
+list(FILTER BUSINESS_SOURCES EXCLUDE REGEX ".+\\.ts$")
+
+# 3. 处理JSON第三方目录
+file(GLOB_RECURSE JSON_SOURCES
+    "${CMAKE_CURRENT_SOURCE_DIR}/json/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/json/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/json/*.inl"
+)
+
+# 从业务代码中移除JSON文件
+foreach(json_file ${JSON_SOURCES})
+    list(REMOVE_ITEM BUSINESS_SOURCES ${json_file})
+endforeach()
+
+# 4. 组合所有源文件（关键修改3：移除TS_FILES，避免被当作源文件编译）
+list(APPEND PROJECT_SOURCES ${BUSINESS_SOURCES} ${JSON_SOURCES})
+list(REMOVE_DUPLICATES PROJECT_SOURCES)
+list(SORT PROJECT_SOURCES)
+
+# 5. 打印搜索结果
+list(LENGTH PROJECT_SOURCES SRC_COUNT)
+message(STATUS "✅ 自动搜索到的源文件（共 ${SRC_COUNT} 个）：")
+foreach(file ${PROJECT_SOURCES})
+    message(STATUS "  - ${file}")
+endforeach()
+# ----------------------------------------------------------------------------
+
+# 生成可执行文件（适配 Qt 5/6）
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(veye_viewer
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
     )
-# Define target properties for Android with Qt 6 as:
-#    set_property(TARGET CamerViewer APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
-#                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
-# For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
-
-    qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
+    # 关键修改4：Qt6 增量更新TS文件（-update：增量，-no-obsolete：移除过时翻译）
+    qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES}
+        OPTIONS -update -no-obsolete
+    )
 else()
     if(ANDROID)
-        add_library(veye_viewer SHARED
-            ${PROJECT_SOURCES}
-        )
-# Define properties for Android with Qt 5 after find_package() calls as:
-#    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
+        add_library(veye_viewer SHARED ${PROJECT_SOURCES})
     else()
-        add_executable(veye_viewer
-            ${PROJECT_SOURCES}
-            qxhelp.cpp qxhelp.h
-            resource.qrc
-            camera.h camera.cpp
-            capture.h capture.cpp
-            probedevice.h probedevice.cpp
-            commheader.h
-            capturemplane.h capturemplane.cpp
-            capturesplane.h capturesplane.cpp
-            json/autolink.h json/config.h json/features.h json/forwards.h json/json.h json/json_batchallocator.h json/json_internalarray.inl json/json_internalmap.inl json/json_reader.cpp json/json_value.cpp json/json_valueiterator.inl json/json_writer.cpp json/reader.h json/value.h json/writer.h
-            qxtoast.cpp qxtoast.h qxtoast.ui
-            msgbox.cpp msgbox.h msgbox.ui
-            aboutdialog.cpp aboutdialog.h aboutdialog.ui
-            operatecmd.h operatecmd.cpp
-            commstuct.h
-            expgaindlg.h expgaindlg.cpp expgaindlg.ui
-            triggerdlg.h triggerdlg.cpp triggerdlg.ui
-            imgattrdlg.h imgattrdlg.cpp imgattrdlg.ui
-            registerdlg.h registerdlg.cpp registerdlg.ui
-            curattrdlg.h curattrdlg.cpp curattrdlg.ui
-            codemap.h codemap.cpp
-            framelesswidget.cpp framelesswidget.h
-            version.h.in
-          )
+        add_executable(veye_viewer ${PROJECT_SOURCES})
     endif()
-
-    qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
+    # 关键修改4：Qt5 增量更新TS文件
+    qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES}
+        OPTIONS -update -no-obsolete
+    )
 endif()
 
-target_link_libraries(veye_viewer PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+# 链接依赖库
+target_link_libraries(veye_viewer PRIVATE
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::OpenGL
+    # ${GLES_LIB}
+    # ${EGL_LIB}
+    # ${MALI_LIB}
+    # ${MALI_HOOK_LIB}
+)
 
-# Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
-# If you are developing for iOS or macOS you should consider setting an
-# explicit, fixed bundle identifier manually though.
+# 目标属性配置
 if(${QT_VERSION} VERSION_LESS 6.1.0)
   set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.veye_viewer)
 endif()
@@ -103,8 +170,10 @@ set_target_properties(veye_viewer PROPERTIES
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
+    INSTALL_RPATH "/usr/lib/aarch64-linux-gnu:/usr/lib/aarch64-linux-gnu/mali"
 )
 
+# 安装配置
 include(GNUInstallDirs)
 install(TARGETS veye_viewer
     BUNDLE DESTINATION .
@@ -112,6 +181,7 @@ install(TARGETS veye_viewer
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
+# Qt 6 最终化配置
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(veye_viewer)
 endif()
