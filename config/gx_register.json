@@ -330,7 +330,7 @@
     {
         "address": "0x0460",
         "name": "Slave mode",
-        "description": "Whether the sensor is operating in slave mode. Currently, only RAW-MIPI-IMX462M is supported.",
+        "description": "It takes effect in the synchronous mode of the GX series.\nIn the synchronous mode, the role of the camera.\n0: Master mode\n1: Slave mode",
         "data_type": "bool",
         "rd_wt": "RW",
         "update_timing": "S"
@@ -402,7 +402,7 @@
     {
         "address": "0x0804",
         "name": "Pixel Format",
-        "description": "Pixel format\n0: Mono8\n1: Mono10\n2: Mono12\n3: Mono14(reserved)\n4: UYVY\n5: YUYV",
+        "description": "Pixel format\n0: Mono8\n1: Mono10\n2: Mono12\n3: Mono14(reserved)\n4: UYVY\n5: RGB888\n6: Temp(reserved)\n7: YUYV",
         "data_type": "enum",
         "rd_wt": "RW",
         "update_timing": "S"
@@ -458,7 +458,7 @@
     {
         "address": "0x082C",
         "name": "VideoMode",
-        "description": "For cameras that select width, height, and frame rate using the VideoMode mode, which mode to choose. The corresponding capability set is VideomodeCap. The range is [1-8].",
+        "description": "For cameras that select width, height, and frame rate using the VideoMode mode, which mode to choose. The corresponding capability set is VideomodeCap. The range is [0-7].",
         "data_type": "uint",
         "rd_wt": "RW",
         "update_timing": "S"
@@ -466,7 +466,7 @@
     {
         "address": "0x0838",
         "name": "Read Mode",
-        "description": "Read mode:\n0: Normal\n1: Binning\n2: Subsampling",
+        "description": "Read mode:\n0: Normal\n1: 2x2Binning\n2: Subsampling",
         "data_type": "uint",
         "rd_wt": "RO",
         "update_timing": "A"
@@ -538,7 +538,7 @@
     {
         "address": "0x0C0C",
         "name": "AE Strategy",
-        "description": "Automatic exposure strategy,0: Bright Area Priority mode \n1: Dark zone priority mode\n",
+        "description": "Automatic exposure strategy,\n0: Bright Area Priority mode \n1: Dark zone priority mode\n",
         "data_type": "uint",
         "rd_wt": "RW",
         "update_timing": "A"
@@ -554,7 +554,7 @@
     {
         "address": "0x0C14",
         "name": "AE MAX Time",
-        "description": "Maximum exposure time in AE mode.Range[16,1000000].\u00a0Note1.Unit: microseconds.",
+        "description": "Maximum exposure time in AE mode.Range[16,1000000].Unit: microseconds.",
         "data_type": "uint",
         "rd_wt": "RW",
         "update_timing": "A"
@@ -562,7 +562,7 @@
     {
         "address": "0x0C18",
         "name": "Exp Time",
-        "description": "Current exposure time.\u00a0Note1.Unit: microseconds.",
+        "description": "Current exposure time.Unit: microseconds.",
         "data_type": "uint",
         "rd_wt": "RO",
         "update_timing": "R"
@@ -570,7 +570,7 @@
     {
         "address": "0x0C20",
         "name": "Manual Gain",
-        "description": "Manual gain, ,effective in MG mode.\u00a0Note2.",
+        "description": "Manual gain, ,effective in MG mode.",
         "data_type": "uint",
         "rd_wt": "RW",
         "update_timing": "A"
@@ -578,7 +578,7 @@
     {
         "address": "0x0C24",
         "name": "AG Max Gain",
-        "description": "Maximum value of auto gain.\u00a0Note2.",
+        "description": "Maximum value of auto gain.",
         "data_type": "uint",
         "rd_wt": "RW",
         "update_timing": "A"
@@ -586,7 +586,7 @@
     {
         "address": "0x0C28",
         "name": "Cur Gain",
-        "description": "Current Gain.\u00a0Note2.",
+        "description": "Current Gain.",
         "data_type": "uint",
         "rd_wt": "RO",
         "update_timing": "R"
