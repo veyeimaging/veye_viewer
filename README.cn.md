@@ -5,7 +5,7 @@ veye_viewer是一个开源的，基于QT的，为VEYE IMAGING的相机模组而�
 
 ### 兼容性
 
-兼容MV 系列相机和 RAW 系列相机模组。
+兼容MV系列相机，RAW系列相机和GX系列相机模组。
 
 支持平台RK3566/RK3568/RK3588 系列、Jetson Orin 和 Xavier 系列、raspberry4、5 系列。
 
@@ -32,8 +32,8 @@ veye_viewer是一个开源的，基于QT的，为VEYE IMAGING的相机模组而�
 *To be added.*
 
 ### 使用限制
-当前仅支持RAW8数据格式。
-
+对于MV和RAW系列相机支持RAW8数据格式。
+对于GX系列相机支持UYVY数据格式。
 ### 源码编译
 
 源码采用CMake进行构建，如果需要编译源码，可以采用以下两种方式进行编译，在编译之前需要安装基础环境和脚本授权，以免影响运行。

@@ -1,7 +1,7 @@
 # veye_viewer
 
 ### Installation
-The UI is developed using Qt5, and the video acquisition is based on the v4l2 camera demo development. It is compatible with the MV series cameras and RAW series cameras, and supports the platforms RK3566/RK3568/RK3588 series, Jetson Orin and Xavier series, raspberry4, and 5 series.
+This user interface is developed with Qt5, and the video capture is based on the v4l2 camera demonstration development. It is compatible with MV series, RAW series and GX series cameras, and supports RK3566/RK3568/RK3588 series, Jetson Orin and Xavier series, Raspberry Pi 4 and 5 series platforms.
 
 ### Compilation Tutorial
 The source code is built using CMake. If you need to compile the source code, you can use the following two methods for compilation. Before compiling, you need to install the basic environment and script authorization to avoid affecting the operation.

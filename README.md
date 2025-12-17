@@ -6,7 +6,7 @@
 
 ### Compatibility
 
-Compatible with both **MV series** and **RAW series** camera modules.
+Compatible with "MV series", "RAW series" and "GX series" camera modules.
 
 Supported platforms include:
 - RK3566 / RK3568 / RK3588 series
@@ -35,7 +35,8 @@ chmod 755 ./config/*.sh
 *To be added.*
 
 ### Limitations
-Currently supports only the **RAW8** data format.
+For the MV and RAW series cameras, RAW8 data format is supported.
+For the GX series cameras, UYVY data format is supported.
 
 ### Build from Source
 
