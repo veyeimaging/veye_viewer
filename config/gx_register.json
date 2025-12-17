@@ -434,7 +434,7 @@
     {
         "address": "0x0818",
         "name": "Current Width",
-        "description": "Current Width",
+        "description": "Current Width.",
         "data_type": "uint",
         "rd_wt": "RO",
         "update_timing": "-"
@@ -442,7 +442,7 @@
     {
         "address": "0x081C",
         "name": "Current Height",
-        "description": "Current Height\nOf the four roi registers, please write this last.",
+        "description": "Current Height.",
         "data_type": "uint",
         "rd_wt": "RO",
         "update_timing": "-"
