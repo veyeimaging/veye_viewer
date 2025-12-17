@@ -737,7 +737,7 @@ bool MainWidget::eventFilter(QObject *watched, QEvent *event)
                 ui->graphicsView->setParent(nullptr);
                 ui->graphicsView->showMaximized();
                 m_gvSrcSize = m_gvSize;
-                m_gvSize = screen()->availableGeometry().size();
+                m_gvSize = QApplication::primaryScreen()->availableGeometry().size();
             } else {
                 ui->graphicsView->showNormal();
                 ui->graphicsView->setWindowState(Qt::WindowNoState);

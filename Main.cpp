@@ -168,12 +168,13 @@ int main(int argc, char *argv[])
 
     qInstallMessageHandler(logMessageHandler);
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+#else
     QApplication::setHighDpiScaleFactorRoundingPolicy(
         Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
-    // 启用高 DPI 缩放（Qt 5/6 通用）
-    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    // 使用高 DPI 图标（避免图标模糊）
-    QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+#endif
 
     QApplication a(argc, argv);
     // 修复1：设置应用程序名称

@@ -1,7 +1,17 @@
 cmake_minimum_required(VERSION 3.16)
 
 project(veye_viewer VERSION 1.1.3 LANGUAGES CXX)
+# 若未指定构建类型，默认设为 Release
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+endif()
 
+# 显式指定 Release 模式的编译优化（覆盖默认）
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -Wall -DNDEBUG -ffast-math")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -Wall -DNDEBUG -ffast-math")
+
+# Qt 专属优化：禁用调试宏，减少运行时开销
+add_definitions(-DQT_NO_DEBUG -DQT_NO_DEBUG_OUTPUT -DQT_NO_WARNING_OUTPUT)
 # 基础编译配置
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -152,6 +162,7 @@ endif()
 
 # 链接依赖库
 target_link_libraries(veye_viewer PRIVATE
+    pthread
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::OpenGL
     # ${GLES_LIB}
