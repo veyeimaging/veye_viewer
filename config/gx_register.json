@@ -82,7 +82,7 @@
     {
         "address": "0x0028",
         "name": "Format Cap",
-        "description": "The module supports the capability set of data formats. Each bit represents a data Format, similar to the definition of the Pixel Format register.\nbit0: Mono8\nbit1: Mono10\nbit2: Mono12\nbit3: Mono14\uff08\uff09\nbit4: UYVY\nbit5: RGB888\nbit6: Temp()\nbit7: YUYV",
+        "description": "The module supports the capability set of data formats. Each bit represents a data Format, similar to the definition of the Pixel Format register.\nbit0: Mono8\nbit1: Mono10\nbit2: Mono12\nbit3: Mono14 (reserved)\nbit4: UYVY\nbit5: RGB888\nbit6: Temp (reserved)\nbit7: YUYV",
         "data_type": "uint",
         "rd_wt": "RO",
         "update_timing": "-"
