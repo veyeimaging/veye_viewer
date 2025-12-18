@@ -3,6 +3,7 @@
 #include <QProcess>
 #include <QWindow>
 #include <fstream>
+#include <unistd.h>
 
 QxHelp::QxHelp()
 {    

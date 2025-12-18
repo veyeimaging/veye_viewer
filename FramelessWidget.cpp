@@ -48,7 +48,7 @@ void FramelessWidget::doWindowStateChange(QEvent *event)
         moveEnable = true;
         resizeEnable = true;
     } else {
-        moveEnable = false;
+        //moveEnable = false;
         resizeEnable = false;
     }
 }
