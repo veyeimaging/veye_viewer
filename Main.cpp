@@ -176,6 +176,8 @@ int main(int argc, char *argv[])
         Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
 #endif
 
+    qputenv("QT_QPA_PLATFORM", "xcb");
+
     QApplication a(argc, argv);
     // 修复1：设置应用程序名称
     QApplication::setApplicationName(APP_NAME);
