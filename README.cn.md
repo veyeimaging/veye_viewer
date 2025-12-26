@@ -24,16 +24,20 @@ veye_viewer是一个开源的，基于QT的，为VEYE IMAGING的相机模组而�
 
 ```bash
     cd veye_viewer
-    chmod 755 ./config/*.sh   
+    chmod +x ./*
+	chmod 755 ./config/*.sh
     ./start_veye_viewer.sh
 ```
 
 ### 使用说明
-*To be added.*
+使用中，请注意界面下方的日志提示，如果遇到i2c-num没有访问权限的情况，请手动添加。
+```
+sudo chmod 777 /dev/i2c-*
+```
 
 ### 使用限制
 对于MV和RAW系列相机支持RAW8数据格式。
-对于GX系列相机支持UYVY数据格式。
+
 ### 源码编译
 
 源码采用CMake进行构建，如果需要编译源码，可以采用以下两种方式进行编译，在编译之前需要安装基础环境和脚本授权，以免影响运行。
