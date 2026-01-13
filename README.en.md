@@ -1,7 +1,41 @@
 # veye_viewer
 
-### Installation
-This user interface is developed with Qt5, and the video capture is based on the v4l2 camera demonstration development. It is compatible with MV series, RAW series and GX series cameras, and supports RK3566/RK3568/RK3588 series, Jetson Orin and Xavier series, Raspberry Pi 4 and 5 series platforms.
+### Introduction
+veye_viewer is an open-source, Qt-based client application specifically developed for VEYE IMAGING camera modules. Its user interface is built with Qt5, and video acquisition is implemented via the V4L2 interface.
+
+#### Compatibility
+
+Compatible with MV-series, RAW-series, and GX-series camera modules.
+
+Supported platforms include RK3566/RK3568/RK3588 series, Jetson Orin and Xavier series, and Raspberry Pi 4/5 series.
+
+#### Download and Execution
+
+You can either download the executable directly from the release packages of this project or choose to compile it from source code.
+
+#### Install Dependencies
+
+```bash
+sudo apt update
+sudo apt-get install gawk
+```
+#### Run the Application
+
+```bash
+cd veye_viewer
+chmod +x ./
+chmod 755 ./config/.sh
+./start_veye_viewer.sh
+```
+#### Usage Instructions
+During use, please pay attention to the log messages displayed at the bottom of the interface. If you encounter permission issues accessing i2c-num, manually grant permissions as follows:
+
+```bash
+sudo chmod 777 /dev/i2c-*
+```
+
+#### Usage Limitations
+For MV and RAW series cameras, only the RAW8 data format is supported.
 
 ### Compilation Tutorial
 The source code is built using CMake. If you need to compile the source code, you can use the following two methods for compilation. Before compiling, you need to install the basic environment and script authorization to avoid affecting the operation.
