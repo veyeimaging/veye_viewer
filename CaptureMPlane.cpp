@@ -46,7 +46,6 @@ void CaptureMPlane::initBuf()
     //     perror("ERROR VIDIOC_G_FMT:");
     // }
 
-
     m_v4l2ReqBuf.count = VIDEO_BUFFER_COUNT; //帧缓冲数量
     m_v4l2ReqBuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE;
     m_v4l2ReqBuf.memory = V4L2_MEMORY_MMAP; //内存映射方式
@@ -167,10 +166,15 @@ void CaptureMPlane::run()
                         nBytesperline = m_v4l2Fmt.fmt.pix_mp.plane_fmt[j].bytesperline;
                         m_width = m_v4l2Fmt.fmt.pix_mp.width;
                         m_height = m_v4l2Fmt.fmt.pix_mp.height;
+                        //rk  平台3566 中视频流为uyvy时，获取nBytesperline值错误，自行计算
+                        if (m_v4l2Fmt.fmt.pix_mp.pixelformat == V4L2_PIX_FMT_UYVY) {
+                            nBytesperline = m_width * 2;
+                        }
+
                         pBuf = (unsigned char *) m_buffers[m_v4l2Buf.index].addrs[j].start;
                         int len = m_buffers[m_v4l2Buf.index].planes[j].length;
                         ts = m_v4l2Buf.timestamp;
-                        QString strTS = QString::asprintf("%ld.%06ld", ts.tv_sec, ts.tv_usec);                
+                        QString strTS = QString::asprintf("%ld.%06ld", ts.tv_sec, ts.tv_usec);
                         m_nFps++;
                         if (m_bShow) {
                             StImgInfo sii;
