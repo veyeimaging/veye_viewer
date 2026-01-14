@@ -10,7 +10,7 @@
     {
         "address": "0x0004",
         "name": "Model Name",
-        "description": "Product Model Code.\n0x0662: GX-MIPI-IMX662",
+        "description": "Product Model Code.\n0x0662: GX-MIPI-IMX662\n0x0664: GX-MIPI-IMX664",
         "data_type": "enum",
         "rd_wt": "RO",
         "update_timing": "-"
@@ -18,7 +18,7 @@
     {
         "address": "0x0008",
         "name": "Sensor Name",
-        "description": "Sensor Model:\n0x662: IMX662-AAQR",
+        "description": "Sensor Model:\n0x662: IMX662-AAQR\n0x664: IMX664-AAQR1",
         "data_type": "enum",
         "rd_wt": "RO",
         "update_timing": "-"
