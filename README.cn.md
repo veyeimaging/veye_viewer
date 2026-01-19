@@ -18,6 +18,7 @@ veye_viewer是一个开源的，基于QT的，为VEYE IMAGING的相机模组而�
 ```bash
     sudo apt update
     sudo apt-get install gawk
+	sudo apt install libqt5opengl5
 ```
 
 #### 运行

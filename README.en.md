@@ -18,6 +18,7 @@ You can either download the executable directly from the release packages of thi
 ```bash
 sudo apt update
 sudo apt-get install gawk
+sudo apt install libqt5opengl5
 ```
 #### Run the Application
 
