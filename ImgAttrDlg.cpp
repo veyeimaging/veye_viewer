@@ -1,6 +1,7 @@
 #include "ImgAttrDlg.h"
 #include <QDebug>
 #include <QtConcurrent/QtConcurrent>
+#include "MainWidget.h"
 #include "QxHelp.h"
 #include "QxToast.h"
 #include "ui_ImgAttrDlg.h"
@@ -56,18 +57,18 @@ void ImgAttrDlg::rcvCmdRet(const StCmdRet &ret)
         }
         break;
     case videomode:
-        emit ui->comboBoxModeNum->activated(data);
+        onChangeVideoMode(data, false);
         break;
-    case videomodenum: {       
-        if ((data < 9) && (data > 0)) {
+    case videomodenum: {
+        if ((data < 8) && (data > 0)) {
             ui->comboBoxModeNum->clear();
             for (int i = 0; i < data; ++i) {
                 QString item = QString(tr("模式 ")) + QString::number(i + 1);
                 if ((ui->comboBoxModeNum->findText(item) < 0) && (item != "0 ∗ 0")) {
                     ui->comboBoxModeNum->addItem(item);
                 }
-                emit readCmd(EuCMD(videomodenum + i + 1), this, true);
-                emit readCmd(EuCMD(videomodenum + i + 2), this, true);
+                emit readCmd(EuCMD(videomodenum + i * 2 + 1), this, true);
+                emit readCmd(EuCMD(videomodenum + i * 2 + 2), this, true);
             }
             emit readCmd(videomode, this, true);
         }
@@ -89,7 +90,8 @@ void ImgAttrDlg::rcvCmdRet(const StCmdRet &ret)
             }
             rm.width = QString::number(w);
             rm.height = QString::number(h);
-            m_readModes[key] = rm;            
+            m_readModes[key] = rm;
+            qDebug() << "videomodewh videomode key:" << key << ret.strReg;
         }
 
     } break;
@@ -123,6 +125,7 @@ void ImgAttrDlg::rcvCmdRet(const StCmdRet &ret)
                 break;
             }
             m_readModes[key] = rm;
+            qDebug() << "videomodeparam videomode key:" << key << ret.strReg;
         }
     } break;
     default:
@@ -150,22 +153,16 @@ void ImgAttrDlg::setupUi()
     default:
         break;
     }
-    if (EuCamType::GxCamera == m_devCfg.cameType) {
-        ui->pushButtonSetRoiAndFps->setText(tr("设置分辨率和帧率"));
-    }
 
     connect(ui->pushButtonSetRoiAndFps, &QPushButton::clicked, this, [this]() {
         onSetRoiAndFpsData(true);
     });
+    connect(ui->pushButtonSetResolution, &QPushButton::clicked, this, [this]() {
+        onSetRoiAndFpsData(true);
+    });
 
     connect(ui->comboBoxModeNum, QOverload<int>::of(&QComboBox::activated), this, [this](int index) {
-        if (m_readModes.contains(index)) {
-            readMode rm = m_readModes.value(index);
-            ui->labelReadModeValue->setText(rm.mode);
-            ui->labelFps->setText(rm.fps);
-            ui->labelResolutionValue->setText(rm.width + " ∗ " + rm.height);
-            QxHelp::setDoubleLineEdit(ui->lineEditFPSGX, 0.00, rm.fps.toInt());
-        }
+        onChangeVideoMode(index, true);
     });
 }
 
@@ -190,18 +187,38 @@ void ImgAttrDlg::onSetRoiAndFpsData(bool read)
     } else if (EuCamType::GxCamera == m_devCfg.cameType) {
         info.strX = "0";
         info.strY = "0";
-        int index = ui->comboBoxModeNum->currentIndex();
-        if (m_readModes.contains(index)) {
-            info.strW = m_readModes[index].width;
-            info.strH = m_readModes[index].height;
+        int key = ui->comboBoxModeNum->currentIndex() * 2;
+        if (m_readModes.contains(key)) {
+            info.strW = m_readModes[key].width;
+            info.strH = m_readModes[key].height;
             info.strFps = ui->lineEditFPSGX->text();
         }
-        if (!info.strX.isEmpty() && !info.strY.isEmpty() && !info.strW.isEmpty()
-            && !info.strH.isEmpty() && !info.strFps.isEmpty()) {
+        if (!info.strW.isEmpty() && !info.strH.isEmpty() && !info.strFps.isEmpty()) {
             info.strFps = QString::number(info.strFps.toFloat(), 'f', 0);
             emit setRoiAndFpsData(info);
         } else {
-            QxToast::showTip(tr("请设置合理的ROI和FFS"));
+            QxToast::showTip(tr("请设置合理分辨率和帧率"));
+        }
+    }
+}
+
+void ImgAttrDlg::onChangeVideoMode(int index, bool isWrite)
+{
+    if (((MainWidget *) nativeParentWidget())->isCamRunning() && isWrite) {
+        ui->comboBoxModeNum->setCurrentIndex(m_prevVideoMode);
+        QxToast::showTip(tr("状态为采集中，不支持该操作"));
+    } else {
+        int key = index * 2;
+        if (m_readModes.contains(key)) {
+            readMode rm = m_readModes.value(key);
+            ui->labelReadModeValue->setText(rm.mode);
+            ui->labelFps->setText(rm.fps);
+            ui->labelResolutionValue->setText(rm.width + " ∗ " + rm.height);
+            QxHelp::setDoubleLineEdit(ui->lineEditFPSGX, 0.00, rm.fps.toInt());
+            m_prevVideoMode = index;
+            if (isWrite) {
+                emit sndCmd(readmode, index, true);
+            }
         }
     }
 }

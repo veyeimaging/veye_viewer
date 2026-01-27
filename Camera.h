@@ -91,6 +91,7 @@ protected:
     int m_fd = -1;
     QObject *m_mainWidget;
     CommDevCfg m_devCfg;
+    std::atomic<int> m_refCount = 0;
 };
 
 #endif // CAMERA_H

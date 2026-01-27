@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(veye_viewer VERSION 1.1.5 LANGUAGES CXX)
+project(veye_viewer VERSION 1.1.6 LANGUAGES CXX)
 # 若未指定构建类型，默认设为 Release
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)

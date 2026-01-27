@@ -122,6 +122,13 @@
         </item>
        </layout>
       </item>
+      <item>
+       <widget class="QPushButton" name="pushButtonSetRoiAndFps">
+        <property name="text">
+         <string>设置ROI和帧率</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -261,14 +268,14 @@
         </item>
        </layout>
       </item>
+      <item>
+       <widget class="QPushButton" name="pushButtonSetResolution">
+        <property name="text">
+         <string>设置分辨率和帧率</string>
+        </property>
+       </widget>
+      </item>
      </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="pushButtonSetRoiAndFps">
-     <property name="text">
-      <string>设置ROI和帧率</string>
-     </property>
     </widget>
    </item>
    <item>

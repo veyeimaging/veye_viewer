@@ -8,6 +8,7 @@ Capture::Capture(CommDevCfg devCfg, QObject *parent)
 {
     qRegisterMetaType<timeval>("timeval");
     qRegisterMetaType<StCamInfo>("StCamInfo");
+    qRegisterMetaType<EuCamStatus>("EuCamStatus");
     m_timer = new QTimer(this);
 }
 

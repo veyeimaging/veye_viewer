@@ -25,6 +25,8 @@ void CaptureMPlane::stopStream()
 
 void CaptureMPlane::initBuf()
 {
+    freeBuf();
+
     m_v4l2Fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE;
     if (ioctl(m_fd, VIDIOC_G_FMT, &m_v4l2Fmt) == -1) {
         perror("ERROR VIDIOC_G_FMT:");
@@ -42,10 +44,6 @@ void CaptureMPlane::initBuf()
         perror("ERROR VIDIOC_S_FMT:");
     }
 
-    // if (ioctl(m_fd, VIDIOC_G_FMT, &m_v4l2Fmt) == -1) {
-    //     perror("ERROR VIDIOC_G_FMT:");
-    // }
-
     m_v4l2ReqBuf.count = VIDEO_BUFFER_COUNT; //帧缓冲数量
     m_v4l2ReqBuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE;
     m_v4l2ReqBuf.memory = V4L2_MEMORY_MMAP; //内存映射方式
@@ -55,7 +53,7 @@ void CaptureMPlane::initBuf()
 
     num_planes = m_v4l2Fmt.fmt.pix_mp.num_planes;
     m_buffers = (StMplaneBuffer *) calloc(m_v4l2ReqBuf.count, sizeof(StMplaneBuffer));
-    for (int i = 0; i < m_v4l2ReqBuf.count; ++i) {
+    for (size_t i = 0; i < m_v4l2ReqBuf.count; ++i) {
         v4l2_plane *planes = (v4l2_plane *) calloc(num_planes, sizeof(v4l2_plane));
         StMmapAddr *addrs = (StMmapAddr *) calloc(num_planes, sizeof(StMmapAddr));
 
@@ -88,48 +86,53 @@ void CaptureMPlane::initBuf()
         }
     }
 
-    //for (int i = 0; i < m_v4l2ReqBuf.count; i++) {
     int bufType = V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE;
     if (ioctl(m_fd, VIDIOC_STREAMON, &bufType) == -1) {
         perror("ERROR VIDIOC_STREAMON:");
     }
-    //}
+    qDebug() << "...............run.....................initBuf";
 }
 
 void CaptureMPlane::freeBuf()
 {
-    //for (int i = 0; i < m_v4l2ReqBuf.count; i++) {
-    int bufType = V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE;
-    if (ioctl(m_fd, VIDIOC_STREAMOFF, &bufType) == -1) {
-        perror("VIDIOC_STREAMOFF");
-    }
-    //}
-
-    for (int i = 0; i < m_v4l2ReqBuf.count; i++) {
-        m_v4l2Buf.index = i;
-        ioctl(m_fd, VIDIOC_QBUF, &m_v4l2Buf);
-        for (int j = 0; j < num_planes; ++j) {
-            munmap(m_buffers[i].addrs[j].start, m_buffers[i].planes[j].length);
+    if (m_buffers) {
+        int bufType = V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE;
+        if (ioctl(m_fd, VIDIOC_STREAMOFF, &bufType) == -1) {
+            perror("VIDIOC_STREAMOFF");
         }
-    }
 
-    for (int i = 0; i < m_v4l2ReqBuf.count; ++i) {
-        free(m_buffers[i].planes);
-        m_buffers[i].planes = nullptr;
-        free(m_buffers[i].addrs);
-        m_buffers[i].addrs = nullptr;
-    }
-    free(m_buffers);
-    m_buffers = nullptr;
+        for (size_t i = 0; i < m_v4l2ReqBuf.count; i++) {
+            if (m_buffers[i].addrs) {
+                //m_v4l2Buf.index = i;
+                ioctl(m_fd, VIDIOC_QBUF, &m_v4l2Buf);
+                for (int j = 0; j < num_planes; ++j) {
+                    if (m_buffers[i].addrs[j].start != MAP_FAILED && m_buffers[i].addrs[j].start) {
+                        munmap(m_buffers[i].addrs[j].start, m_buffers[i].planes[j].length);
+                        m_buffers[i].addrs[j].start = nullptr;
+                    }
+                }
+                free(m_buffers[i].addrs);
+                m_buffers[i].addrs = nullptr;
+            }
 
-    memset(&m_v4l2ReqBuf, 0, sizeof(m_v4l2ReqBuf));
-    m_v4l2ReqBuf.count = 0; //帧缓冲数量
-    m_v4l2ReqBuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE;
-    m_v4l2ReqBuf.memory = V4L2_MEMORY_MMAP; //内存映射方式
-    if (0 != ioctl(m_fd, VIDIOC_REQBUFS, &m_v4l2ReqBuf)) {
-        perror("ERROR: failed to VIDIOC_REQBUFS");
+            if (m_buffers[i].planes) {
+                free(m_buffers[i].planes);
+                m_buffers[i].planes = nullptr;
+            }
+        }
+        free(m_buffers);
+        m_buffers = nullptr;
+
+        memset(&m_v4l2ReqBuf, 0, sizeof(m_v4l2ReqBuf));
+        m_v4l2ReqBuf.count = 0;
+        m_v4l2ReqBuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE;
+        m_v4l2ReqBuf.memory = V4L2_MEMORY_MMAP;
+        if (0 != ioctl(m_fd, VIDIOC_REQBUFS, &m_v4l2ReqBuf)) {
+            perror("ERROR: failed to VIDIOC_REQBUFS");
+        }
+        m_v4l2ReqBuf.count = 0;
+        qDebug() << "...............run.....................freeBuf";
     }
-    qDebug() << "...freeBuf....";
 }
 
 void CaptureMPlane::run()
@@ -137,15 +140,15 @@ void CaptureMPlane::run()
     qDebug() << "...............run.....................enter";
     QThread::currentThread()->setPriority(QThread::TimeCriticalPriority);
     initBuf();
-    qDebug() << "...............run.....................initBuf";
+
     int nBytesperline = 0;
     unsigned char *pBuf = nullptr;
     int strategy = new_buf;
     fd_set readfds;
     timeval timeout;
     struct timeval ts;
-    emit sndStatus(1);
     bool bNeedSndShow = false;
+    int timeoutCount = 0;
 
     while (m_bRunning) {
         FD_ZERO(&readfds);
@@ -159,8 +162,14 @@ void CaptureMPlane::run()
             qDebug() << "read data error!" << errno;
         } else if (0 == ready) {
             qDebug() << "read data time out!";
+            timeoutCount++;
+            if (timeoutCount > 5) {
+                timeoutCount = 0;
+                emit sndStatus(EuCamStatus::READ_TIMEMOU);
+            }
         } else {
             if (FD_ISSET(m_fd, &readfds)) {
+                timeoutCount = 0;
                 while (0 == ioctl(m_fd, VIDIOC_DQBUF, &m_v4l2Buf)) {
                     for (int j = 0; j < num_planes; j++) {
                         nBytesperline = m_v4l2Fmt.fmt.pix_mp.plane_fmt[j].bytesperline;
@@ -197,7 +206,6 @@ void CaptureMPlane::run()
                         } else {
                             if (bNeedSndShow) {
                                 bNeedSndShow = false;
-                                emit sndStatus(2);
                             }
                         }
                         if (m_bSave && m_nSaveCount > 0) {
@@ -249,7 +257,7 @@ void CaptureMPlane::run()
         msleep(1);
     }
     freeBuf();
-    qDebug() << "...............run.....................freeBuf";
-    emit sndStatus(0);
+
+    emit sndStatus(EuCamStatus::CLOSE_STA);
     qDebug() << "...............run.....................leave";
 }

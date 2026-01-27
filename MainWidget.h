@@ -35,6 +35,7 @@ public:
 
 public:
     void pushData(const StImgInfo &sii);
+    bool isCamRunning();
 public slots:
     void onTitleDblClick();
     void rcvFrameInfo(const StCamInfo &info);
@@ -42,7 +43,7 @@ public slots:
     void rcvCmdRet(const StCmdRet &ret);
     void rcvPixmap(const QPixmap &pix, QString strTS);
     void rcvSaveFinish(bool bFalg);
-    void rcvStatus(int status);
+    void onCamStatus(EuCamStatus status);
 protected slots:
     void asyncWriteCmd(EuCMD cmd, uint32_t data, bool bShow = true);
     void asyncReadCmd(EuCMD cmd, QObject *obj, bool bShow = true);

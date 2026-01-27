@@ -216,52 +216,55 @@ Camera::~Camera()
 bool Camera::OpenDevice(StCamParam &param)
 {
     bool bRet = false;
-    m_fd = open(param.videoNode.toStdString().c_str(), O_RDWR | O_NONBLOCK);
-    if (-1 != m_fd) {
-        struct v4l2_capability cap;
-        int ret = ioctl(m_fd, VIDIOC_QUERYCAP, &cap);
-        if (ret < 0) {
-            qWarning() << "获取功能失败:" << errno;
-        } else {
-            if (cap.capabilities & V4L2_CAP_VIDEO_CAPTURE) {
-                m_capture = std::make_unique<CaptureSPlane>(m_devCfg, this);
-                qDebug() << "get capabilities:V4L2_CAP_VIDEO_CAPTURE";
-            } else if (cap.capabilities & V4L2_CAP_VIDEO_CAPTURE_MPLANE) {
-                m_capture = std::make_unique<CaptureMPlane>(m_devCfg, this);
-                qDebug() << "get capabilities:V4L2_CAP_VIDEO_CAPTURE_MPLANE";
+    if ((-1 == m_fd) && (nullptr == m_capture)) {
+        m_fd = open(param.videoNode.toStdString().c_str(), O_RDWR | O_NONBLOCK);
+        if (-1 != m_fd) {
+            struct v4l2_capability cap;
+            int ret = ioctl(m_fd, VIDIOC_QUERYCAP, &cap);
+            if (ret < 0) {
+                qWarning() << "获取功能失败:" << errno;
             } else {
-                qWarning() << "get capabilities:unknow";
+                if (cap.capabilities & V4L2_CAP_VIDEO_CAPTURE) {
+                    m_capture = std::make_unique<CaptureSPlane>(m_devCfg, this);
+                    qDebug() << "get capabilities:V4L2_CAP_VIDEO_CAPTURE";
+                } else if (cap.capabilities & V4L2_CAP_VIDEO_CAPTURE_MPLANE) {
+                    m_capture = std::make_unique<CaptureMPlane>(m_devCfg, this);
+                    qDebug() << "get capabilities:V4L2_CAP_VIDEO_CAPTURE_MPLANE";
+                } else {
+                    qWarning() << "get capabilities:unknow";
+                }
             }
+            if (m_capture) {
+                bRet = true;
+                m_capture.get()->setMainWidget(parent());
+                connect((MainWidget *) parent(),
+                        &MainWidget::sndSaveImg,
+                        m_capture.get(),
+                        &Capture::rcvSaveImg);
+                connect((MainWidget *) parent(),
+                        &MainWidget::sndShow,
+                        m_capture.get(),
+                        &Capture::rcvShow);
+                connect(m_capture.get(),
+                        &Capture::sndFrameInfo,
+                        qobject_cast<MainWidget *>(parent()),
+                        &MainWidget::rcvFrameInfo);
+                connect(m_capture.get(),
+                        &Capture::sndSaveFinish,
+                        qobject_cast<MainWidget *>(parent()),
+                        &MainWidget::rcvSaveFinish);
+                connect(m_capture.get(),
+                        &Capture::sndStatus,
+                        qobject_cast<MainWidget *>(parent()),
+                        &MainWidget::onCamStatus);
+                m_capture->startStream(m_fd, param);
+                m_refCount++;
+            }
+        } else {
+            qWarning() << "...........OpenDevice.....error.........." << m_fd;
         }
-
-        if (m_capture) {
-            bRet = true;
-            m_capture.get()->setMainWidget(parent());
-            connect((MainWidget *) parent(),
-                    &MainWidget::sndSaveImg,
-                    m_capture.get(),
-                    &Capture::rcvSaveImg);
-            connect((MainWidget *) parent(),
-                    &MainWidget::sndShow,
-                    m_capture.get(),
-                    &Capture::rcvShow);
-            connect(m_capture.get(),
-                    &Capture::sndFrameInfo,
-                    qobject_cast<MainWidget *>(parent()),
-                    &MainWidget::rcvFrameInfo);
-            connect(m_capture.get(),
-                    &Capture::sndSaveFinish,
-                    qobject_cast<MainWidget *>(parent()),
-                    &MainWidget::rcvSaveFinish);
-            connect(m_capture.get(),
-                    &Capture::sndStatus,
-                    qobject_cast<MainWidget *>(parent()),
-                    &MainWidget::rcvStatus);
-            m_capture->startStream(m_fd, param);
-        }
-    } else {
-        qDebug() << "...........OpenDevice.....error.........." << m_fd;
     }
+    qDebug() << "...........OpenDevice.............." << m_refCount;
     return bRet;
 }
 
@@ -271,6 +274,8 @@ void Camera::CloseDevice()
         m_capture->stopStream();
         m_capture->disconnect();
         m_capture.release();
+        m_capture = nullptr;
+        m_refCount--;
     }
     if (-1 != m_fd) {
         close(m_fd);

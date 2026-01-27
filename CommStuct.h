@@ -20,6 +20,9 @@ enum class EuCamType {
     MvCamera  // 代表 MV 系列相机
 };
 
+enum class EuCamStatus { OPEN_STA, CLOSE_STA, SHOW_STA, HIDE_STA, READ_TIMEMOU };
+Q_DECLARE_METATYPE(EuCamStatus)
+
 enum class EuPlatform {
     Rockchip,     // 瑞芯微平台
     RaspberryPi,  // 树莓派 (泛指或旧型号)

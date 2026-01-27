@@ -24,12 +24,14 @@ public:
     ~ImgAttrDlg();
 signals:
     void setRoiAndFpsData(StImgAttrInfo &info);
+    void sndCmd(EuCMD cmd, uint32_t data, bool bShow = true);
     void readCmd(EuCMD cmd, QObject *obj, bool bShow = true);
 public slots:
     void rcvUpdateUi();
     void rcvSetROI(bool read);
     void rcvCmdRet(const StCmdRet &ret);
     void onSetRoiAndFpsData(bool read);
+    void onChangeVideoMode(int index, bool isWrite);
 
 protected:
     void setupUi();
@@ -41,6 +43,7 @@ private:
     Ui::ImgAttrDlg *ui;
     CommDevCfg m_devCfg;
     QMap<int, readMode> m_readModes;
+    int m_prevVideoMode = 0;
 };
 
 #endif // IMGATTRDLG_H

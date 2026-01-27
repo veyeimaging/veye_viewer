@@ -46,7 +46,7 @@ void ImgProcDlg::rcvCmdRet(const StCmdRet &ret)
 bool ImgProcDlg::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::MouseButtonRelease) {
-        QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+        //QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
         QSpinBox *spinBox = qobject_cast<QSpinBox *>(obj);
         if (spinBox && spinBox->isEnabled()) {
             int value = spinBox->value();

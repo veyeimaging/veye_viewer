@@ -172,6 +172,10 @@ void MainWidget::initObj()
     connect(this, &MainWidget::sndUpdateUI, m_pImgAttr, &ImgAttrDlg::rcvUpdateUi);
     connect(this, &MainWidget::sndImgAttrCmdRet, m_pImgAttr, &ImgAttrDlg::rcvCmdRet);
     connect(m_pImgAttr, &ImgAttrDlg::setRoiAndFpsData, this, &MainWidget::onSetRoiAndFps);
+    connect(m_pImgAttr, &ImgAttrDlg::sndCmd, this, [this](EuCMD cmd, uint32_t data, bool bShow) {
+        asyncWriteCmd(cmd, data, bShow);
+        readCmd(cmd, m_pImgAttr);
+    });
     connect(m_pImgAttr, &ImgAttrDlg::readCmd, this, &MainWidget::asyncReadCmd);
 
     m_pExpAndGain = new ExpGainDlg(devCfg, this);
@@ -492,7 +496,9 @@ void MainWidget::setupUi()
     });
 
     connect(ui->pushButtonCapture, &QPushButton::clicked, this, [this](bool checked) {
-        if (checked) {
+        // ui->pushButtonCapture->setEnabled(false);
+        // QTimer::singleShot(300, this, [this]() { ui->pushButtonCapture->setEnabled(true); });
+        if (tr("开始采集") == ui->pushButtonCapture->text()) {
             openCam();
         } else {
             closeCam();
@@ -958,47 +964,86 @@ void MainWidget::onSetRoiAndFps(const StImgAttrInfo &info)
     }
 }
 
-void MainWidget::openCam()
+void MainWidget::onCamStatus(EuCamStatus status)
 {
-    emit sndSetROI(false);
-    QString videoNode = ui->lineEditVideoNode->text();
-    switch (m_euPlatform) {
-    case EuPlatform::Rockchip: {
+    switch (status) {
+    case EuCamStatus::OPEN_STA: {
+        ui->pushButtonSaveImg->setEnabled(true);
+        //ui->pushButtonShow->setText(tr("停止显示"));
+        ui->pushButtonCapture->setText(tr("停止采集"));
+        ui->pushButtonShow->setEnabled(true);
     } break;
-    case EuPlatform::RaspberryPi: {        
+    case EuCamStatus::CLOSE_STA: {
+        ui->pushButtonSaveImg->setEnabled(false);
+        ui->pushButtonCapture->setText(tr("开始采集"));
+        ui->pushButtonShow->setText(tr("开始显示"));
+        rcvFrameInfo(StCamInfo());
+        ui->pushButtonShow->setEnabled(false);
+        showBGImg();
+        m_camRunning = false;
     } break;
-    case EuPlatform::RaspberryPi5: {
+    case EuCamStatus::HIDE_STA: {
+        showBGImg();
     } break;
-    case EuPlatform::Jetson: {
-        QString strCmd = QString("v4l2-ctl -d %1 --set-ctrl vi_time_out_disable=1").arg(videoNode);
-        m_cam->runSystemCmd(strCmd);
+    case EuCamStatus::READ_TIMEMOU: {
+        QxToast::showTip("Data reading timed out. Please try restarting");
     } break;
     default:
         break;
     }
-    m_camRunning = m_cam->OpenDevice(m_camParam);
+}
+
+void MainWidget::openCam()
+{
+    if (!m_camRunning) {
+        qDebug() << ".........openCam.........";
+        emit sndSetROI(false);
+        QString videoNode = ui->lineEditVideoNode->text();
+        switch (m_euPlatform) {
+        case EuPlatform::Rockchip: {
+        } break;
+        case EuPlatform::RaspberryPi: {
+        } break;
+        case EuPlatform::RaspberryPi5: {
+        } break;
+        case EuPlatform::Jetson: {
+            QString strCmd = QString("v4l2-ctl -d %1 --set-ctrl vi_time_out_disable=1")
+                                 .arg(videoNode);
+            m_cam->runSystemCmd(strCmd);
+        } break;
+        default:
+            break;
+        };
+
+        m_camRunning = m_cam->OpenDevice(m_camParam);
+        if (m_camRunning) {
+            onCamStatus(EuCamStatus::OPEN_STA);
+        } else {
+            onCamStatus(EuCamStatus::CLOSE_STA);
+        }
+    }
 }
 
 void MainWidget::closeCam()
 {
-    QString videoNode = ui->lineEditVideoNode->text();
-    switch (m_euPlatform) {
-    case EuPlatform::Rockchip: {
-    } break;
-    case EuPlatform::RaspberryPi: {
-    } break;
-    case EuPlatform::RaspberryPi5: {
-    } break;
-    case EuPlatform::Jetson: {
-        QString strCmd = QString("v4l2-ctl -d %1 --set-ctrl vi_time_out_disable=0").arg(videoNode);
-        m_cam->runSystemCmd(strCmd);
-    } break;
-    default:
-        break;
-    }
-
     if (m_camRunning) {
-        m_camRunning = false;
+        qDebug() << ".........closeCam.........";
+        QString videoNode = ui->lineEditVideoNode->text();
+        switch (m_euPlatform) {
+        case EuPlatform::Rockchip: {
+        } break;
+        case EuPlatform::RaspberryPi: {
+        } break;
+        case EuPlatform::RaspberryPi5: {
+        } break;
+        case EuPlatform::Jetson: {
+            QString strCmd = QString("v4l2-ctl -d %1 --set-ctrl vi_time_out_disable=0")
+                                 .arg(videoNode);
+            m_cam->runSystemCmd(strCmd);
+        } break;
+        default:
+            break;
+        }
         m_cam->CloseDevice();
         ui->pushButtonCapture->setChecked(false);
         closeShow();
@@ -1367,6 +1412,8 @@ void MainWidget::showBGImg()
     m_pixItem->setPixmap(pix);
     m_pixItem->update();
     m_scene->setSceneRect(0, 0, pix.width(), pix.height());
+    ui->labelTimestamp->setText("0");
+    ui->label_showFps->setText("0");
 }
 
 void MainWidget::showCtrlWidget()
@@ -1428,6 +1475,11 @@ void MainWidget::pushData(const StImgInfo &sii)
         m_seconds = 0;
         m_showFps = 0;
     }
+}
+
+bool MainWidget::isCamRunning()
+{
+    return m_camRunning;
 }
 
 QImage uyvyToQImage(unsigned char *uyvyData, int dataSize, int width, int height, int bytesPerLine)
@@ -1614,32 +1666,6 @@ void MainWidget::rcvSaveFinish(bool bFalg)
 {
     QxToast::showTip(tr("保存图像完成"), this);
     ui->pushButtonSaveImg->setEnabled(bFalg);
-}
-
-void MainWidget::rcvStatus(int status)
-{
-    if (status) {
-        ui->pushButtonSaveImg->setEnabled(true);
-        ui->pushButtonCapture->setText(tr("停止采集"));
-        m_camRunning = true;
-        ui->pushButtonShow->setEnabled(true);
-
-    } else {
-        showBGImg();
-        ui->pushButtonSaveImg->setEnabled(false);
-        ui->pushButtonCapture->setText(tr("开始采集"));
-        ui->pushButtonShow->setText(tr("开始显示"));
-        m_camRunning = false;
-        ui->labelTimestamp->setText("0");
-        ui->label_showFps->setText("0");
-        rcvFrameInfo(StCamInfo());
-        ui->pushButtonShow->setEnabled(false);
-    }
-    if (2 == status) {
-        showBGImg();
-        ui->labelTimestamp->setText("0");
-        ui->label_showFps->setText("0");
-    }
 }
 
 void MainWidget::rcvOptLog(int ret, QString strMsg, bool bShow)

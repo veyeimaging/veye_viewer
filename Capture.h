@@ -41,7 +41,7 @@ signals:
     void sndCaptureImg(const StImgInfo &sii);
     void sndFrameInfo(const StCamInfo &sci);
     void sndSaveFinish(bool bFlag);
-    void sndStatus(int status);
+    void sndStatus(EuCamStatus status);
 public slots:
     void rcvSaveImg(QString strPath, int count);
     void rcvShow(bool bShow);
