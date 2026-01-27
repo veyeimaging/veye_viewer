@@ -61,7 +61,7 @@ void ImgAttrDlg::rcvCmdRet(const StCmdRet &ret)
         break;
     case videomodenum: {
         if ((data < 8) && (data > 0)) {
-            ui->comboBoxModeNum->clear();
+            //ui->comboBoxModeNum->clear();
             for (int i = 0; i < data; ++i) {
                 QString item = QString(tr("模式 ")) + QString::number(i + 1);
                 if ((ui->comboBoxModeNum->findText(item) < 0) && (item != "0 ∗ 0")) {
@@ -91,7 +91,6 @@ void ImgAttrDlg::rcvCmdRet(const StCmdRet &ret)
             rm.width = QString::number(w);
             rm.height = QString::number(h);
             m_readModes[key] = rm;
-            qDebug() << "videomodewh videomode key:" << key << ret.strReg;
         }
 
     } break;
@@ -125,7 +124,6 @@ void ImgAttrDlg::rcvCmdRet(const StCmdRet &ret)
                 break;
             }
             m_readModes[key] = rm;
-            qDebug() << "videomodeparam videomode key:" << key << ret.strReg;
         }
     } break;
     default:
@@ -215,6 +213,7 @@ void ImgAttrDlg::onChangeVideoMode(int index, bool isWrite)
             ui->labelFps->setText(rm.fps);
             ui->labelResolutionValue->setText(rm.width + " ∗ " + rm.height);
             QxHelp::setDoubleLineEdit(ui->lineEditFPSGX, 0.00, rm.fps.toInt());
+            ui->comboBoxModeNum->setCurrentIndex(index);
             m_prevVideoMode = index;
             if (isWrite) {
                 emit sndCmd(readmode, index, true);
