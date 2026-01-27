@@ -314,7 +314,7 @@
     {
         "address": "0x041C",
         "name": "I2C ADDR",
-        "description": "I2c address. Range[0x03,0x77].",
+        "description": "I2c address. Range[0x08,0x77].",
         "data_type": "uint",
         "rd_wt": "RW",
         "update_timing": "A"
