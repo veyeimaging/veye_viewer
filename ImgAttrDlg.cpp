@@ -61,8 +61,8 @@ void ImgAttrDlg::rcvCmdRet(const StCmdRet &ret)
         break;
     case videomodenum: {
         if ((data < 8) && (data > 0)) {
-            //ui->comboBoxModeNum->clear();
-            for (int i = 0; i < data; ++i) {
+            ui->comboBoxModeNum->clear();
+            for (uint32_t i = 0; i < data; ++i) {
                 QString item = QString(tr("模式 ")) + QString::number(i + 1);
                 if ((ui->comboBoxModeNum->findText(item) < 0) && (item != "0 ∗ 0")) {
                     ui->comboBoxModeNum->addItem(item);
@@ -216,7 +216,7 @@ void ImgAttrDlg::onChangeVideoMode(int index, bool isWrite)
             ui->comboBoxModeNum->setCurrentIndex(index);
             m_prevVideoMode = index;
             if (isWrite) {
-                emit sndCmd(readmode, index, true);
+                emit sndCmd(videomode, index, true);
             }
         }
     }
