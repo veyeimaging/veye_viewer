@@ -184,7 +184,7 @@ void ImgAttrDlg::onSetRoiAndFpsData(bool read)
         info.strFps = ui->lineEditFPSMV->text();
         if (!info.strX.isEmpty() && !info.strY.isEmpty() && !info.strW.isEmpty()
             && !info.strH.isEmpty() && !info.strFps.isEmpty()) {
-            info.strFps = QString::number(info.strFps.toFloat(), 'f', 0);
+            info.strFps = QString::number(info.strFps.toFloat(), 'f', 2);
             qDebug() << info.strFps;
             emit setRoiAndFpsData(info);
         } else {
@@ -200,7 +200,7 @@ void ImgAttrDlg::onSetRoiAndFpsData(bool read)
             info.strFps = ui->lineEditFPSGX->text();
         }
         if (!info.strW.isEmpty() && !info.strH.isEmpty() && !info.strFps.isEmpty()) {
-            info.strFps = QString::number(info.strFps.toFloat(), 'f', 0);
+            info.strFps = QString::number(info.strFps.toFloat(), 'f', 2);
             emit setRoiAndFpsData(info);
         } else {
             QxToast::showTip(tr("请设置合理分辨率和帧率"));

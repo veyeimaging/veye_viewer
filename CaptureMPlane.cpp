@@ -165,7 +165,7 @@ void CaptureMPlane::run()
             timeoutCount++;
             if (timeoutCount > 5) {
                 timeoutCount = 0;
-                emit sndStatus(EuCamStatus::READ_TIMEMOU);
+                //emit sndStatus(EuCamStatus::READ_TIMEMOU);
             }
         } else {
             if (FD_ISSET(m_fd, &readfds)) {
