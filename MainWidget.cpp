@@ -860,7 +860,7 @@ void MainWidget::onSetRoiAndFps(const StImgAttrInfo &info)
 
         QString strCmd;
         switch (m_euPlatform) {
-        case EuPlatform::Rockchip: {
+        case EuPlatform::Rockchip: { 
             if (EuCamType::MvCamera == m_euCamType) {        
                 strCmd = QString("v4l2-ctl -d %1 --set-ctrl roi_x=%2").arg(subNode, strX);
                 m_cam->runSystemCmd(strCmd);
@@ -869,7 +869,7 @@ void MainWidget::onSetRoiAndFps(const StImgAttrInfo &info)
                 strCmd = QString("media-ctl -d %1 --set-v4l2 \'\"%2\":0[fmt:%3/%4x%5@1/%6]\'")
                              .arg(mediaNode, entityName, "Y8_1X8", strW, strH, strFps);
                 m_cam->runSystemCmd(strCmd);
-                asyncWriteCmd(fps, strFps.toFloat() * 100.0, true);
+                asyncWriteCmd(fps, strFps.toFloat() * 100, true);
             } else if (EuCamType::GxCamera == m_euCamType) {
                 strCmd = QString("media-ctl -d %1 --set-v4l2 \'\"%2\":0[fmt:%3/%4x%5@1/%6]\'")
                              .arg(mediaNode,
@@ -877,9 +877,9 @@ void MainWidget::onSetRoiAndFps(const StImgAttrInfo &info)
                                   "UYVY8_2X8",
                                   strW,
                                   strH,
-                                  QString::number(static_cast<int>(strFps.toDouble())));
+                                  QString::number(static_cast<int>(strFps.toFloat())));
                 m_cam->runSystemCmd(strCmd);
-                asyncWriteCmd(fps_gx, strFps.toFloat() * 10000.0, true);
+                asyncWriteCmd(fps_gx, strFps.toFloat() * 10000, true);
                 qDebug() << strCmd;
             }
         } break;
@@ -893,13 +893,13 @@ void MainWidget::onSetRoiAndFps(const StImgAttrInfo &info)
                              "v4l2-ctl -d %1 --set-fmt-video=width=%2,height=%3,pixelformat=GREY")
                              .arg(videoNode, strW, strH);
                 m_cam->runSystemCmd(strCmd);
-                asyncWriteCmd(fps, strFps.toFloat() * 100.0, true);
+                asyncWriteCmd(fps, strFps.toFloat() * 100, true);
             } else if (EuCamType::GxCamera == m_euCamType) {
                 strCmd = QString(
                              "v4l2-ctl -d %1 --set-fmt-video=width=%2,height=%3,pixelformat=UYVY")
                              .arg(videoNode, strW, strH);
                 m_cam->runSystemCmd(strCmd);
-                asyncWriteCmd(fps_gx, strFps.toFloat() * 10000.0, true);
+                asyncWriteCmd(fps_gx, strFps.toFloat() * 10000, true);
             }
             // strCmd = QString("v4l2-ctl -d %1 --set-ctrl frame_rate=%2").arg(videoNode, strFps);
             // m_cam->runSystemCmd(strCmd);
@@ -920,7 +920,7 @@ void MainWidget::onSetRoiAndFps(const StImgAttrInfo &info)
                                           subNode.toStdString().c_str(),
                                           videoNode.toStdString().c_str());
                 m_cam->runSystemCmd(strCmd);
-                asyncWriteCmd(fps, strFps.toFloat() * 100.0, true);
+                asyncWriteCmd(fps, strFps.toFloat() * 100, true);
             } else if (EuCamType::GxCamera == m_euCamType) {
                 strCmd
                     = m_strCfgPath + "config_camera-rpi5.sh"
@@ -935,7 +935,7 @@ void MainWidget::onSetRoiAndFps(const StImgAttrInfo &info)
                                           subNode.toStdString().c_str(),
                                           videoNode.toStdString().c_str());
                 m_cam->runSystemCmd(strCmd);
-                asyncWriteCmd(fps_gx, strFps.toFloat() * 10000.0, true);
+                asyncWriteCmd(fps_gx, strFps.toFloat() * 10000, true);
             }
             // strCmd = QString("v4l2-ctl -d %1 --set-ctrl frame_rate=%2").arg(subNode, strFps);
             // m_cam->runSystemCmd(strCmd);
@@ -950,13 +950,13 @@ void MainWidget::onSetRoiAndFps(const StImgAttrInfo &info)
                              "v4l2-ctl -d %1 --set-fmt-video=width=%2,height=%3,pixelformat=GREY")
                              .arg(videoNode, strW, strH);
                 m_cam->runSystemCmd(strCmd);
-                asyncWriteCmd(fps, strFps.toFloat() * 100.0, true);
+                asyncWriteCmd(fps, strFps.toFloat() * 100, true);
             } else if (EuCamType::GxCamera == m_euCamType) {
                 strCmd = QString(
                              "v4l2-ctl -d %1 --set-fmt-video=width=%2,height=%3,pixelformat=UYVY")
                              .arg(videoNode, strW, strH);
                 m_cam->runSystemCmd(strCmd);
-                asyncWriteCmd(fps_gx, strFps.toFloat() * 10000.0, true);
+                asyncWriteCmd(fps_gx, strFps.toFloat() * 10000, true);
             }
             // strCmd = QString("v4l2-ctl -d %1 --set-ctrl frame_rate=%2").arg(videoNode, strFps);
             // m_cam->runSystemCmd(strCmd);
