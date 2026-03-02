@@ -27,7 +27,7 @@ sudo apt install libqt5opengl5
 ```bash
 cd veye_viewer
 chmod +x ./
-chmod 755 ./config/.sh
+chmod 755 ./config/*.sh
 ./start_veye_viewer.sh
 ```
 #### Usage Instructions
