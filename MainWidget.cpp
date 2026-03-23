@@ -868,7 +868,12 @@ void MainWidget::onSetRoiAndFps(const StImgAttrInfo &info)
                 strCmd = QString("v4l2-ctl -d %1 --set-ctrl roi_y=%2").arg(subNode, strY);
                 m_cam->runSystemCmd(strCmd);
                 strCmd = QString("media-ctl -d %1 --set-v4l2 \'\"%2\":0[fmt:%3/%4x%5@1/%6]\'")
-                             .arg(mediaNode, entityName, "Y8_1X8", strW, strH, strFps);
+                             .arg(mediaNode,
+                                  entityName,
+                                  "Y8_1X8",
+                                  strW,
+                                  strH,
+                                  QString::number(static_cast<int>(strFps.toFloat())));
                 m_cam->runSystemCmd(strCmd);
                 asyncWriteCmd(fps, nFps, true);
             } else if (EuCamType::GxCamera == m_euCamType) {
