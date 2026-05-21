@@ -325,7 +325,7 @@
         "description": "Indicates whether the clock lan of the mipi signal is in continuous clock mode.\n0: discontinuous mode\n1: continuous mode",
         "data_type": "bool",
         "rd_wt": "RW",
-        "update_timing": "A"
+        "update_timing": "S"
     },
     {
         "address": "0x0460",
