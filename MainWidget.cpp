@@ -862,7 +862,7 @@ void MainWidget::onSetRoiAndFps(const StImgAttrInfo &info)
         switch (m_euPlatform) {
         case EuPlatform::Rockchip: {
             if (EuCamType::MvCamera == m_euCamType) {
-                int nFps = QString::number(strFps.toFloat() * 100).toInt();
+                int nFps = strFps.toFloat() * 100;
                 strCmd = QString("v4l2-ctl -d %1 --set-ctrl roi_x=%2").arg(subNode, strX);
                 m_cam->runSystemCmd(strCmd);
                 strCmd = QString("v4l2-ctl -d %1 --set-ctrl roi_y=%2").arg(subNode, strY);
@@ -877,7 +877,7 @@ void MainWidget::onSetRoiAndFps(const StImgAttrInfo &info)
                 m_cam->runSystemCmd(strCmd);
                 asyncWriteCmd(fps, nFps, true);
             } else if (EuCamType::GxCamera == m_euCamType) {
-                int nFps = QString::number(strFps.toFloat() * 10000).toInt();
+                int nFps = strFps.toFloat() * 10000;
                 strCmd = QString("media-ctl -d %1 --set-v4l2 \'\"%2\":0[fmt:%3/%4x%5@1/%6]\'")
                              .arg(mediaNode,
                                   entityName,
@@ -892,7 +892,7 @@ void MainWidget::onSetRoiAndFps(const StImgAttrInfo &info)
         } break;
         case EuPlatform::RaspberryPi: {
             if (EuCamType::MvCamera == m_euCamType) {
-                int nFps = QString::number(strFps.toFloat() * 100).toInt();
+                int nFps = strFps.toFloat() * 100;
                 strCmd = QString("v4l2-ctl -d %1 --set-ctrl roi_x=%2").arg(videoNode, strX);
                 m_cam->runSystemCmd(strCmd);
                 strCmd = QString("v4l2-ctl -d %1 --set-ctrl roi_y=%2").arg(videoNode, strY);
@@ -903,7 +903,7 @@ void MainWidget::onSetRoiAndFps(const StImgAttrInfo &info)
                 m_cam->runSystemCmd(strCmd);
                 asyncWriteCmd(fps, nFps, true);
             } else if (EuCamType::GxCamera == m_euCamType) {
-                int nFps = QString::number(strFps.toFloat() * 10000).toInt();
+                int nFps = strFps.toFloat() * 10000;
                 strCmd = QString(
                              "v4l2-ctl -d %1 --set-fmt-video=width=%2,height=%3,pixelformat=UYVY")
                              .arg(videoNode, strW, strH);
@@ -916,7 +916,7 @@ void MainWidget::onSetRoiAndFps(const StImgAttrInfo &info)
         } break;
         case EuPlatform::RaspberryPi5: {
             if (EuCamType::MvCamera == m_euCamType) {
-                int nFps = QString::number(strFps.toFloat() * 100).toInt();
+                int nFps = strFps.toFloat() * 100;
                 strCmd
                     = m_strCfgPath + "config_camera-rpi5.sh"
                       + QString::asprintf(" mvcam -fmt RAW8 -x %d -y %d -w %d -h %d -bus %d -media "
@@ -932,7 +932,7 @@ void MainWidget::onSetRoiAndFps(const StImgAttrInfo &info)
                 m_cam->runSystemCmd(strCmd);
                 asyncWriteCmd(fps, nFps, true);
             } else if (EuCamType::GxCamera == m_euCamType) {
-                int nFps = QString::number(strFps.toFloat() * 10000).toInt();
+                int nFps = strFps.toFloat() * 10000;
                 strCmd
                     = m_strCfgPath + "config_camera-rpi5.sh"
                       + QString::asprintf(" gxcam -fmt UYVY -x %d -y %d -w %d -h %d -bus %d -media "
@@ -953,7 +953,7 @@ void MainWidget::onSetRoiAndFps(const StImgAttrInfo &info)
         } break;
         case EuPlatform::Jetson: {
             if (EuCamType::MvCamera == m_euCamType) {
-                int nFps = QString::number(strFps.toFloat() * 100).toInt();
+                int nFps = strFps.toFloat() * 100;
                 strCmd = QString("v4l2-ctl -d %1 --set-ctrl roi_x=%2").arg(videoNode, strX);
                 m_cam->runSystemCmd(strCmd);
                 strCmd = QString("v4l2-ctl -d %1 --set-ctrl roi_y=%2").arg(videoNode, strY);
@@ -964,7 +964,7 @@ void MainWidget::onSetRoiAndFps(const StImgAttrInfo &info)
                 m_cam->runSystemCmd(strCmd);
                 asyncWriteCmd(fps, nFps, true);
             } else if (EuCamType::GxCamera == m_euCamType) {
-                int nFps = QString::number(strFps.toFloat() * 10000).toInt();
+                int nFps = strFps.toFloat() * 10000;
                 strCmd = QString(
                              "v4l2-ctl -d %1 --set-fmt-video=width=%2,height=%3,pixelformat=UYVY")
                              .arg(videoNode, strW, strH);
