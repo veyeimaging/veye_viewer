@@ -10,7 +10,7 @@
     {
         "address": "0x0004",
         "name": "Model Name",
-        "description": "Product Model Code.\n0x0662: GX-MIPI-IMX662\n0x0664: GX-MIPI-IMX664\n0x0234: GX-MIPI-AR0234",
+        "description": "Product Model Code.\n0x0662: GX-MIPI-IMX662\n0x0664: GX-MIPI-IMX664\n0x0234: GX-MIPI-AR0234\n0x8662:GXC-MIPI-IMX662\n0x8234:GXC-MIPI-AR0234\n0x8664:GXC-MIPI-IMX664",
         "data_type": "enum",
         "rd_wt": "RO",
         "update_timing": "-"
@@ -18,7 +18,7 @@
     {
         "address": "0x0008",
         "name": "Sensor Name",
-        "description": "Sensor Model:\n0x662: IMX662-AAQR\n0x664: IMX664-AAQR1\n0x234: AR0234-AAQR",
+        "description": "Sensor Model:\n0x662: IMX662-AAQR\n0x664: IMX664-AAQR1\n0x8234: AR0234CSSC",
         "data_type": "enum",
         "rd_wt": "RO",
         "update_timing": "-"
@@ -314,7 +314,7 @@
     {
         "address": "0x041C",
         "name": "I2C ADDR",
-        "description": "I2c address. Range[0x08,0x77].",
+        "description": "I2c address. Range[0x03,0x77].",
         "data_type": "uint",
         "rd_wt": "RW",
         "update_timing": "A"
@@ -387,6 +387,14 @@
         "address": "0x0480",
         "name": "IRCUT Timer",
         "description": "Whether to enable the IRCUT periodic control; if enabled, perform IRCUT control according to the default cycle; if not enabled, only perform one control when the mode is switched.",
+        "data_type": "bool",
+        "rd_wt": "RW",
+        "update_timing": "A"
+    },
+	{
+        "address": "0x048C",
+        "name": "ReDriver Reg",
+        "description": "MIPI Repeater Control Registers:\nBit[0-3]: EQ[0-3].\nBit[8-10]: ERC[0-3].\nBit[16-19]: Output Pre-emphasis & Swing[0-3].",
         "data_type": "bool",
         "rd_wt": "RW",
         "update_timing": "A"
@@ -518,6 +526,14 @@
         "data_type": "uint",
         "rd_wt": "RW",
         "update_timing": "S"
+    },
+	{
+        "address": "0x0858",
+        "name": "MetaData Mode",
+        "description": "Metadata Implementation Modes:\n0: Disabled or Metadata not supported.\n1: Metadata Overlay on Image (occupying the last 64 Y pixels of the final line).",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "A"
     },
     {
         "address": "0x0C04",
@@ -787,6 +803,30 @@
         "address": "0x0CD4",
         "name": "DRC strength",
         "description": "Digital wide dynamic range. Range [0-255], 0 indicates off.",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "A"
+    },
+	{
+        "address": "0x0CD8",
+        "name": "Scene Custom",
+        "description": "Custom Scene Selection. When bit 15 is set to 1, custom scene mode is enabled; otherwise, the camera automatically selects the scene based on the current mode configuration.",
+        "data_type": "uint",
+        "rd_wt": "RW",
+        "update_timing": "A"
+    },
+	{
+        "address": "0x0CDC",
+        "name": "ISO",
+        "description": "Retrieve the current ISO value, expressed in units of 100 multiplied by the gain.",
+        "data_type": "uint",
+        "rd_wt": "RO",
+        "update_timing": "-"
+    },
+	{
+        "address": "0x0CE0",
+        "name": "AE Weight",
+        "description": "AE Region Weighting:\n0: Center-priority.\n1: Bottom-priority.\n2: Top-priority.",
         "data_type": "uint",
         "rd_wt": "RW",
         "update_timing": "A"
