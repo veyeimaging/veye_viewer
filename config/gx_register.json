@@ -113,7 +113,7 @@
     },
     {
         "address": "0x0058",
-        "name": "Temperature K",
+        "name": "Sensor Junction Temperature (K)",
         "description": "The sensor's temperature value, in Kelvin, is 100 times the current temperature.",
         "data_type": "uint",
         "rd_wt": "RO",
@@ -259,6 +259,14 @@
         "address": "0x00A0",
         "name": "VideoMode_Param8",
         "description": "The frame rate and reading method of the eighth mode.",
+        "data_type": "uint",
+        "rd_wt": "RO",
+        "update_timing": "-"
+    },
+    {
+        "address": "0x00A4",
+        "name": "ISP chip Junction Temperature (K)",
+        "description": "The  ISP chip temperature value, in Kelvin, is 100 times the current temperature.",
         "data_type": "uint",
         "rd_wt": "RO",
         "update_timing": "-"
