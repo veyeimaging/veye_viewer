@@ -64,6 +64,7 @@ void MainWidget::initCfg()
         m_mapCmdReg[roi_h] = "0x081C";
         m_mapCmdReg[fps] = "0x0814";
         m_mapCmdReg[fps_gx] = "0x0850"; //gx
+        m_mapCmdReg[videomodecap] = "0x005C"; //gx
         m_mapCmdReg[maxfps] = "0x0810"; //gx
         m_mapCmdReg[pixelformat] = "0x0804";
         m_mapCmdReg[factoryparam] = "0x0014";
@@ -878,6 +879,13 @@ void MainWidget::onSetRoiAndFps(const StImgAttrInfo &info)
                 asyncWriteCmd(fps, nFps, true);
             } else if (EuCamType::GxCamera == m_euCamType) {
                 int nFps = strFps.toFloat() * 10000;
+                if (m_gxVideoModeCap & 0x01) {
+                    // GX ROI 模式：设置 ROI x/y
+                    strCmd = QString("v4l2-ctl -d %1 --set-ctrl roi_x=%2").arg(subNode, strX);
+                    m_cam->runSystemCmd(strCmd);
+                    strCmd = QString("v4l2-ctl -d %1 --set-ctrl roi_y=%2").arg(subNode, strY);
+                    m_cam->runSystemCmd(strCmd);
+                }
                 strCmd = QString("media-ctl -d %1 --set-v4l2 \'\"%2\":0[fmt:%3/%4x%5@1/%6]\'")
                              .arg(mediaNode,
                                   entityName,
@@ -904,15 +912,19 @@ void MainWidget::onSetRoiAndFps(const StImgAttrInfo &info)
                 asyncWriteCmd(fps, nFps, true);
             } else if (EuCamType::GxCamera == m_euCamType) {
                 int nFps = strFps.toFloat() * 10000;
+                if (m_gxVideoModeCap & 0x01) {
+                    // GX ROI 模式：设置 ROI x/y
+                    strCmd = QString("v4l2-ctl -d %1 --set-ctrl roi_x=%2").arg(videoNode, strX);
+                    m_cam->runSystemCmd(strCmd);
+                    strCmd = QString("v4l2-ctl -d %1 --set-ctrl roi_y=%2").arg(videoNode, strY);
+                    m_cam->runSystemCmd(strCmd);
+                }
                 strCmd = QString(
                              "v4l2-ctl -d %1 --set-fmt-video=width=%2,height=%3,pixelformat=UYVY")
                              .arg(videoNode, strW, strH);
                 m_cam->runSystemCmd(strCmd);
                 asyncWriteCmd(fps_gx, nFps, true);
             }
-            // strCmd = QString("v4l2-ctl -d %1 --set-ctrl frame_rate=%2").arg(videoNode, strFps);
-            // m_cam->runSystemCmd(strCmd);
-
         } break;
         case EuPlatform::RaspberryPi5: {
             if (EuCamType::MvCamera == m_euCamType) {
@@ -948,8 +960,6 @@ void MainWidget::onSetRoiAndFps(const StImgAttrInfo &info)
                 m_cam->runSystemCmd(strCmd);
                 asyncWriteCmd(fps_gx, nFps, true);
             }
-            // strCmd = QString("v4l2-ctl -d %1 --set-ctrl frame_rate=%2").arg(subNode, strFps);
-            // m_cam->runSystemCmd(strCmd);
         } break;
         case EuPlatform::Jetson: {
             if (EuCamType::MvCamera == m_euCamType) {
@@ -965,14 +975,19 @@ void MainWidget::onSetRoiAndFps(const StImgAttrInfo &info)
                 asyncWriteCmd(fps, nFps, true);
             } else if (EuCamType::GxCamera == m_euCamType) {
                 int nFps = strFps.toFloat() * 10000;
+                if (m_gxVideoModeCap & 0x01) {
+                    // GX ROI 模式：设置 ROI x/y
+                    strCmd = QString("v4l2-ctl -d %1 --set-ctrl roi_x=%2").arg(videoNode, strX);
+                    m_cam->runSystemCmd(strCmd);
+                    strCmd = QString("v4l2-ctl -d %1 --set-ctrl roi_y=%2").arg(videoNode, strY);
+                    m_cam->runSystemCmd(strCmd);
+                }
                 strCmd = QString(
                              "v4l2-ctl -d %1 --set-fmt-video=width=%2,height=%3,pixelformat=UYVY")
                              .arg(videoNode, strW, strH);
                 m_cam->runSystemCmd(strCmd);
                 asyncWriteCmd(fps_gx, nFps, true);
             }
-            // strCmd = QString("v4l2-ctl -d %1 --set-ctrl frame_rate=%2").arg(videoNode, strFps);
-            // m_cam->runSystemCmd(strCmd);
             int width = strW.toInt();
             if (0 != width % 256) {
                 width = (width / 256 + 1) * 256;
@@ -1231,8 +1246,24 @@ void MainWidget::getImgAttr()
         readCmd(roi_h, m_pImgAttr);
         readCmd(fps, m_pImgAttr);
     } else if (EuCamType::GxCamera == m_euCamType) {
-        readCmd(videomodenum, m_pImgAttr);
-        readCmd(fps_gx, m_pImgAttr);
+        // 先读取 VideoModeCap 判断模式
+        uint32_t cap = readCmd(videomodecap, this, true, false); // 同步读取
+        m_gxVideoModeCap = cap;
+        bool bRoiMode = (cap & 0x01); // Bit0=1 → ROI
+        m_pImgAttr->setGxMode(bRoiMode);
+
+        if (bRoiMode) {
+            // ROI 模式：读取 ROI 参数
+            readCmd(roi_x, m_pImgAttr);
+            readCmd(roi_y, m_pImgAttr);
+            readCmd(roi_w, m_pImgAttr);
+            readCmd(roi_h, m_pImgAttr);
+            readCmd(fps_gx, m_pImgAttr);
+        } else {
+            // VideoMode 模式：当前逻辑
+            readCmd(videomodenum, m_pImgAttr);
+            readCmd(fps_gx, m_pImgAttr);
+        }
     } else {
         qWarning() << "EuCamType is ???" << (int) m_euCamType;
     }

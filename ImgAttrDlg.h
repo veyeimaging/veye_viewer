@@ -32,6 +32,9 @@ public slots:
     void rcvCmdRet(const StCmdRet &ret);
     void onSetRoiAndFpsData(bool read);
 
+public:
+    void setGxMode(bool bRoiMode);
+
 protected:
     void setupUi();
 
@@ -42,6 +45,7 @@ private:
     Ui::ImgAttrDlg *ui;
     CommDevCfg m_devCfg;
     QMap<int, readMode> m_readModes;
+    bool m_bGXRoiMode = false; // false=VideoMode, true=ROI mode
 };
 
 #endif // IMGATTRDLG_H

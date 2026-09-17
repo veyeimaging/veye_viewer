@@ -142,7 +142,7 @@ validate_required_parameters() {
 set_camera_entity() {
     media-ctl -d "$g_media_device" -r
     media-ctl -d "$g_media_device" -l "'csi2':4 -> 'rp1-cfe-csi2_ch0':0 [1]"
-    if [ "$g_camera_name" = "mvcam" ]; then
+    if [ "$g_camera_name" = "mvcam" ] || [ "$g_camera_name" = "gxcam" ]; then
         v4l2-ctl --set-ctrl roi_x=$g_roi_x -d $g_video_subdevice
         v4l2-ctl --set-ctrl roi_y=$g_roi_y -d $g_video_subdevice
     fi

@@ -192,6 +192,7 @@ private:
     int m_roiW = 0;
     int m_roiH = 0;
     int m_CamFps = 0;
+    uint32_t m_gxVideoModeCap = 0; // GX VideoMode capability (0x005C)
     QString m_strPwd;
 
     int m_lblFps = 0;

@@ -111,6 +111,7 @@ typedef enum _tagCMD {
     roi_h,
     fps,
     fps_gx,
+    videomodecap,
     maxfps,
     pixelformat,
     factoryparam,

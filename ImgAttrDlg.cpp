@@ -53,7 +53,11 @@ void ImgAttrDlg::rcvCmdRet(const StCmdRet &ret)
         break;
     case fps_gx:
         if (data > 0) {
-            ui->lineEditFPSGX->setText(QString::number(data / 10000.0));
+            if (m_bGXRoiMode) {
+                ui->lineEditFPSMV->setText(QString::number(data / 10000.0));
+            } else {
+                ui->lineEditFPSGX->setText(QString::number(data / 10000.0));
+            }
         }
         break;
     case videomode:
@@ -141,6 +145,7 @@ void ImgAttrDlg::setupUi()
     ui->lineEditFPSGX->setText("0");
     ui->widgetMV->hide();
     ui->widgetGX->hide();
+    ui->widgetGXVideoMode->show();
     switch (m_devCfg.cameType) {
     case EuCamType::GxCamera:
         ui->widgetGX->show();
@@ -172,6 +177,15 @@ void ImgAttrDlg::setupUi()
     });
 }
 
+void ImgAttrDlg::setGxMode(bool bRoiMode)
+{
+    m_bGXRoiMode = bRoiMode;
+    if (EuCamType::GxCamera == m_devCfg.cameType) {
+        ui->widgetMV->setVisible(bRoiMode);
+        ui->widgetGXVideoMode->setVisible(!bRoiMode);
+    }
+}
+
 void ImgAttrDlg::onSetRoiAndFpsData(bool read)
 {
     StImgAttrInfo info;
@@ -191,19 +205,36 @@ void ImgAttrDlg::onSetRoiAndFpsData(bool read)
             QxToast::showTip(tr("请设置合理的ROI和PFS"));
         }
     } else if (EuCamType::GxCamera == m_devCfg.cameType) {
-        info.strX = "0";
-        info.strY = "0";
-        int key = ui->comboBoxModeNum->currentIndex() * 2;
-        if (m_readModes.contains(key)) {
-            info.strW = m_readModes[key].width;
-            info.strH = m_readModes[key].height;
-            info.strFps = ui->lineEditFPSGX->text();
-        }
-        if (!info.strW.isEmpty() && !info.strH.isEmpty() && !info.strFps.isEmpty()) {
-            info.strFps = QString::number(info.strFps.toFloat(), 'f', 2);
-            emit setRoiAndFpsData(info);
+        if (m_bGXRoiMode) {
+            // GX ROI 模式：复用 MV 的 ROI 控件
+            info.strX = ui->lineEditX->text();
+            info.strY = ui->lineEditY->text();
+            info.strW = ui->lineEditW->text();
+            info.strH = ui->lineEditH->text();
+            info.strFps = ui->lineEditFPSMV->text();
+            if (!info.strX.isEmpty() && !info.strY.isEmpty() && !info.strW.isEmpty()
+                && !info.strH.isEmpty() && !info.strFps.isEmpty()) {
+                info.strFps = QString::number(info.strFps.toFloat(), 'f', 2);
+                emit setRoiAndFpsData(info);
+            } else {
+                QxToast::showTip(tr("请设置合理的ROI和帧率"));
+            }
         } else {
-            QxToast::showTip(tr("请设置合理分辨率和帧率"));
+            // GX VideoMode 模式
+            info.strX = "0";
+            info.strY = "0";
+            int key = ui->comboBoxModeNum->currentIndex() * 2;
+            if (m_readModes.contains(key)) {
+                info.strW = m_readModes[key].width;
+                info.strH = m_readModes[key].height;
+                info.strFps = ui->lineEditFPSGX->text();
+            }
+            if (!info.strW.isEmpty() && !info.strH.isEmpty() && !info.strFps.isEmpty()) {
+                info.strFps = QString::number(info.strFps.toFloat(), 'f', 2);
+                emit setRoiAndFpsData(info);
+            } else {
+                QxToast::showTip(tr("请设置合理分辨率和帧率"));
+            }
         }
     }
 }
