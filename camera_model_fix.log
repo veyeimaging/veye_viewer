@@ -1,0 +1,21 @@
+VEYE Viewer Camera Model Display Fix
+Date: 2026-10-21
+
+Issue:
+When multiple cameras were connected, the main window always displayed the same
+camera model on the left, although each camera's camera_model value in sysfs was
+correct.
+
+Cause:
+The sysfs path was overwritten by the last camera found during scanning. The
+path was also not updated when a different camera was selected.
+
+Fix:
+Use the first camera in the scan results as the initial camera. When the
+selection changes, update the sysfs path using that camera's I2C bus and read
+its camera_model value.
+
+Verification:
+cmake --build build -j2: passed
+git diff --check: passed
+Note: Runtime verification with multiple connected cameras has not been performed.

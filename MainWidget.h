@@ -86,6 +86,7 @@ protected:
 protected:
     void readPlatform();
     void readCamIndex();
+    bool setSysfsPath(const QString &i2cBus);
     void adjustAdaptive();
     bool readRegCfg();
     void readSysCfg();

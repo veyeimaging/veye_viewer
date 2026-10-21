@@ -1179,7 +1179,7 @@ void MainWidget::readCamIndex()
                     camIndex.video_subnode = jsonNode["video_subnode"].asString().c_str();
                     ui->comboBoxDev->addItem(camIndex.video_node);
                     m_mapAutoCamIndex.insert(camIndex.video_node, camIndex);
-                    if (!i2c_bus_num.isEmpty()) {
+                    if (i2c_bus.isEmpty() && !i2c_bus_num.isEmpty()) {
                         i2c_bus = i2c_bus_num;
                     }
                 }
@@ -1194,26 +1194,41 @@ void MainWidget::readCamIndex()
     }
 
     if (!i2c_bus.isEmpty()) {
-        QString basePath = "/sys/bus/i2c/devices/i2c-" + i2c_bus + "/" + i2c_bus + "-003b/";
-        {
-            QString path = basePath + "/veye_mvcam/";
-            if (QxHelp::isDirectoryExists(path)) {
-                m_sysfsPath = path;
-                m_euCamType = EuCamType::MvCamera;
-                return;
-            }
-        }
-        {
-            QString path = basePath + "/veye_gxcam/";
-            if (QxHelp::isDirectoryExists(path)) {
-                m_sysfsPath = path;
-                m_euCamType = EuCamType::GxCamera;
-                return;
-            }
-        }
+        setSysfsPath(i2c_bus);
     } else {
         qWarning() << "i2cBus is empty, readCamType failed";
     }
+}
+
+bool MainWidget::setSysfsPath(const QString &i2cBus)
+{
+    bool validBus = false;
+    const int busNumber = i2cBus.section('-', -1).toInt(&validBus);
+    if (!validBus) {
+        qWarning() << "Invalid I2C bus:" << i2cBus;
+        m_sysfsPath.clear();
+        return false;
+    }
+
+    const QString basePath =
+        QString("/sys/bus/i2c/devices/i2c-%1/%1-003b/").arg(busNumber);
+    const QString mvPath = basePath + "veye_mvcam/";
+    if (QxHelp::isDirectoryExists(mvPath)) {
+        m_sysfsPath = mvPath;
+        m_euCamType = EuCamType::MvCamera;
+        return true;
+    }
+
+    const QString gxPath = basePath + "veye_gxcam/";
+    if (QxHelp::isDirectoryExists(gxPath)) {
+        m_sysfsPath = gxPath;
+        m_euCamType = EuCamType::GxCamera;
+        return true;
+    }
+
+    qWarning() << "No camera sysfs directory found for I2C bus" << busNumber;
+    m_sysfsPath.clear();
+    return false;
 }
 
 void MainWidget::adjustAdaptive()
@@ -1422,8 +1437,13 @@ void MainWidget::setCamIndex(StCamIndex camIndex)
     ui->lineEditVideoNode->setText(camIndex.video_node);
     ui->lineEditSubNode->setText(camIndex.video_subnode);
     ui->lineEditMediaNode->setText(camIndex.media_node);
+    if (camIndex.i2c_bus_num > 0) {
+        setSysfsPath(QString::number(camIndex.i2c_bus_num));
+    }
     QString model = "";
-    QxHelp::readFirstLine(m_sysfsPath + "camera_model", model);
+    if (!m_sysfsPath.isEmpty()) {
+        QxHelp::readFirstLine(m_sysfsPath + "camera_model", model);
+    }
     ui->label_model->setText(model);
 }
 
