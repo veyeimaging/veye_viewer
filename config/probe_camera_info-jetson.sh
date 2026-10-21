@@ -2,50 +2,97 @@
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OUTPUT_JSON="$SCRIPT_DIR/auto_camera_index.json"
+TMP_ENTRIES="$OUTPUT_JSON.entries.$$"
+TMP_OUTPUT="$OUTPUT_JSON.tmp.$$"
 
-camera_infos=()
+trap 'rm -f "$TMP_ENTRIES" "$TMP_OUTPUT"' EXIT
+: > "$TMP_ENTRIES"
 
-for media in /dev/media*; do
-    media-ctl -d "$media" -p | awk '
-    BEGIN {
-        RS = ""
-    }
+shopt -s nullglob
+media_nodes=(/dev/media*)
 
-    {
-        # 找到所有 sensor 名称和 i2c bus
-        if ($0 ~ /subtype Sensor/) {
-            if (match($0, /entity [0-9]+: ([^(\n]+) \(/, m)) {
-                sensor_name = m[1]
-                if (match(sensor_name, /([0-9]+)-0*[0-9a-fA-F]+/, i2c)) {
-                    i2c_bus = i2c[1]
-                    sensor_map_name = sensor_name
-                    sensor_map_bus = i2c_bus
+for media in "${media_nodes[@]}"; do
+    if ! media_output=$(media-ctl -d "$media" -p); then
+        echo "Error: failed to read media topology from $media" >&2
+        exit 1
+    fi
+
+    if ! printf '%s\n' "$media_output" | awk -v media_node="$media" '
+        function extract(text, pattern) {
+            if (match(text, pattern)) {
+                return substr(text, RSTART, RLENGTH)
+            }
+            return ""
+        }
+
+        function entity_name(block, lines, count, i, name) {
+            count = split(block, lines, "\n")
+            for (i = 1; i <= count; i++) {
+                if (lines[i] ~ /entity [0-9]+:/) {
+                    name = extract(lines[i], "entity [0-9]+: [^(]+ [(]")
+                    sub(/^entity [0-9]+: /, "", name)
+                    sub(/ [(]$/, "", name)
+                    return name
                 }
+            }
+            return ""
+        }
+
+        BEGIN {
+            RS = ""
+            sensor_count = 0
+            video_count = 0
+        }
+
+        /subtype Sensor/ {
+            sensor_name = entity_name($0)
+
+            i2c_bus = extract(sensor_name, "[0-9]+-[0-9a-fA-F]+")
+            sub(/-.*/, "", i2c_bus)
+            subdev_node = extract($0, "/dev/v4l-subdev[0-9]+")
+
+            if (sensor_name != "" && i2c_bus != "") {
+                sensors[sensor_count] = sensor_name
+                sensor_buses[sensor_count] = i2c_bus
+                sensor_subdevs[sensor_count] = subdev_node
+                sensor_count++
             }
         }
 
-        # 找出所有 /dev/videoX 节点并匹配
-        if ($0 ~ /type Node subtype V4L/) {
-            if (match($0, /entity [0-9]+: ([^(\n]+) \(/, m1) &&
-                match($0, /device node name (\/dev\/video[0-9]+)/, m2)) {
+        /type Node subtype V4L/ {
+            video_entity = entity_name($0)
+            video_node = extract($0, "/dev/video[0-9]+")
 
-                entity_name = m1[1]
-                video_node = m2[1]
+            if (video_entity != "" && video_node != "") {
+                videos[video_count] = video_node
+                video_entities[video_count] = video_entity
+                video_count++
+            }
+        }
 
-                if (index(entity_name, sensor_map_name) > 0) {
-                    printf("{\"i2c_bus\": \"%s\", \"video_node\": \"%s\"}\n", sensor_map_bus, video_node)
+        END {
+            for (v = 0; v < video_count; v++) {
+                for (s = 0; s < sensor_count; s++) {
+                    if (index(video_entities[v], sensors[s]) > 0) {
+                        printf("{\"media_node\":\"%s\",\"video_node\":\"%s\",\"video_subnode\":\"%s\",\"media_entity_name\":\"%s\",\"i2c_bus\":\"%s\"}\n",
+                            media_node, videos[v], sensor_subdevs[s], sensors[s], sensor_buses[s])
+                    }
                 }
             }
         }
-    }' >> "$OUTPUT_JSON.tmp"
+    ' >> "$TMP_ENTRIES"; then
+        echo "Error: failed to parse media topology from $media" >&2
+        exit 1
+    fi
 done
 
-# 组装 JSON 格式
 {
-  echo "["
-  sed '$!s/$/,/' "$OUTPUT_JSON.tmp"
-  echo "]"
-} > "$OUTPUT_JSON"
-rm -f "$OUTPUT_JSON.tmp"
+    echo "["
+    if [[ -s "$TMP_ENTRIES" ]]; then
+        sed '$!s/$/,/' "$TMP_ENTRIES"
+    fi
+    echo "]"
+} > "$TMP_OUTPUT"
 
+mv "$TMP_OUTPUT" "$OUTPUT_JSON"
 echo "Done --> $OUTPUT_JSON"
