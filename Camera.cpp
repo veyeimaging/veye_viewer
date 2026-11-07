@@ -2,6 +2,7 @@
 #include "CaptureMPlane.h"
 #include "CaptureSPlane.h"
 #include "MainWidget.h"
+#include "I2CLock.h"
 
 #define WRITE_HEAD 0xAB
 #define PRE_READ_HEAD 0xBC
@@ -322,6 +323,15 @@ int Camera::readData(StI2CCmd &cmd)
     int ret = QX_FAILURE;
     QString strMsg;
     QString strReg = QString("0x%1").arg(cmd.reg, 2, 16, QLatin1Char('0'));
+    
+    // 使用I2C进程锁保护设备访问
+    I2CLockGuard lockGuard(cmd.i2c.toStdString());
+    if (!lockGuard.isLocked()) {
+        strMsg = QString("i2c_read failed to acquire lock for %1").arg(cmd.i2c);
+        emit sndOptLog(-1, strMsg, cmd.showlog);
+        return QX_FAILURE;
+    }
+    
     int fd = open(cmd.i2c.toStdString().c_str(), O_RDWR);
     if (-1 != fd) {
         if (0 == ioctl(fd, I2C_SLAVE_FORCE, cmd.addr)) {
@@ -357,6 +367,15 @@ int Camera::writeData(StI2CCmd &cmd)
     QString strMsg;
     QString strReg = QString("0x%1").arg(cmd.reg, 2, 16, QLatin1Char('0'));
     QString strData = QString("0x%1").arg(cmd.data, 4, 16, QLatin1Char('0'));
+    
+    // 使用I2C进程锁保护设备访问
+    I2CLockGuard lockGuard(cmd.i2c.toStdString());
+    if (!lockGuard.isLocked()) {
+        strMsg = QString("i2c_write failed to acquire lock for %1").arg(cmd.i2c);
+        emit sndOptLog(-1, strMsg, cmd.showlog);
+        return -1;
+    }
+    
     int fd = open(cmd.i2c.toStdString().c_str(), O_RDWR);
     if (-1 != fd) {
         if (ioctl(fd, I2C_SLAVE_FORCE, cmd.addr) < 0) {
