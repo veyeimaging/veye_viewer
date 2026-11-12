@@ -1,5 +1,43 @@
 # veye_viewer Version Change Log
 
+## v1.3.0 (2026-11-12)
+
+### New Features
+
+#### Multi-camera simultaneous preview (up to 4 channels)
+- Each view cell owns an independent channel: its own `Camera`, frame queue, QGraphicsScene/view and parameter snapshot
+- New Single View / Quad View / Fullscreen layout buttons (localized in both Chinese and English)
+- Quad View opens by clicking Start Capture in each cell; Fullscreen restores the layout and maximized state it came from
+- Channel switching now pushes the current device type/platform to every open dialog, so dialogs no longer keep the device configuration captured at construction time
+
+### Security & Robustness Fixes
+
+- **External command execution**: removed every `system()` / `/bin/sh` path. Commands are now tokenized by a quote-aware splitter and executed directly with `QProcess`, which closes the shell-injection surface and stops writing fixed-name temporary files
+- **Stack overflow**: UI input no longer goes through `sprintf()` into a 256-byte stack buffer before reaching a shell
+- **Thread lifetime**: capture / save / I2C-command / frame-render threads are now signaled with `std::atomic<bool>` and `join()`ed on destruction instead of being left detached, fixing use-after-free when closing a device or quitting the app
+- **Leaks**: `Capture` objects are released instead of accumulating as Qt children; stopping capture drains the pending save queue and the unconsumed frame queue
+- **Input validation**: ROI/frame-rate edits are range-checked and the ROI fields carry an integer validator; device nodes and entity names read from JSON are validated before being used as command arguments; probe scripts escape kernel-provided strings when emitting JSON
+- **I2C lock**: bus number is parsed by hand instead of `std::stoi()` (which could throw out of a Qt slot and terminate the app), the lock fd is opened with `O_CLOEXEC` so child processes can no longer inherit and hold the bus, `O_NOFOLLOW` guards the predictable `/tmp` path, and `flock()` polling retries on `EINTR`
+- **Buffer bounds**: dequeued V4L2 buffer index is range-checked before it is used to index the mmap buffer table
+- **Busy waiting**: the render loop sleeps against a frame-time budget instead of spinning, and the GUI thread priority was lowered from TimeCritical to High
+- **Unknown platform / unknown device type** are now explicit states that get a clear message instead of silently executing the config directory as a script or reusing the previous channel's camera type
+
+### Build & Release
+
+- Version bumped to 1.3.0; `Version.h` is now generated into the build directory only, so it no longer keeps dirtying the source tree
+- Translation sources live in `config/` only (the duplicated copies in the repository root were removed). `.qm` files are regenerated at build time with `lrelease`; `lupdate` moved to an explicit `update_translations` target so builds no longer rewrite the source tree
+- Dropped `-ffast-math` (relaxed IEEE semantics for no measurable gain in this application)
+- Dropped `QT_NO_DEBUG_OUTPUT` / `QT_NO_WARNING_OUTPUT`, which compiled all `qDebug()`/`qWarning()` output away and left the log file essentially empty
+- Third-party `json/` sources are built without warnings so the project's own warning count stays meaningful; the source glob now uses `CONFIGURE_DEPENDS` and excludes the build directory, and install rules for `config/` were added
+- Cleaned up compiler warnings: sign-compare, unused variables, implicit fall-through, ignored qualifiers, member-initializer order, deprecated overloads, trigraph sequences. A `-Wall` build of the project's own sources is now warning-free
+
+### Compatibility
+
+- Configuration file layout is unchanged; existing `config/syscfg.json` keeps working
+- Quad View requires each camera to be started individually, matching the previous per-cell workflow
+
+---
+
 ## v1.2.1 (2026-11-07)
 
 ### New Features
@@ -106,6 +144,6 @@ rm /tmp/i2c-*.lock
 
 ---
 
-**Document Version**: v1.0  
-**Last Updated**: 2026-11-07  
+**Document Version**: v1.1  
+**Last Updated**: 2026-11-12  
 **Maintained by**: veye_viewer development team

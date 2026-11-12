@@ -424,6 +424,16 @@
         <translation>Please set appropriate ROI and PFS</translation>
     </message>
     <message>
+        <location filename="ImgAttrDlg.cpp" line="220"/>
+        <source>请设置合理的ROI和帧率</source>
+        <translation>Please set appropriate ROI and FPS</translation>
+    </message>
+    <message>
+        <location filename="ImgAttrDlg.cpp" line="236"/>
+        <source>请设置合理分辨率和帧率</source>
+        <translation>Please set appropriate resolution and FPS</translation>
+    </message>
+    <message>
         <location filename="ImgAttrDlg.cpp" line="199"/>
         <source>.............</source>
         <translation></translation>
@@ -560,6 +570,21 @@
         <location filename="build/RK3588-Release/veye_viewer_autogen/include/ui_MainWidget.h" line="777"/>
         <source>检索相机</source>
         <translation>Search camera</translation>
+    </message>
+    <message>
+        <location filename="MainWidget.cpp" line="950"/>
+        <source>设备节点/实体名不合法</source>
+        <translation>Invalid video node / entity name</translation>
+    </message>
+    <message>
+        <location filename="MainWidget.cpp" line="1302"/>
+        <source>未知平台，无法检索相机</source>
+        <translation>Unknown platform, cannot search camera</translation>
+    </message>
+    <message>
+        <location filename="MainWidget.cpp" line="1308"/>
+        <source>检索脚本不存在</source>
+        <translation>Search script not found</translation>
     </message>
     <message>
         <location filename="MainWidget.ui" line="310"/>
@@ -966,6 +991,22 @@
         <location filename="MainWidget.cpp" line="1971"/>
         <source>导入完成</source>
         <translation>Import successful</translation>
+    </message>
+    <message>
+        <location filename="MainWidget.ui" line="479"/>
+        <location filename="MainWidget.cpp" line="2438"/>
+        <source>四画面</source>
+        <translation>Quad View</translation>
+    </message>
+    <message>
+        <location filename="MainWidget.cpp" line="2438"/>
+        <source>单画面</source>
+        <translation>Single View</translation>
+    </message>
+    <message>
+        <location filename="MainWidget.ui" line="486"/>
+        <source>全屏</source>
+        <translation>Fullscreen</translation>
     </message>
 </context>
 <context>

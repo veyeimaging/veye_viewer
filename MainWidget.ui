@@ -474,6 +474,20 @@
                 </widget>
                </item>
                <item>
+                <widget class="QPushButton" name="pushButtonLayout">
+                 <property name="text">
+                  <string>四画面</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="pushButtonFullScreen">
+                 <property name="text">
+                  <string>全屏</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QRadioButton" name="radioButton_adaptive">
                  <property name="text">
                   <string>自适应</string>
@@ -563,10 +577,7 @@
                </property>
                <item>
                 <widget class="QWidget" name="widgetGV" native="true">
-                 <layout class="QVBoxLayout" name="verticalLayout_4">
-                  <property name="spacing">
-                   <number>0</number>
-                  </property>
+                 <layout class="QGridLayout" name="gridLayoutViews">
                   <property name="leftMargin">
                    <number>0</number>
                   </property>
@@ -579,8 +590,50 @@
                   <property name="bottomMargin">
                    <number>0</number>
                   </property>
-                  <item>
-                   <widget class="QGraphicsView" name="graphicsView">
+                  <property name="spacing">
+                   <number>2</number>
+                  </property>
+                  <item row="0" column="0">
+                   <widget class="QGraphicsView" name="gv0">
+                    <property name="backgroundBrush">
+                     <brush brushstyle="SolidPattern">
+                      <color alpha="255">
+                       <red>127</red>
+                       <green>127</green>
+                       <blue>127</blue>
+                      </color>
+                     </brush>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QGraphicsView" name="gv1">
+                    <property name="backgroundBrush">
+                     <brush brushstyle="SolidPattern">
+                      <color alpha="255">
+                       <red>127</red>
+                       <green>127</green>
+                       <blue>127</blue>
+                      </color>
+                     </brush>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QGraphicsView" name="gv2">
+                    <property name="backgroundBrush">
+                     <brush brushstyle="SolidPattern">
+                      <color alpha="255">
+                       <red>127</red>
+                       <green>127</green>
+                       <blue>127</blue>
+                      </color>
+                     </brush>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QGraphicsView" name="gv3">
                     <property name="backgroundBrush">
                      <brush brushstyle="SolidPattern">
                       <color alpha="255">

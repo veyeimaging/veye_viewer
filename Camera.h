@@ -16,6 +16,8 @@
 #include <linux/i2c.h>
 #include <memory>
 #include <mutex>
+#include <atomic>
+#include <thread>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -54,6 +56,10 @@ public:
 public:
     bool OpenDevice(StCamParam &param);
     void CloseDevice();
+    // 多相机改造：针对本通道 Capture 的显示/存图控制（同线程直接转发，等价原信号调用）
+    void setShow(bool bShow);
+    void saveImg(QString strPath, int count);
+    bool IsOpen() const { return m_capture != nullptr; }
 
 signals:
     void sndOptLog(int ret, QString strInfo, bool show = true);
@@ -70,16 +76,14 @@ protected:
     int writeData(StI2CCmd &cmd);
 
 protected:
-    void systemCmd(QString strCmd);
-    int system_ex(const char *cmdstring, unsigned int timeout);
-    int runSystem(const char *cmdstring, char *buff, int size);
-
-protected:
     void cmdSleep(int n, bool bReal = true);
     void cmdThread();
 
 protected:
-    bool m_bThread = true;
+    // 线程停止标志必须原子可见，且线程句柄要保存以便析构时 join，
+    // 否则 cmdThread 会在对象释放后继续访问 m_mtx/m_listCmd 并在已析构的 QObject 上 emit。
+    std::atomic<bool> m_bThread{true};
+    std::thread m_threadCmd;
 
 protected:
     std::list<StI2CCmd> m_listCmd;

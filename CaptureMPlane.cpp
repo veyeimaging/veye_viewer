@@ -171,6 +171,12 @@ void CaptureMPlane::run()
             if (FD_ISSET(m_fd, &readfds)) {
                 timeoutCount = 0;
                 while (0 == ioctl(m_fd, VIDIOC_DQBUF, &m_v4l2Buf)) {
+                    // 驱动返回的 buffer index 必须落在自己 mmap 的缓冲数组内，否则直接越界读写
+                    if (m_v4l2Buf.index >= m_v4l2ReqBuf.count) {
+                        qDebug() << "invalid buffer index:" << m_v4l2Buf.index
+                                 << "count:" << m_v4l2ReqBuf.count;
+                        break;
+                    }
                     for (int j = 0; j < num_planes; j++) {
                         nBytesperline = m_v4l2Fmt.fmt.pix_mp.plane_fmt[j].bytesperline;
                         m_width = m_v4l2Fmt.fmt.pix_mp.width;
@@ -187,6 +193,7 @@ void CaptureMPlane::run()
                         m_nFps++;
                         if (m_bShow) {
                             StImgInfo sii;
+                            sii.index = m_devCfg.channel;
                             sii.buf = new unsigned char[len];
                             memcpy(sii.buf, pBuf, len);
                             sii.strategy = strategy;

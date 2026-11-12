@@ -267,19 +267,94 @@ bool QxHelp::isDirectoryExists(const QString &path)
     return fileInfo.exists() && fileInfo.isDir();
 }
 
+QStringList QxHelp::splitCmdLine(const QString &cmd)
+{
+    // 类 POSIX 分词：单引号内一律字面、双引号内支持反斜杠转义、引号外按空白切分。
+    // 这样 media-ctl 的 \'"entity":0[fmt:UYVY8_2X8/1920x1080@1/30]\' 仍会作为单个参数传入，
+    // 与原 shell 行为一致，但不再需要 /bin/sh 参与。
+    enum QuoteState { qNone, qSingle, qDouble };
+    QStringList out;
+    QString tok;
+    bool inTok = false;
+    QuoteState st = qNone;
+    for (int i = 0; i < cmd.size(); ++i) {
+        const QChar c = cmd.at(i);
+        if (qSingle == st) {
+            if (QLatin1Char('\'') == c) {
+                st = qNone;
+            } else {
+                tok += c;
+            }
+            inTok = true;
+        } else if (qDouble == st) {
+            if (QLatin1Char('"') == c) {
+                st = qNone;
+            } else if (QLatin1Char('\\') == c && (i + 1) < cmd.size()) {
+                tok += cmd.at(++i);
+            } else {
+                tok += c;
+            }
+            inTok = true;
+        } else if (QLatin1Char('\'') == c) {
+            st = qSingle;
+            inTok = true;
+        } else if (QLatin1Char('"') == c) {
+            st = qDouble;
+            inTok = true;
+        } else if (QLatin1Char('\\') == c && (i + 1) < cmd.size()) {
+            tok += cmd.at(++i);
+            inTok = true;
+        } else if (c.isSpace()) {
+            if (inTok) {
+                out << tok;
+                tok.clear();
+                inTok = false;
+            }
+        } else {
+            tok += c;
+            inTok = true;
+        }
+    }
+    if (inTok) {
+        out << tok;
+    }
+    return out;
+}
+
+bool QxHelp::isSafeCmdToken(const QString &s, int maxLen)
+{
+    // 来自设备拓扑/配置文件的字符串：限长、非空，且不含控制字符（换行/NUL 等）。
+    if (s.isEmpty() || (s.size() > maxLen)) {
+        return false;
+    }
+    for (const QChar &c : s) {
+        if (c.unicode() < 0x20 || c.unicode() == 0x7f) {
+            return false;
+        }
+    }
+    return true;
+}
+
 int QxHelp::runCmd(const QString &cmd, QString &output, int timeout_ms)
 {
+    // 不再把整行交给 /bin/sh：拆成 program + args 后用 QProcess 直接执行。
+    const QStringList argv = splitCmdLine(cmd);
+    if (argv.isEmpty()) {
+        output = QStringLiteral("empty command");
+        return -3;
+    }
+
     QProcess process;
-    process.start(cmd);                         // 启动进程
+    process.setProcessChannelMode(QProcess::MergedChannels);
+    process.start(argv.first(), argv.mid(1)); // 启动进程
     if (!process.waitForFinished(timeout_ms)) { // 等待完成，超时返回 false
         process.kill();
+        process.waitForFinished(1000);
+        output = process.readAll();
         return -2; // 超时
     }
 
-    output = process.readAllStandardOutput();     // 读取 stdout
-    QString err = process.readAllStandardError(); // 读取 stderr（可选合并）
-    if (!err.isEmpty())
-        output += "\n错误：" + err;
+    output = process.readAll(); // stdout + stderr 已合并
 
     return process.exitCode(); // 命令退出码
 }

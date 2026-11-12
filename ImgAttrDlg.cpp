@@ -1,5 +1,6 @@
 #include "ImgAttrDlg.h"
 #include <QDebug>
+#include <QValidator>
 #include <QtConcurrent/QtConcurrent>
 #include "MainWidget.h"
 #include "QxHelp.h"
@@ -8,8 +9,8 @@
 
 ImgAttrDlg::ImgAttrDlg(CommDevCfg devCfg, QWidget *parent)
     : QDialog(parent)
-    , m_devCfg(devCfg)
     , ui(new Ui::ImgAttrDlg)
+    , m_devCfg(devCfg)
 {
     ui->setupUi(this);
     setupUi();
@@ -135,14 +136,8 @@ void ImgAttrDlg::rcvCmdRet(const StCmdRet &ret)
     }
 }
 
-void ImgAttrDlg::setupUi()
+void ImgAttrDlg::applyCamType()
 {
-    ui->lineEditX->setText("0");
-    ui->lineEditY->setText("0");
-    ui->lineEditW->setText("0");
-    ui->lineEditH->setText("0");
-    ui->lineEditFPSMV->setText("0");
-    ui->lineEditFPSGX->setText("0");
     ui->widgetMV->hide();
     ui->widgetGX->hide();
     ui->widgetGXVideoMode->show();
@@ -154,8 +149,36 @@ void ImgAttrDlg::setupUi()
         ui->widgetMV->show();
         break;
     default:
+        // Unknown：两个面板都不显示，避免把 GX 参数当 MV 下发
         break;
     }
+}
+
+void ImgAttrDlg::setDevCfg(CommDevCfg devCfg)
+{
+    m_devCfg = devCfg;
+    applyCamType();
+    if (EuCamType::GxCamera == m_devCfg.cameType) {
+        // 切到 GX 通道时重新套用一次当前的 ROI/VideoMode 布局（控件复用，必须先恢复）
+        setGxMode(m_bGXRoiMode);
+    }
+}
+
+void ImgAttrDlg::setupUi()
+{
+    ui->lineEditX->setText("0");
+    ui->lineEditY->setText("0");
+    ui->lineEditW->setText("0");
+    ui->lineEditH->setText("0");
+    ui->lineEditFPSMV->setText("0");
+    ui->lineEditFPSGX->setText("0");
+    // ROI/分辨率只接受整数，防止把任意文本填进来后拼到 v4l2-ctl 命令参数里
+    // （下限用 0 而不是 1，否则用户连“清空重填”都会被拒；真正的范围判断在 MainWidget 下发前做）
+    ui->lineEditX->setValidator(new QIntValidator(0, 65535, ui->lineEditX));
+    ui->lineEditY->setValidator(new QIntValidator(0, 65535, ui->lineEditY));
+    ui->lineEditW->setValidator(new QIntValidator(0, 65535, ui->lineEditW));
+    ui->lineEditH->setValidator(new QIntValidator(0, 65535, ui->lineEditH));
+    applyCamType();
 
     connect(ui->pushButtonSetRoiAndFps, &QPushButton::clicked, this, [this]() {
         onSetRoiAndFpsData(true);

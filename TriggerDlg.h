@@ -16,6 +16,11 @@ class TriggerDlg : public QDialog
 public:
     explicit TriggerDlg(CommDevCfg devCfg, QWidget *parent = nullptr);
     ~TriggerDlg();
+    // 设备类型/平台/通道号会随“选设备、切通道”变化，不能只在构造时快照一次
+    void setDevCfg(CommDevCfg devCfg)
+    {
+        m_devCfg = devCfg;
+    }
 public slots:
     void rcvUpdateUi();
     void rcvCmdRet(const StCmdRet &ret);

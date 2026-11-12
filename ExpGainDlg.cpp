@@ -8,8 +8,8 @@
 
 ExpGainDlg::ExpGainDlg(CommDevCfg devCfg, QWidget *parent)
     : QDialog(parent)
-    , m_devCfg(devCfg)
     , ui(new Ui::ExpGainDlg)
+    , m_devCfg(devCfg)
 {
     ui->setupUi(this);
     setupUi();

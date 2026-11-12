@@ -14,12 +14,30 @@ Capture::Capture(CommDevCfg devCfg, QObject *parent)
 
 Capture::~Capture()
 {
+    // 先停掉后台存盘线程并 join，再释放本对象；否则 saveThread 会访问已析构的成员。
+    stopSaveThread();
+
     if (m_timer) {
         m_timer->stop();
 
         m_timer->deleteLater();
         m_timer = nullptr;
     }
+}
+
+void Capture::stopSaveThread()
+{
+    m_bThread = false;
+    if (m_threadSave.joinable()) {
+        m_threadSave.join();
+    }
+    // 排空未写完的存盘请求，避免残留帧缓存泄漏
+    std::lock_guard<std::mutex> lock(m_mtxSaveImg);
+    for (StSaveImg &si : m_listSaveImg) {
+        delete[] si.buf;
+        si.buf = nullptr;
+    }
+    m_listSaveImg.clear();
 }
 
 void Capture::setMainWidget(QObject *mainWidget)
@@ -29,9 +47,10 @@ void Capture::setMainWidget(QObject *mainWidget)
 
 void Capture::startStream(int fd, StCamParam &param)
 {
+    // 上一轮存盘线程可能还未退出（stop 后马上 start），先 join 避免两个存盘线程同时写盘
+    stopSaveThread();
     m_bThread = true;
-    std::thread tSave([this]() { saveThread(); });
-    tSave.detach();
+    m_threadSave = std::thread([this]() { saveThread(); });
 
     m_fd = fd;
     m_stCamParam = param;
@@ -52,7 +71,8 @@ void Capture::startStream(int fd, StCamParam &param)
 
 void Capture::stopStream()
 {
-    m_bThread = false;
+    // 等存盘线程真正把队列处理完再返回，与下面子类的 wait() 保持同样的生命周期语义
+    stopSaveThread();
 }
 
 void Capture::rcvSaveImg(QString strPath, int count)

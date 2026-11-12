@@ -18,6 +18,13 @@ for media in "${media_nodes[@]}"; do
     fi
 
     if ! printf '%s\n' "$media_output" | awk -v media_node="$media" '
+        function jesc(s) {
+            # 来自内核拓扑的字符串写 JSON 前先转义，避免引号/反斜杠把 JSON 弄坏
+            gsub(/\\/, "\\\\", s); gsub(/"/, "\\\"", s)
+            gsub(/\t/, " ", s); gsub(/\r/, "", s); gsub(/\n/, " ", s)
+            return s
+        }
+
         function extract(text, pattern) {
             if (match(text, pattern)) {
                 return substr(text, RSTART, RLENGTH)
@@ -75,7 +82,7 @@ for media in "${media_nodes[@]}"; do
                 for (s = 0; s < sensor_count; s++) {
                     if (index(video_entities[v], sensors[s]) > 0) {
                         printf("{\"media_node\":\"%s\",\"video_node\":\"%s\",\"video_subnode\":\"%s\",\"media_entity_name\":\"%s\",\"i2c_bus\":\"%s\"}\n",
-                            media_node, videos[v], sensor_subdevs[s], sensors[s], sensor_buses[s])
+                            jesc(media_node), jesc(videos[v]), jesc(sensor_subdevs[s]), jesc(sensors[s]), jesc(sensor_buses[s]))
                     }
                 }
             }

@@ -32,6 +32,15 @@ for media in /dev/media*; do
 
     # 提取 sensor 信息
     result=$(echo "$TOPOLOGY" | $awk -v media="$media" -v force_video="$target_video_node" '
+    function jesc(s) {
+        # 来自内核拓扑的字符串写 JSON 前先转义，避免引号/反斜杠把 JSON 弄坏
+        gsub(/\\/, "\\\\", s)
+        gsub(/"/, "\\\"", s)
+        gsub(/\t/, " ", s)
+        gsub(/\r/, "", s)
+        gsub(/\n/, " ", s)
+        return s
+    }
     BEGIN {
         RS = ""
     }
@@ -54,11 +63,11 @@ for media in /dev/media*; do
         }
 
         printf("{")
-        printf("\"media_node\": \"%s\",", media)
-        printf("\"video_node\": \"%s\",", video_node)
-        printf("\"video_subnode\": \"%s\",", subdev_node)
-        printf("\"media_entity_name\": \"%s\",", entity_name)
-        printf("\"i2c_bus\": \"%s\"", i2c_bus)
+        printf("\"media_node\": \"%s\",", jesc(media))
+        printf("\"video_node\": \"%s\",", jesc(video_node))
+        printf("\"video_subnode\": \"%s\",", jesc(subdev_node))
+        printf("\"media_entity_name\": \"%s\",", jesc(entity_name))
+        printf("\"i2c_bus\": \"%s\"", jesc(i2c_bus))
         printf("}")
     }')
 

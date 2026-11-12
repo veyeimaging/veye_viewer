@@ -8,8 +8,8 @@
 
 WhiteBlanceDlg::WhiteBlanceDlg(CommDevCfg devCfg, QWidget *parent)
     : QDialog(parent)
-    , m_devCfg(devCfg)
     , ui(new Ui::WhiteBlanceDlg)
+    , m_devCfg(devCfg)
 {
     ui->setupUi(this);
     setupUi();

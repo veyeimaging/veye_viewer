@@ -4,8 +4,8 @@
 
 CurAttrDlg::CurAttrDlg(CommDevCfg devCfg, QWidget *parent)
     : QDialog(parent)
-    , m_devCfg(devCfg)
     , ui(new Ui::CurAttrDlg)
+    , m_devCfg(devCfg)
 {
     ui->setupUi(this);
     setupUi();

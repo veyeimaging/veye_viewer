@@ -1,6 +1,8 @@
 #ifndef QXHELP_H
 #define QXHELP_H
 #include <QLabel>
+#include <QRegularExpression>
+#include <QStringList>
 #include "CommHeader.h"
 #include "MsgBox.h"
 #include "QxToast.h"
@@ -61,6 +63,13 @@ public:
     static bool isDirectoryExists(const QString &path);
 
     static int runCmd(const QString &cmd, QString &output, int timeout_ms);
+
+    // 把一行命令拆成 program + arguments（支持单/双引号分组），
+    // 供 QProcess 直接执行，不再经过 /bin/sh，避免 shell 注入与引号规则差异。
+    static QStringList splitCmdLine(const QString &cmd);
+
+    // 校验来自设备/配置文件的字符串是否可安全用作命令参数（白名单字符集）。
+    static bool isSafeCmdToken(const QString &s, int maxLen = 256);
 
     static void setDoubleLineEdit(QLineEdit *lineEdit,
                                   double minVal = 0.00,

@@ -3,6 +3,8 @@
 
 #include <QObject>
 #include <QThread>
+#include <atomic>
+#include <thread>
 #include "CommHeader.h"
 #include "CommStuct.h"
 
@@ -51,9 +53,14 @@ protected:
 
 protected:
     void saveThread();
+    // 停止并 join 存盘线程，同时排空待写队列（stopStream / 析构都会调用）
+    void stopSaveThread();
 
 protected:
-    bool m_bThread = true;
+    // 停止标志必须原子可见；线程句柄必须保存并在 stopStream/析构时 join，
+    // 否则 saveThread 会在 Capture 析构后继续访问 m_mtxSaveImg/m_listSaveImg 并在已析构的 QObject 上 emit。
+    std::atomic<bool> m_bThread{true};
+    std::thread m_threadSave;
 
 protected:
     std::mutex m_mtxSaveImg;

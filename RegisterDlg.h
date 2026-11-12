@@ -15,6 +15,11 @@ class RegisterDlg : public QDialog
 public:
     explicit RegisterDlg(CommDevCfg devCfg, QWidget *parent = nullptr);
     ~RegisterDlg();
+    // 设备类型/平台/通道号会随“选设备、切通道”变化，不能只在构造时快照一次
+    void setDevCfg(CommDevCfg devCfg)
+    {
+        m_devCfg = devCfg;
+    }
 
 public:
     void setCfg(QMap<QString, StRegInfo> nameReg, QMap<uint32_t, StRegInfo> addrReg);

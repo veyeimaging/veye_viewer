@@ -17,11 +17,15 @@ enum class CurPage {
 
 enum class EuCamType {
     GxCamera, // 代表 GX 系列相机
-    MvCamera  // 代表 MV 系列相机
+    MvCamera, // 代表 MV 系列相机
+    Unknown   // 未探测/探测失败：不能猜格式解码，也不能发寄存器命令
 };
 
 enum class EuCamStatus { OPEN_STA, CLOSE_STA, SHOW_STA, HIDE_STA, READ_TIMEMOU };
 Q_DECLARE_METATYPE(EuCamStatus)
+
+// 最大同时预览/采集的相机通道数
+#define MAX_CHANNELS 4
 
 enum class EuPlatform {
     Rockchip,     // 瑞芯微平台
@@ -34,6 +38,7 @@ struct CommDevCfg
 {
     EuCamType cameType;  // 相机类型
     EuPlatform platform; // 运行平台
+    int channel = 0;     // 所属相机通道号(0..MAX_CHANNELS-1)
 };
 typedef enum _strategy { change_img, v4l2_buf, new_buf } EuStrategy;
 

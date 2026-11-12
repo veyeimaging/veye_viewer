@@ -7,8 +7,8 @@
 
 TriggerDlg::TriggerDlg(CommDevCfg devCfg, QWidget *parent)
     : QDialog(parent)
-    , m_devCfg(devCfg)
     , ui(new Ui::TriggerDlg)
+    , m_devCfg(devCfg)
 {
     ui->setupUi(this);
     setupUi();
@@ -118,7 +118,6 @@ void TriggerDlg::rcvCmdRet(const StCmdRet &ret)
 bool TriggerDlg::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::MouseButtonRelease) {
-        QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
         QSpinBox *spinBox = qobject_cast<QSpinBox *>(obj);
         if (spinBox && spinBox->isEnabled()) {
             int value = spinBox->value();
@@ -362,7 +361,7 @@ void TriggerDlg::updateStatus()
         ui->comboBox_trgsrc->setEnabled(false);
         ui->pushButton_trgone->setEnabled(false);
         ui->widgetCtrl->setEnabled(false);
-    }
+    } break; // 原先缺 break，会贯穿执行到 case Normal
     case Normal: {
         if (0 != curSrc) {
             ui->pushButton_trgone->setEnabled(false);

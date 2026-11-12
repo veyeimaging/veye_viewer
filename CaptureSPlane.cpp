@@ -47,7 +47,7 @@ void CaptureSPlane::initBuf()
     }
 
     m_buffers = (StSplaneBuffer *) calloc(m_v4l2ReqBuf.count, sizeof(StSplaneBuffer));
-    for (int i = 0; i < m_v4l2ReqBuf.count; ++i) {
+    for (size_t i = 0; i < m_v4l2ReqBuf.count; ++i) { // count 是无符号，循环变量用同类型避免比较告警
         memset(&m_v4l2Buf, 0, sizeof(m_v4l2Buf));
         m_v4l2Buf.index = i;
         m_v4l2Buf.memory = V4L2_MEMORY_MMAP;
@@ -88,7 +88,7 @@ void CaptureSPlane::freeBuf()
             perror("VIDIOC_STREAMOFF");
         }
 
-        for (int i = 0; i < m_v4l2ReqBuf.count; i++) {
+        for (size_t i = 0; i < m_v4l2ReqBuf.count; i++) {
             m_v4l2Buf.index = i;
             ioctl(m_fd, VIDIOC_QBUF, &m_v4l2Buf);
             munmap(m_buffers[i].start, m_buffers[i].length);
@@ -144,6 +144,12 @@ void CaptureSPlane::run()
             if (FD_ISSET(m_fd, &readfds)) {
                 timeoutCount = 0;
                 while (0 == ioctl(m_fd, VIDIOC_DQBUF, &m_v4l2Buf)) {
+                    // 驱动返回的 buffer index 必须落在自己 mmap 的缓冲数组内，否则直接越界读写
+                    if (m_v4l2Buf.index >= m_v4l2ReqBuf.count) {
+                        qDebug() << "invalid buffer index:" << m_v4l2Buf.index
+                                 << "count:" << m_v4l2ReqBuf.count;
+                        break;
+                    }
                     nBytesperline = m_v4l2Fmt.fmt.pix.bytesperline;
                     m_width = m_v4l2Fmt.fmt.pix_mp.width;
                     m_height = m_v4l2Fmt.fmt.pix_mp.height;
@@ -154,6 +160,7 @@ void CaptureSPlane::run()
                     m_nFps++;
                     if (m_bShow) {
                         StImgInfo sii;
+                        sii.index = m_devCfg.channel;
                         sii.buf = new unsigned char[len];
                         memcpy(sii.buf, pBuf, len);
                         sii.strategy = strategy;

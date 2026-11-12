@@ -1,8 +1,13 @@
 #include "MainWidget.h"
 #include <QDebug>
 #include <QFormLayout>
+#include <QGridLayout>
+#include <QKeyEvent>
 #include <QMenuBar>
 #include <QOpenGLWidget>
+#include <QProcess>
+#include <QResizeEvent>
+#include <QScreen>
 #include <QToolBar>
 #include "AboutDialog.h"
 #include "CodeMap.h"
@@ -26,10 +31,15 @@ MainWidget::MainWidget(QWidget *parent)
 MainWidget::~MainWidget()
 {
     m_bThread = false;
-    if (m_camRunning) {
-        if (m_cam) {
-            m_cam->CloseDevice();
-        }
+    // 帧处理线程会访问 m_channels[].queueSii/mtxPix，必须先 join 再拆通道，
+    // 否则就是 use-after-free（以前 detach 后直接退出，靠进程退出兜底）。
+    if (m_threadWork.joinable()) {
+        m_threadWork.join();
+    }
+    for (int i = 0; i < MAX_CHANNELS; ++i) {
+        // 退出时事件循环已结束，deleteLater 不会被处理，这里必须同步销毁，
+        // 才轮到 ~Camera 把采集线程/命令线程 join 掉。
+        teardownChannel(i, true);
     }
     saveSysCfg();
 }
@@ -153,21 +163,14 @@ void MainWidget::initObj()
     //m_renderer = new UYVYRenderer(ui->widgetRender);
     // ui->widgetRender->setFixedSize(300, 400);
     // ui->graphicsView->hide();
-    CommDevCfg devCfg = {m_euCamType, m_euPlatform};
+    CommDevCfg devCfg = {m_euCamType, m_euPlatform, 0};
     qRegisterMetaType<StCmdRet>("StCmdRet");
     connect(this, &MainWidget::sndPixmap, this, &MainWidget::rcvPixmap);
 
-    std::thread tWork([this]() { workThread(); });
-    tWork.detach();
+    // 保存线程句柄，析构时 join（见 ~MainWidget）
+    m_threadWork = std::thread([this]() { workThread(); });
 
-    //m_optCmd = new OperateCmd(this);
-    //connect(m_optCmd, &OperateCmd::sndOptLog, this, &MainWidget::rcvOptLog);
-    //connect(m_optCmd, &OperateCmd::sndCmdRet, this, &MainWidget::rcvCmdRet);
-
-    m_cam = new Camera(devCfg, this);
-    connect(m_cam, &Camera::sndOptLog, this, &MainWidget::rcvOptLog);
-    connect(m_cam, &Camera::sndCmdRet, this, &MainWidget::rcvCmdRet);
-
+    // 多相机：每个通道的 Camera 懒创建(首次绑定设备时)，此处不再创建单个 m_cam。
     m_pImgAttr = new ImgAttrDlg(devCfg, this);
     connect(this, &MainWidget::sndSetROI, m_pImgAttr, &ImgAttrDlg::rcvSetROI);
     connect(this, &MainWidget::sndUpdateUI, m_pImgAttr, &ImgAttrDlg::rcvUpdateUi);
@@ -235,7 +238,6 @@ void MainWidget::initObj()
 
 void MainWidget::setupUi()
 {
-    ui->graphicsView->installEventFilter(this);
     setWindowIcon(QIcon(":/image/logo.png"));
     ui->labelIcon->setPixmap(QPixmap(":/image/logo.png"));
     ui->labelTitle->setText(QString(APP_NAME) + " V" + APP_VERSION);
@@ -249,11 +251,34 @@ void MainWidget::setupUi()
 
     setTitleBar(ui->widgetTitle);
     m_timer = new QTimer(this);
-    m_scene = new QGraphicsScene(this);
-    ui->graphicsView->setScene(m_scene);
-    m_pixItem = new QGraphicsPixmapItem();
-    ui->graphicsView->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
-    m_scene->addItem(m_pixItem);
+
+    // ---- 多相机通道视图初始化 ----
+    {
+        QGraphicsView *views[MAX_CHANNELS] = {ui->gv0, ui->gv1, ui->gv2, ui->gv3};
+        for (int i = 0; i < MAX_CHANNELS; ++i) {
+            m_channels[i].index = i;
+            m_channels[i].view = views[i];
+            m_channels[i].scene = new QGraphicsScene(this);
+            views[i]->setScene(m_channels[i].scene);
+            m_channels[i].pixItem = new QGraphicsPixmapItem();
+            views[i]->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+            views[i]->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+            views[i]->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+            m_channels[i].scene->addItem(m_channels[i].pixItem);
+            views[i]->installEventFilter(this);
+            m_channels[i].gvSize = views[i]->size();
+        }
+        // 修正布局伸缩：图像区域始终扩展、工具栏固定高度，
+        // 避免单画面模式下顶部工具栏因伸缩传递失效而占据上半部分。
+        ui->gridLayoutViews->setRowStretch(0, 1);
+        ui->gridLayoutViews->setRowStretch(1, 1);
+        ui->gridLayoutViews->setColumnStretch(0, 1);
+        ui->gridLayoutViews->setColumnStretch(1, 1);
+        ui->widgetGV->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        ui->widget_Img->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        ui->widget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+        applyViewLayout();
+    }
 
     ui->widgetTitle->setFixedHeight(42);
 
@@ -274,7 +299,7 @@ void MainWidget::setupUi()
     ui->comboBoxPlatform->addItem("RaspberryPi5", (int) EuPlatform::RaspberryPi5);
     ui->comboBoxPlatform->addItem("Jetson", (int) EuPlatform::Jetson);
 
-    ui->lineEditSavePath->setFixedWidth(256);
+    ui->lineEditSavePath->setFixedWidth(150);
     //ui->spinBox_showFPS->setRange(15, 120);
     ui->comboBox_showFPS->addItem(tr("30帧/秒"), 30);
     ui->comboBox_showFPS->addItem(tr("60帧/秒"), 60);
@@ -288,7 +313,7 @@ void MainWidget::setupUi()
     ui->radioButton_adaptive->setChecked(true);
     ui->pushButtonSaveImg->setEnabled(false);
 
-    int btnWidth = 110;
+    int btnWidth = 92;
     ui->pushButtonCapture->setFixedWidth(btnWidth);
     ui->pushButtonShow->setFixedWidth(btnWidth);
     ui->pushButtonSaveImg->setFixedWidth(btnWidth);
@@ -439,32 +464,38 @@ void MainWidget::setupUi()
             [this](int index) { m_euPlatform = (EuPlatform) index; });
 
     connect(ui->comboBoxDev, QOverload<int>::of(&QComboBox::activated), this, [this]() {
-        if (m_camRunning) {
-            closeCam();
-            ui->pushButtonCapture->setChecked(false);
-            ui->pushButtonShow->setChecked(false);
-        }
-        setCamIndex(StCamIndex());
         QString strValue = ui->comboBoxDev->currentText();
-        if (m_mapAutoCamIndex.contains(strValue)) {
-            StCamIndex camIndex = m_mapAutoCamIndex[strValue];
-            setCamIndex(camIndex);
+        if (!m_mapAutoCamIndex.contains(strValue)) {
+            return;
         }
+        StCamIndex camIndex = m_mapAutoCamIndex[strValue];
+        // 选设备 -> 分配/激活到某个通道(已绑定则直接激活;否则空闲槽位优先)
+        int ch = pickChannelForDevice(strValue);
+        bindDeviceToChannel(ch, camIndex);
+        setActiveChannel(ch);
         readSysfs();
         QString strI2C = ui->lineEditI2cBus->text();
         if (QxHelp::hasWritePermission(strI2C.toStdString().c_str())) {
             emit ui->pushButtonGetCamParam->clicked();
-        }        
+        }
     });
 
     connect(ui->pushButtonSearchCamera, &QPushButton::clicked, this, [this]() {
+        // 重新搜索前停止并复位所有通道（含排空帧队列、销毁 Camera 对象）
+        for (int i = 0; i < MAX_CHANNELS; ++i) {
+            teardownChannel(i);
+            showChannelBg(i);
+        }
+        m_active = 0;
         ui->comboBoxDev->clear();
         m_mapAutoCamIndex.clear();
         readCamIndex();
         if (m_mapAutoCamIndex.size() > 0) {
             emit ui->comboBoxDev->activated(0);
+        } else {
+            updatePanelForActive();
+            showBGImg();
         }
-        
     });
 
     connect(ui->pushButtonGetCamParam, &QPushButton::clicked, this, [this]() {
@@ -513,15 +544,22 @@ void MainWidget::setupUi()
         }
     });
 
+    connect(ui->pushButtonLayout, &QPushButton::clicked, this, [this]() { toggleViewLayout(); });
+    connect(ui->pushButtonFullScreen, &QPushButton::clicked, this, [this]() { toggleFullscreen(); });
+
     connect(ui->radioButton_adaptive, &QRadioButton::clicked, this, [this]() {
         m_scale = true;
-        ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        for (int i = 0; i < MAX_CHANNELS; ++i) {
+            m_channels[i].view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+            m_channels[i].view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        }
     });
     connect(ui->radioButton_src, &QRadioButton::clicked, this, [this]() {
         m_scale = false;
-        ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-        ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        for (int i = 0; i < MAX_CHANNELS; ++i) {
+            m_channels[i].view->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+            m_channels[i].view->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        }
     });
 
     connect(ui->pushButtonSavePath, &QPushButton::clicked, this, [this]() {
@@ -547,7 +585,9 @@ void MainWidget::setupUi()
         QxHelp::makeFolder(strPath);
         QxHelp::makeFolderTail(strPath);
         int count = ui->spinBoxSaveCount->value();
-        emit sndSaveImg(strPath, count);
+        if (cur().cam) {
+            cur().cam->saveImg(strPath, count);
+        }
     });
 
     connect(ui->pushButtonCleanOptLog, &QPushButton::clicked, this, [this]() {
@@ -564,8 +604,8 @@ void MainWidget::setupUi()
                                                          QApplication::applicationDirPath());
             if (!savePath.isEmpty()) {
                 QString fileName;
-                int pos = savePath.lastIndexOf(".txt");
-                if (pos != (savePath.length() - strlen(".txt"))) {
+                // 结尾判断用 endsWith：lastIndexOf 在下标 0 时也会等于 length-4（size_t 下溢）
+                if (!savePath.endsWith(".txt", Qt::CaseInsensitive)) {
                     fileName = savePath + ".txt";
                 } else {
                     fileName = savePath;
@@ -645,21 +685,24 @@ void MainWidget::setupUi()
     m_timer->start(1000);
 
     QTimer::singleShot(0, this, [this]() {
-        QScreen *screen = QGuiApplication::primaryScreen();
-        if (screen) {
-            m_setFps = ui->comboBox_showFPS->currentData().toInt();
-        }
-
+        m_setFps = ui->comboBox_showFPS->currentData().toInt();
         ui->comboBoxPlatform->setCurrentIndex((int) m_euPlatform);
 
-        emit ui->comboBoxDev->setCurrentIndex(0);
-
-        setCamIndex(StCamIndex());
-        QString strValue = ui->comboBoxDev->currentText();
-        if (m_mapAutoCamIndex.contains(strValue)) {
-            StCamIndex camIndex = m_mapAutoCamIndex[strValue];
-            setCamIndex(camIndex);
+        // 默认将第一个探测到的设备绑定到通道0并激活
+        if (m_mapAutoCamIndex.size() > 0) {
+            QString strValue = ui->comboBoxDev->itemText(0);
+            ui->comboBoxDev->setCurrentIndex(0);
+            if (m_mapAutoCamIndex.contains(strValue)) {
+                int ch = pickChannelForDevice(strValue);
+                bindDeviceToChannel(ch, m_mapAutoCamIndex[strValue]);
+                setActiveChannel(ch);
+                readSysfs();
+            }
+        } else {
+            updatePanelForActive();
         }
+
+        showBGImg();
 
         if (1 == m_language) {
             m_language = 0;
@@ -670,11 +713,20 @@ void MainWidget::setupUi()
                 emit ui->pushButtonGetCamParam->clicked();
             }
         }
-
-        showBGImg();
     });
 
-    resize(1800, 1000);
+    // 按 16:9 适配当前屏幕可用区域，避免窗口比例不对/被显示器裁切（显示不全）
+    {
+        QScreen *scr = QApplication::primaryScreen();
+        QRect av = scr ? scr->availableGeometry() : QRect(0, 0, 1920, 1080);
+        int h = av.height();
+        int w = h * 16 / 9;
+        if (w > av.width()) {
+            w = av.width();
+            h = w * 9 / 16;
+        }
+        resize(w, h);
+    }
     QxHelp::moveCenter(this);
 }
 
@@ -687,10 +739,10 @@ void MainWidget::transUi()
         headers << tr("Num") << tr("Result") << tr("Operation Log");
         ui->tableWidgetLog->setColumnCount(headers.size());
         ui->tableWidgetLog->setHorizontalHeaderLabels(headers);
-        if (m_camRunning) {
+        if (cur().bRunning) {
             ui->pushButtonCapture->setText(("Stop Capture"));
         }
-        if (m_camImgShow) {
+        if (cur().bShow) {
             ui->pushButtonShow->setText(("Stop Show"));
         }
         int index = ui->comboBox_showFPS->currentIndex();
@@ -703,10 +755,10 @@ void MainWidget::transUi()
         headers << tr("序号") << tr("结果") << tr("操作记录");
         ui->tableWidgetLog->setColumnCount(headers.size());
         ui->tableWidgetLog->setHorizontalHeaderLabels(headers);
-        if (m_camRunning) {
+        if (cur().bRunning) {
             ui->pushButtonCapture->setText(("停止采集"));
         }
-        if (m_camImgShow) {
+        if (cur().bShow) {
             ui->pushButtonShow->setText(("停止显示"));
         }
         int index = ui->comboBox_showFPS->currentIndex();
@@ -715,50 +767,69 @@ void MainWidget::transUi()
         ui->comboBox_showFPS->addItem(tr("60帧/秒"), 60);
         ui->comboBox_showFPS->setCurrentIndex(index);
     }
+    // 布局按钮文本随当前画面模式动态变化，retranslateUi 只会还原成 .ui 里的默认值，
+    // 这里按模式重设，避免切换语言后按钮显示与实际情况不符。
+    ui->pushButtonLayout->setText(m_bFourView ? tr("单画面") : tr("四画面"));
     QxHelp::setWindowIdentity(this, APP_NAME);
 }
 
 void MainWidget::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
-    if (!m_camRunning) {
-        showBGImg();
+    for (int i = 0; i < MAX_CHANNELS; ++i) {
+        if (m_channels[i].view && m_channels[i].view->isVisible()) {
+            m_channels[i].gvSize = m_channels[i].view->size();
+        }
     }
-    if (m_gvSize != ui->graphicsView->size()) {
-        m_gvSize = ui->graphicsView->size();
-        qDebug() << "m_gvSize" << m_gvSize;
+    if (!cur().bRunning) {
+        showBGImg();
     }
 }
 
 bool MainWidget::eventFilter(QObject *watched, QEvent *event)
 {
-    if ((watched == ui->graphicsView) && (event->type() == QEvent::MouseButtonDblClick)
-        && m_camImgShow) {
-        QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
-        if (mouseEvent->button() == Qt::LeftButton) {
-            if (!isFullScreen) {
-                ui->graphicsView->setAttribute(Qt::WA_TranslucentBackground);
-                ui->graphicsView->setWindowFlags(ui->graphicsView->windowFlags()
-                                                 | Qt::FramelessWindowHint);
-                ui->graphicsView->setWindowState(Qt::WindowFullScreen);
-                ui->graphicsView->setParent(nullptr);
-                ui->graphicsView->showMaximized();
-                m_gvSrcSize = m_gvSize;
-                m_gvSize = QApplication::primaryScreen()->availableGeometry().size();
-            } else {
-                ui->graphicsView->showNormal();
-                ui->graphicsView->setWindowState(Qt::WindowNoState);
-                ui->graphicsView->setParent(ui->widgetGV);
-                ui->widgetGV->layout()->addWidget(ui->graphicsView);
-                m_gvSize = m_gvSrcSize;
-            }
-
-            isFullScreen = !isFullScreen;
-            return true; // 事件已处理，不再传递
+    for (int i = 0; i < MAX_CHANNELS; ++i) {
+        if (watched != m_channels[i].view) {
+            continue;
         }
+        QEvent::Type et = event->type();
+        if (et == QEvent::Resize) {
+            m_channels[i].gvSize = m_channels[i].view->size();
+        } else if (et == QEvent::MouseButtonPress) {
+            // 单击某个画面 -> 激活该通道（允许空格，便于“先选中空格再放相机”）
+            if (m_active != i) {
+                setActiveChannel(i);
+                // 已绑定相机时再刷新右侧参数到该通道
+                if (m_channels[i].used) {
+                    QString strI2C = ui->lineEditI2cBus->text();
+                    if (QxHelp::hasWritePermission(strI2C.toStdString().c_str())) {
+                        emit ui->pushButtonGetCamParam->clicked();
+                    }
+                }
+            }
+        } else if (et == QEvent::MouseButtonDblClick) {
+            QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+            if (mouseEvent->button() == Qt::LeftButton) {
+                if (m_fs != FS_None) {
+                    exitFullscreen();
+                } else if (m_channels[i].used) {
+                    enterFullscreenSingle(i);
+                }
+                return true; // 已处理
+            }
+        }
+        break;
     }
-
     return FramelessWidget::eventFilter(watched, event);
+}
+
+void MainWidget::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Escape && m_fs != FS_None) {
+        exitFullscreen();
+        return;
+    }
+    FramelessWidget::keyPressEvent(event);
 }
 
 void MainWidget::onTitleDblClick()
@@ -806,8 +877,14 @@ void MainWidget::readSysCfg()
     QString strJson = m_strCfgPath + "syscfg.json";
     if (QxHelp::readJson(strJson, m_jsonSysCfg)) {
         QString savePath = m_jsonSysCfg["img_path"].asString().c_str();
-        if (QxHelp::hasWritePermission(savePath.toStdString().c_str())) {
+        // 只有“不可写”才需要回退到默认目录（此处原先判断写反了，导致能用的路径反而被丢弃）
+        if (!QxHelp::hasWritePermission(savePath.toStdString().c_str())) {
             savePath = QApplication::applicationDirPath() + "/image";
+        }
+        // 默认目录可能不存在（刚安装/手动删过），不建的话存图会静默失败
+        QDir dir(savePath);
+        if (!dir.exists()) {
+            dir.mkpath(savePath);
         }
 
         ui->lineEditSavePath->setText(savePath);
@@ -832,32 +909,63 @@ void MainWidget::saveSysCfg()
 
 void MainWidget::onSetRoiAndFps(const StImgAttrInfo &info)
 {
-    if (m_camRunning) {
+    if (cur().bRunning) {
         QxToast::showTip(tr("状态为采集中，不支持该操作"), this);
     } else {
-        QString strX = info.strX;
-        QString strY = info.strY;
-        QString strW = info.strW;
-        QString strH = info.strH;
-        QString strFps = info.strFps;
+        QString strX = info.strX.trimmed();
+        QString strY = info.strY.trimmed();
+        QString strW = info.strW.trimmed();
+        QString strH = info.strH.trimmed();
+        QString strFps = info.strFps.trimmed();
 
-        QString videoNode = ui->lineEditVideoNode->text();
-        QString i2cBus = ui->lineEditI2cBus->text();
-        QString mediaNode = ui->lineEditMediaNode->text();
-        QString subNode = ui->lineEditSubNode->text();
-        QString entityName = ui->lineEditEntityName->text();
+        // 这些字符串会直接拼进 v4l2-ctl / media-ctl / config_camera-rpi5.sh 的参数里，
+        // 对话框只判了“非空”，这里做严格的数字格式+范围校验（同时拼不上脏字符）。
+        static const QRegularExpression reInt("^[0-9]{1,5}$");
+        static const QRegularExpression reFps("^[0-9]{1,3}([.][0-9]{1,3})?$");
+        const int nROIVerify = strW.toInt();
+        const int nROIHVerify = strH.toInt();
+        if (!reInt.match(strX).hasMatch() || !reInt.match(strY).hasMatch()
+            || !reInt.match(strW).hasMatch() || !reInt.match(strH).hasMatch()
+            || !reFps.match(strFps).hasMatch() || nROIVerify <= 0 || nROIHVerify <= 0
+            || nROIVerify > 8192 || nROIHVerify > 8192) {
+            QxToast::showTip(tr("请设置合理的ROI和帧率"), this);
+            return;
+        }
+        strX = QString::number(strX.toInt());
+        strY = QString::number(strY.toInt());
+        strW = QString::number(nROIVerify);
+        strH = QString::number(nROIHVerify);
+
+        QString videoNode = ui->lineEditVideoNode->text().trimmed();
+        QString i2cBus = ui->lineEditI2cBus->text().trimmed();
+        QString mediaNode = ui->lineEditMediaNode->text().trimmed();
+        QString subNode = ui->lineEditSubNode->text().trimmed();
+        QString entityName = ui->lineEditEntityName->text().trimmed();
+
+        // 这些控件不是只读的，用户（或被改过的 auto_camera_index.json）可以直接填任意文本；
+        // 命令参数来到的字符串先过一遍白名单，不干净就拒绝下发。
+        if (!QxHelp::isSafeCmdToken(videoNode) || !QxHelp::isSafeCmdToken(mediaNode)
+            || !QxHelp::isSafeCmdToken(subNode) || !QxHelp::isSafeCmdToken(entityName)) {
+            qCritical() << "reject set-roi with unsafe device strings";
+            QxToast::showTip(tr("设备节点/实体名不合法"), this);
+            return;
+        }
 
         int nPos = i2cBus.lastIndexOf("-") + 1;
         i2cBus = i2cBus.mid(nPos, i2cBus.length() - nPos);
         //QString addr = m_i2cAddr.mid(2, m_i2cAddr.length() - 2);
 
-        m_camParam.videoNode = videoNode;
-        m_camParam.subNode = subNode;
-        m_camParam.x = strX.toInt();
-        m_camParam.y = strY.toInt();
-        m_camParam.w = strW.toInt();
-        m_camParam.h = strH.toInt();
-        m_camParam.fps = strFps.toInt();
+        Camera *cam = cur().cam;
+        if (!cam) {
+            return;
+        }
+        cur().camParam.videoNode = videoNode;
+        cur().camParam.subNode = subNode;
+        cur().camParam.x = strX.toInt();
+        cur().camParam.y = strY.toInt();
+        cur().camParam.w = strW.toInt();
+        cur().camParam.h = strH.toInt();
+        cur().camParam.fps = strFps.toInt();
 
         QString strCmd;
         switch (m_euPlatform) {
@@ -865,9 +973,9 @@ void MainWidget::onSetRoiAndFps(const StImgAttrInfo &info)
             if (EuCamType::MvCamera == m_euCamType) {
                 int nFps = strFps.toFloat() * 100;
                 strCmd = QString("v4l2-ctl -d %1 --set-ctrl roi_x=%2").arg(subNode, strX);
-                m_cam->runSystemCmd(strCmd);
+                cam->runSystemCmd(strCmd);
                 strCmd = QString("v4l2-ctl -d %1 --set-ctrl roi_y=%2").arg(subNode, strY);
-                m_cam->runSystemCmd(strCmd);
+                cam->runSystemCmd(strCmd);
                 strCmd = QString("media-ctl -d %1 --set-v4l2 \'\"%2\":0[fmt:%3/%4x%5@1/%6]\'")
                              .arg(mediaNode,
                                   entityName,
@@ -875,16 +983,16 @@ void MainWidget::onSetRoiAndFps(const StImgAttrInfo &info)
                                   strW,
                                   strH,
                                   QString::number(static_cast<int>(strFps.toFloat())));
-                m_cam->runSystemCmd(strCmd);
+                cam->runSystemCmd(strCmd);
                 asyncWriteCmd(fps, nFps, true);
             } else if (EuCamType::GxCamera == m_euCamType) {
                 int nFps = strFps.toFloat() * 10000;
                 if (m_gxVideoModeCap & 0x01) {
                     // GX ROI 模式：设置 ROI x/y
                     strCmd = QString("v4l2-ctl -d %1 --set-ctrl roi_x=%2").arg(subNode, strX);
-                    m_cam->runSystemCmd(strCmd);
+                    cam->runSystemCmd(strCmd);
                     strCmd = QString("v4l2-ctl -d %1 --set-ctrl roi_y=%2").arg(subNode, strY);
-                    m_cam->runSystemCmd(strCmd);
+                    cam->runSystemCmd(strCmd);
                 }
                 strCmd = QString("media-ctl -d %1 --set-v4l2 \'\"%2\":0[fmt:%3/%4x%5@1/%6]\'")
                              .arg(mediaNode,
@@ -893,7 +1001,7 @@ void MainWidget::onSetRoiAndFps(const StImgAttrInfo &info)
                                   strW,
                                   strH,
                                   QString::number(static_cast<int>(strFps.toFloat())));
-                m_cam->runSystemCmd(strCmd);
+                cam->runSystemCmd(strCmd);
                 asyncWriteCmd(fps_gx, nFps, true);
                 qDebug() << strCmd;
             }
@@ -902,27 +1010,27 @@ void MainWidget::onSetRoiAndFps(const StImgAttrInfo &info)
             if (EuCamType::MvCamera == m_euCamType) {
                 int nFps = strFps.toFloat() * 100;
                 strCmd = QString("v4l2-ctl -d %1 --set-ctrl roi_x=%2").arg(videoNode, strX);
-                m_cam->runSystemCmd(strCmd);
+                cam->runSystemCmd(strCmd);
                 strCmd = QString("v4l2-ctl -d %1 --set-ctrl roi_y=%2").arg(videoNode, strY);
-                m_cam->runSystemCmd(strCmd);
+                cam->runSystemCmd(strCmd);
                 strCmd = QString(
                              "v4l2-ctl -d %1 --set-fmt-video=width=%2,height=%3,pixelformat=GREY")
                              .arg(videoNode, strW, strH);
-                m_cam->runSystemCmd(strCmd);
+                cam->runSystemCmd(strCmd);
                 asyncWriteCmd(fps, nFps, true);
             } else if (EuCamType::GxCamera == m_euCamType) {
                 int nFps = strFps.toFloat() * 10000;
                 if (m_gxVideoModeCap & 0x01) {
                     // GX ROI 模式：设置 ROI x/y
                     strCmd = QString("v4l2-ctl -d %1 --set-ctrl roi_x=%2").arg(videoNode, strX);
-                    m_cam->runSystemCmd(strCmd);
+                    cam->runSystemCmd(strCmd);
                     strCmd = QString("v4l2-ctl -d %1 --set-ctrl roi_y=%2").arg(videoNode, strY);
-                    m_cam->runSystemCmd(strCmd);
+                    cam->runSystemCmd(strCmd);
                 }
                 strCmd = QString(
                              "v4l2-ctl -d %1 --set-fmt-video=width=%2,height=%3,pixelformat=UYVY")
                              .arg(videoNode, strW, strH);
-                m_cam->runSystemCmd(strCmd);
+                cam->runSystemCmd(strCmd);
                 asyncWriteCmd(fps_gx, nFps, true);
             }
         } break;
@@ -941,7 +1049,7 @@ void MainWidget::onSetRoiAndFps(const StImgAttrInfo &info)
                                           mediaNode.toStdString().c_str(),
                                           subNode.toStdString().c_str(),
                                           videoNode.toStdString().c_str());
-                m_cam->runSystemCmd(strCmd);
+                cam->runSystemCmd(strCmd);
                 asyncWriteCmd(fps, nFps, true);
             } else if (EuCamType::GxCamera == m_euCamType) {
                 int nFps = strFps.toFloat() * 10000;
@@ -957,7 +1065,7 @@ void MainWidget::onSetRoiAndFps(const StImgAttrInfo &info)
                                           mediaNode.toStdString().c_str(),
                                           subNode.toStdString().c_str(),
                                           videoNode.toStdString().c_str());
-                m_cam->runSystemCmd(strCmd);
+                cam->runSystemCmd(strCmd);
                 asyncWriteCmd(fps_gx, nFps, true);
             }
         } break;
@@ -965,27 +1073,27 @@ void MainWidget::onSetRoiAndFps(const StImgAttrInfo &info)
             if (EuCamType::MvCamera == m_euCamType) {
                 int nFps = strFps.toFloat() * 100;
                 strCmd = QString("v4l2-ctl -d %1 --set-ctrl roi_x=%2").arg(videoNode, strX);
-                m_cam->runSystemCmd(strCmd);
+                cam->runSystemCmd(strCmd);
                 strCmd = QString("v4l2-ctl -d %1 --set-ctrl roi_y=%2").arg(videoNode, strY);
-                m_cam->runSystemCmd(strCmd);
+                cam->runSystemCmd(strCmd);
                 strCmd = QString(
                              "v4l2-ctl -d %1 --set-fmt-video=width=%2,height=%3,pixelformat=GREY")
                              .arg(videoNode, strW, strH);
-                m_cam->runSystemCmd(strCmd);
+                cam->runSystemCmd(strCmd);
                 asyncWriteCmd(fps, nFps, true);
             } else if (EuCamType::GxCamera == m_euCamType) {
                 int nFps = strFps.toFloat() * 10000;
                 if (m_gxVideoModeCap & 0x01) {
                     // GX ROI 模式：设置 ROI x/y
                     strCmd = QString("v4l2-ctl -d %1 --set-ctrl roi_x=%2").arg(videoNode, strX);
-                    m_cam->runSystemCmd(strCmd);
+                    cam->runSystemCmd(strCmd);
                     strCmd = QString("v4l2-ctl -d %1 --set-ctrl roi_y=%2").arg(videoNode, strY);
-                    m_cam->runSystemCmd(strCmd);
+                    cam->runSystemCmd(strCmd);
                 }
                 strCmd = QString(
                              "v4l2-ctl -d %1 --set-fmt-video=width=%2,height=%3,pixelformat=UYVY")
                              .arg(videoNode, strW, strH);
-                m_cam->runSystemCmd(strCmd);
+                cam->runSystemCmd(strCmd);
                 asyncWriteCmd(fps_gx, nFps, true);
             }
             int width = strW.toInt();
@@ -994,7 +1102,7 @@ void MainWidget::onSetRoiAndFps(const StImgAttrInfo &info)
             }
             strCmd
                 = QString("v4l2-ctl -d %1 --set-ctrl preferred_stride=%2").arg(videoNode).arg(width);
-            m_cam->runSystemCmd(strCmd);
+            cam->runSystemCmd(strCmd);
         } break;
         default:
             break;
@@ -1005,26 +1113,38 @@ void MainWidget::onSetRoiAndFps(const StImgAttrInfo &info)
     }
 }
 
-void MainWidget::onCamStatus(EuCamStatus status)
+void MainWidget::onCamStatus(int ch, EuCamStatus status)
 {
+    if (ch < 0 || ch >= MAX_CHANNELS) {
+        return;
+    }
+    CameraChannel &c = m_channels[ch];
     switch (status) {
     case EuCamStatus::OPEN_STA: {
-        ui->pushButtonSaveImg->setEnabled(true);
-        //ui->pushButtonShow->setText(tr("停止显示"));
-        ui->pushButtonCapture->setText(tr("停止采集"));
-        ui->pushButtonShow->setEnabled(true);
+        c.bRunning = true;
+        if (ch == m_active) {
+            ui->pushButtonSaveImg->setEnabled(true);
+            ui->pushButtonCapture->setText(tr("停止采集"));
+            ui->pushButtonCapture->setChecked(true);
+            ui->pushButtonShow->setEnabled(true);
+        }
     } break;
     case EuCamStatus::CLOSE_STA: {
-        ui->pushButtonSaveImg->setEnabled(false);
-        ui->pushButtonCapture->setText(tr("开始采集"));
-        ui->pushButtonShow->setText(tr("开始显示"));
-        rcvFrameInfo(StCamInfo());
-        ui->pushButtonShow->setEnabled(false);
-        showBGImg();
-        m_camRunning = false;
+        c.bRunning = false;
+        c.bShow = false;
+        rcvFrameInfo(ch, StCamInfo());
+        showChannelBg(ch);
+        if (ch == m_active) {
+            ui->pushButtonSaveImg->setEnabled(false);
+            ui->pushButtonCapture->setText(tr("开始采集"));
+            ui->pushButtonCapture->setChecked(false);
+            ui->pushButtonShow->setText(tr("开始显示"));
+            ui->pushButtonShow->setChecked(false);
+            ui->pushButtonShow->setEnabled(false);
+        }
     } break;
     case EuCamStatus::HIDE_STA: {
-        showBGImg();
+        showChannelBg(ch);
     } break;
     case EuCamStatus::READ_TIMEMOU: {
         QxToast::showTip("Data reading timed out. Please try restarting");
@@ -1036,10 +1156,16 @@ void MainWidget::onCamStatus(EuCamStatus status)
 
 void MainWidget::openCam()
 {
-    if (!m_camRunning) {
+    CameraChannel &c = cur();
+    if (!c.bRunning) {
         qDebug() << ".........openCam.........";
+        ensureChannelCamera(m_active);
         emit sndSetROI(false);
         QString videoNode = ui->lineEditVideoNode->text();
+        Camera *cam = c.cam;
+        if (!cam) {
+            return;
+        }
         switch (m_euPlatform) {
         case EuPlatform::Rockchip: {
         } break;
@@ -1050,24 +1176,26 @@ void MainWidget::openCam()
         case EuPlatform::Jetson: {
             QString strCmd = QString("v4l2-ctl -d %1 --set-ctrl vi_time_out_disable=1")
                                  .arg(videoNode);
-            m_cam->runSystemCmd(strCmd);
+            cam->runSystemCmd(strCmd);
         } break;
         default:
             break;
         };
 
-        m_camRunning = m_cam->OpenDevice(m_camParam);
-        if (m_camRunning) {
-            onCamStatus(EuCamStatus::OPEN_STA);
+        c.bRunning = cam->OpenDevice(c.camParam);
+        if (c.bRunning) {
+            onCamStatus(c.index, EuCamStatus::OPEN_STA);
         } else {
-            onCamStatus(EuCamStatus::CLOSE_STA);
+            onCamStatus(c.index, EuCamStatus::CLOSE_STA);
         }
     }
 }
 
 void MainWidget::closeCam()
 {
-    if (m_camRunning) {
+    CameraChannel &c = cur();
+    Camera *cam = c.cam;
+    if (cam && c.bRunning) {
         qDebug() << ".........closeCam.........";
         QString videoNode = ui->lineEditVideoNode->text();
         switch (m_euPlatform) {
@@ -1080,12 +1208,14 @@ void MainWidget::closeCam()
         case EuPlatform::Jetson: {
             QString strCmd = QString("v4l2-ctl -d %1 --set-ctrl vi_time_out_disable=0")
                                  .arg(videoNode);
-            m_cam->runSystemCmd(strCmd);
+            cam->runSystemCmd(strCmd);
         } break;
         default:
             break;
         }
-        m_cam->CloseDevice();
+        cam->CloseDevice();
+        c.bRunning = false;
+        c.bShow = false;
         ui->pushButtonCapture->setChecked(false);
         closeShow();
     }
@@ -1096,19 +1226,24 @@ void MainWidget::openShow()
     m_showFps = 0;
     m_seconds = 0;
     m_bFps = false;
-    m_camImgShow = true;
-    emit sndShow(m_camImgShow);
+    CameraChannel &c = cur();
+    c.bShow = true;
+    if (c.cam) {
+        c.cam->setShow(true);
+    }
     ui->pushButtonShow->setText(tr("停止显示"));
 }
 
 void MainWidget::closeShow()
 {
-    m_camImgShow = false;
-
-    emit sndShow(m_camImgShow);
+    CameraChannel &c = cur();
+    c.bShow = false;
+    if (c.cam) {
+        c.cam->setShow(false);
+    }
     ui->pushButtonShow->setText(tr("开始显示"));
     ui->pushButtonShow->setChecked(false);
-    showBGImg();
+    showChannelBg(c.index);
     m_showFps = 0;
     m_seconds = 0;
     m_bFps = false;
@@ -1160,8 +1295,35 @@ void MainWidget::readCamIndex()
 {
     //qDebug() << "MainWidget::readCamIndex() is called " << QApplication::applicationDirPath();
     QString i2c_bus;
-    QString strCmd = m_strCfgPath + mapProbefile[m_platform];
-    if (0 == system(strCmd.toStdString().c_str())) {
+    // 用 value()+contains()：非 const 的 operator[] 会把未知平台写进 map（下次拿到空字符串），
+    // 导致把“配置目录”本身当成脚本交给 shell 执行。
+    if (!mapProbefile.contains(m_platform) || mapProbefile.value(m_platform).isEmpty()) {
+        qCritical() << "no probe script mapped for platform" << m_platform;
+        QxToast::showTip(tr("未知平台，无法检索相机") + ": " + m_platform, this);
+        return;
+    }
+    const QString strScript = m_strCfgPath + mapProbefile.value(m_platform);
+    if (!QFile::exists(strScript)) {
+        qCritical() << "probe script not found:" << strScript;
+        QxToast::showTip(tr("检索脚本不存在") + ": " + strScript, this);
+        return;
+    }
+
+    // 不再用 system()：直接 /bin/bash 脚本路径，路径里有空格也不会被重新分词/解析
+    QProcess probe;
+    probe.setProcessChannelMode(QProcess::MergedChannels);
+    probe.start("/bin/bash", QStringList() << strScript);
+    if (!probe.waitForStarted(3000)) {
+        qCritical() << "run probe failed:" << strScript << probe.errorString();
+        return;
+    }
+    if (!probe.waitForFinished(60000)) {
+        probe.kill();
+        probe.waitForFinished(1000);
+        qCritical() << "probe timeout:" << strScript;
+        return;
+    }
+    if (0 == probe.exitCode()) {
         QString strJson = m_strCfgPath + "auto_camera_index.json";
         if (QxHelp::fileExists(strJson.toStdString().c_str())) {
             Json::Value jsonRoot;
@@ -1171,12 +1333,29 @@ void MainWidget::readCamIndex()
                     Json::Value jsonNode = jsonRoot[i];
                     StCamIndex camIndex;
                     QString i2c_bus_num = QString::fromStdString(jsonNode["i2c_bus"].asString());
-                    camIndex.i2c_bus = "/dev/i2c-" + i2c_bus_num;
-                    camIndex.i2c_bus_num = i2c_bus_num.toInt();
+                    bool busOk = false;
+                    // 探测脚本写的是裸数字；非数字（包括被篡改的 JSON）一律丢弃，
+                    // 后面的 set-v4l2 / media-ctl 命令不会拼到脏字符串
+                    const int busNumber = i2c_bus_num.trimmed().toInt(&busOk);
+                    if (!busOk || busNumber < 0) {
+                        qWarning() << "skip camera entry with invalid i2c bus:" << i2c_bus_num;
+                        continue;
+                    }
+                    camIndex.i2c_bus = QString("/dev/i2c-%1").arg(busNumber);
+                    camIndex.i2c_bus_num = busNumber;
                     camIndex.media_entity_name = jsonNode["media_entity_name"].asString().c_str();
                     camIndex.media_node = jsonNode["media_node"].asString().c_str();
                     camIndex.video_node = jsonNode["video_node"].asString().c_str();
                     camIndex.video_subnode = jsonNode["video_subnode"].asString().c_str();
+                    // 设备名字段会被拼进 v4l2-ctl / media-ctl 命令，先做长度与控制字符校验
+                    if (!QxHelp::isSafeCmdToken(camIndex.media_entity_name)
+                        || !QxHelp::isSafeCmdToken(camIndex.media_node)
+                        || !QxHelp::isSafeCmdToken(camIndex.video_subnode)
+                        || !camIndex.video_node.startsWith("/dev/video")
+                        || !QxHelp::isSafeCmdToken(camIndex.video_node)) {
+                        qWarning() << "skip camera entry index" << i << "with suspicious device strings";
+                        continue;
+                    }
                     ui->comboBoxDev->addItem(camIndex.video_node);
                     m_mapAutoCamIndex.insert(camIndex.video_node, camIndex);
                     if (i2c_bus.isEmpty() && !i2c_bus_num.isEmpty()) {
@@ -1190,7 +1369,7 @@ void MainWidget::readCamIndex()
             qDebug() << "auto_camera_index.json  does not exist ";
         }
     } else {
-        qCritical() << "runShell " << strCmd << " failed";
+        qCritical() << "runShell " << strScript << " failed, code" << probe.exitCode();
     }
 
     if (!i2c_bus.isEmpty()) {
@@ -1363,7 +1542,8 @@ uint32_t MainWidget::readRegData(EuCMD cmd, uint32_t reg, QObject *obj, bool sho
 {
     uint32_t data = 0;
     QString i2c = ui->lineEditI2cBus->text();
-    if (!i2c.isEmpty()) {
+    Camera *cam = cur().cam;
+    if (!i2c.isEmpty() && cam) {
         StI2CCmd stCmd;
         stCmd.bWrite = false;
         stCmd.cmd = cmd;
@@ -1375,9 +1555,9 @@ uint32_t MainWidget::readRegData(EuCMD cmd, uint32_t reg, QObject *obj, bool sho
         stCmd.obj = obj;
         stCmd.showlog = showlog;
         if (async) {
-            m_cam->asynReadData(stCmd);
+            cam->asynReadData(stCmd);
         } else {
-            m_cam->syncReadData(stCmd);
+            cam->syncReadData(stCmd);
             data = stCmd.data;
         }
     } else {
@@ -1393,7 +1573,7 @@ bool MainWidget::writeRegData(EuCMD cmd, uint32_t reg, uint32_t data, bool showL
         StRegInfo info = m_mapAddrRegister[reg];
 
         EuUpdateTiming type = (EuUpdateTiming) CodeMap::getUpdateTiming(info.update_timing);
-        if (Standby == type && m_camRunning) {
+        if (Standby == type && cur().bRunning) {
             QxToast::showTip(tr("状态为采集中，不支持该操作"), this);
             return false;
         } else if (ReadOnly == type) {
@@ -1403,7 +1583,7 @@ bool MainWidget::writeRegData(EuCMD cmd, uint32_t reg, uint32_t data, bool showL
     }
 
     QString i2cBus = ui->lineEditI2cBus->text();
-    if (!i2cBus.isEmpty()) {
+    if (!i2cBus.isEmpty() && cur().cam) {
         StI2CCmd stCmd;
         stCmd.bWrite = true;
         stCmd.camType = m_euCamType;
@@ -1414,7 +1594,7 @@ bool MainWidget::writeRegData(EuCMD cmd, uint32_t reg, uint32_t data, bool showL
         stCmd.data = data;
         stCmd.obj = nullptr;
         stCmd.showlog = showLog;
-        m_cam->asynWriteDate(stCmd);
+        cur().cam->asynWriteDate(stCmd);
         bRet = true;
     } else {
         QxToast::showTip(tr("i2c序号不能为空"), this);
@@ -1482,15 +1662,31 @@ END:
     return bRet;
 }
 
+void MainWidget::showChannelBg(int ch)
+{
+    if (ch < 0 || ch >= MAX_CHANNELS) {
+        return;
+    }
+    CameraChannel &c = m_channels[ch];
+    if (!c.view || !c.scene || !c.pixItem) {
+        return;
+    }
+    // 不连相机/未在显示时不再铺 logo（放大后难看），仅保留纯色背景
+    c.pixItem->setPixmap(QPixmap());
+    c.scene->setSceneRect(0, 0, c.view->size().width(), c.view->size().height());
+}
+
 void MainWidget::showBGImg()
 {
-    m_gvSize = ui->graphicsView->size();
-    QPixmap pix = QPixmap::fromImage(m_bkImage).scaled(m_gvSize / 4, Qt::KeepAspectRatio);
-    m_pixItem->setPixmap(pix);
-    m_pixItem->update();
-    m_scene->setSceneRect(0, 0, pix.width(), pix.height());
-    ui->labelTimestamp->setText("0");
-    ui->label_showFps->setText("0");
+    for (int i = 0; i < MAX_CHANNELS; ++i) {
+        if (m_channels[i].view && m_channels[i].view->isVisible() && !m_channels[i].bShow) {
+            showChannelBg(i);
+        }
+    }
+    if (!cur().bShow) {
+        ui->labelTimestamp->setText("0");
+        ui->label_showFps->setText("0");
+    }
 }
 
 void MainWidget::showCtrlWidget()
@@ -1532,31 +1728,37 @@ void MainWidget::showCtrlWidget()
 
 void MainWidget::pushData(const StImgInfo &sii)
 {
-    if (m_camImgShow) {
-        m_mtxPix.lock();
-        m_queueSii.push(sii);
-        int size = m_queueSii.size();
+    int ch = sii.index;
+    if (ch < 0 || ch >= MAX_CHANNELS) {
+        ch = m_active;
+    }
+    CameraChannel &c = m_channels[ch];
+    if (c.bShow) {
+        std::lock_guard<std::mutex> lk(c.mtxPix);
+        c.queueSii.push(sii);
+        int size = (int) c.queueSii.size();
         if (size > m_nChachFrameSize) {
-            StImgInfo tmp = m_queueSii.front();
-            m_queueSii.pop();
+            StImgInfo tmp = c.queueSii.front();
+            c.queueSii.pop();
             if (new_buf == tmp.strategy) {
                 delete[] tmp.buf;
             }
             //qDebug() << "cache frame size " << size << " > " << m_nChachFrameSize << ", drop frame";
         }
-        m_mtxPix.unlock();
     } else {
         if (new_buf == sii.strategy) {
             delete[] sii.buf;
         }
-        m_seconds = 0;
-        m_showFps = 0;
+        if (ch == m_active) {
+            m_seconds = 0;
+            m_showFps = 0;
+        }
     }
 }
 
 bool MainWidget::isCamRunning()
 {
-    return m_camRunning;
+    return cur().bRunning;
 }
 
 QImage uyvyToQImage(unsigned char *uyvyData, int dataSize, int width, int height, int bytesPerLine)
@@ -1616,10 +1818,10 @@ QImage uyvyToQImage(unsigned char *uyvyData, int dataSize, int width, int height
             unsigned char Y1 = uyvyLine[uyvyByteIdx + 3];
 
             // 校验并修正Y/UV的有效范围（避免原始数据异常导致亮度为0）
-            Y0 = qBound(Y_MIN, (const int) Y0, Y_MAX);
-            Y1 = qBound(Y_MIN, (const int) Y1, Y_MAX);
-            U = qBound(UV_MIN, (const int) U, UV_MAX);
-            V = qBound(UV_MIN, (const int) V, UV_MAX);
+            Y0 = qBound(Y_MIN, (int) Y0, Y_MAX);
+            Y1 = qBound(Y_MIN, (int) Y1, Y_MAX);
+            U = qBound(UV_MIN, (int) U, UV_MAX);
+            V = qBound(UV_MIN, (int) V, UV_MAX);
 
             // 转换为归一化值（避免浮点溢出）
             int Y0_norm = Y0 - Y_MIN;
@@ -1658,84 +1860,106 @@ void MainWidget::workThread()
 {
     QElapsedTimer timer;
     timer.restart();
+    bool warnedUnknown[MAX_CHANNELS] = {false};
 
     while (m_bThread) {
-        double setFrameIntv = 1000.0 / m_setFps * 1000;
+        // 下拉框某一项没带 data 时 toInt() 会得到 0，1000/0 = inf 会让预览永远不刷新
+        const int fps = m_setFps > 0 ? m_setFps : 30;
+        double setFrameIntv = 1000.0 / fps * 1000;
         if (timer.nsecsElapsed() / 1000 >= setFrameIntv) {
             //qDebug() << setFrameIntv << timer.nsecsElapsed() / 1000;
             timer.restart();
-            StImgInfo sii;
-            QImage img;
-            m_mtxPix.lock();
-            int count = m_queueSii.size();
-            if (count > 0) {
-                sii = m_queueSii.front();
-                m_queueSii.pop();
-            }
-            m_mtxPix.unlock();
-
-            if (count > 0) {
-                if (m_camImgShow) {
-                    if (EuCamType::GxCamera == m_euCamType) {
+            for (int ch = 0; ch < MAX_CHANNELS; ++ch) {
+                CameraChannel &c = m_channels[ch];
+                StImgInfo sii;
+                bool got = false;
+                {
+                    std::lock_guard<std::mutex> lk(c.mtxPix);
+                    if (!c.queueSii.empty()) {
+                        sii = c.queueSii.front();
+                        c.queueSii.pop();
+                        got = true;
+                    }
+                }
+                if (!got) {
+                    continue;
+                }
+                if (c.bShow) {
+                    QImage img;
+                    if (EuCamType::GxCamera == c.camType) {
                         img = uyvyToQImage(sii.buf,
                                            sii.len,
                                            sii.width,
                                            sii.height,
                                            sii.nBytesperline);
-                    } else if (EuCamType::MvCamera == m_euCamType) {
+                    } else if (EuCamType::MvCamera == c.camType) {
                         img = QImage(sii.buf,
                                      sii.nBytesperline,
                                      sii.height,
                                      QImage::Format_Grayscale8);
+                    } else {
+                        // 类型未知：两种格式的字节含义完全不同，当作 GRAY8 只会解出花屏，
+                        // 宁可不显示并留一条日志。
+                        if (!warnedUnknown[ch]) {
+                            warnedUnknown[ch] = true;
+                            qWarning() << "channel" << ch << "cam type unknown, frame dropped";
+                        }
+                        if (new_buf == sii.strategy) {
+                            delete[] sii.buf;
+                        }
+                        continue;
                     }
                     QPixmap pix;
                     if (m_scale) {
-                        pix = QPixmap::fromImage(img).scaled(m_gvSize,
+                        pix = QPixmap::fromImage(img).scaled(c.gvSize,
                                                              Qt::KeepAspectRatio,
                                                              Qt::FastTransformation);
                     } else {
                         pix = QPixmap::fromImage(img);
                     }
-                    emit sndPixmap(pix, sii.strTS);
+                    emit sndPixmap(ch, pix, sii.strTS);
                 }
                 if (new_buf == sii.strategy) {
                     delete[] sii.buf;
                 }
             }
         } else {
+            // 睡到下一个出帧节拍（最多 5ms 一次，保证停止时及时退出），
+            // 而不是原来 1us 的忙等（四路时会白白吃掉一颗核）
+            qint64 waitUs = (qint64) setFrameIntv - timer.nsecsElapsed() / 1000;
+            if (waitUs < 200) {
+                waitUs = 200;
+            } else if (waitUs > 5000) {
+                waitUs = 5000;
+            }
+            QThread::usleep((unsigned long) waitUs);
         }
-        QThread::usleep(1);
-        //std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 }
 
-void MainWidget::rcvPixmap(const QPixmap &pix, QString strTS)
+void MainWidget::rcvPixmap(int ch, const QPixmap &pix, QString strTS)
 {
-    QElapsedTimer timer;
-
-    if (m_camImgShow) {
-        m_lblFps++;
-        timer.start(); // 开始计时
-        if (m_lastCmd == trgone) {
-            m_trgoneCount++;
-        } else {
-            m_trgoneCount = 0;
+    if (ch < 0 || ch >= MAX_CHANNELS) {
+        return;
+    }
+    CameraChannel &c = m_channels[ch];
+    if (c.bShow && c.pixItem && c.scene) {
+        if (ch == m_active) {
+            m_lblFps++;
+            if (m_lastCmd == trgone) {
+                m_trgoneCount++;
+            } else {
+                m_trgoneCount = 0;
+            }
+            if (0 == m_showFps) {
+                timestamps.clear();
+                m_bFps = true;
+            }
+            m_showFps++;
+            ui->labelTimestamp->setText(strTS);
         }
-
-        if (0 == m_showFps) {
-            timestamps.clear();
-            m_bFps = true;
-        }
-        m_showFps++;
-        ui->labelTimestamp->setText(strTS);
-        m_pixItem->setPixmap(pix);
-        m_scene->setSceneRect(0, 0, pix.width(), pix.height());
-        qint64 elapsedTime = timer.elapsed(); // 获取经过的时间，单位为微秒
-        if (elapsedTime > TIEM_OUT) {
-            qDebug() << "show:" << elapsedTime << "microseconds";
-        }
-    } else {
-        showBGImg();
+        c.pixItem->setPixmap(pix);
+        c.scene->setSceneRect(0, 0, pix.width(), pix.height());
     }
 }
 
@@ -1865,7 +2089,7 @@ void MainWidget::asyncWriteCmd(EuCMD cmd, uint32_t data, bool bShow)
         qInfo() << "............" << data;
     }
     if (factoryparam == cmd) {
-        if (m_camRunning) {
+        if (cur().bRunning) {
             emit ui->pushButtonCapture->clicked(false);
         }
     }
@@ -1912,21 +2136,15 @@ void MainWidget::rcvOneAEAG(int nAemaxtime, int nAgmaxgain, int nAatarget)
         uint32_t gainValue = readCmd(curgain, m_pExpAndGain, true, false);
         emit sndExpGainValue(expValue, gainValue);
         //[step.5]:.set.to.manual.mode
-        uint32_t expMode = 0;
-        uint32_t gainMode = 0;
         asyncWriteCmd(expmode, 0);
         asyncWriteCmd(gainmode, 0);
         asyncWriteCmd(metime, expValue);
         asyncWriteCmd(mgain, gainValue);
         cmdSleep(500);
         //[step.6]:.check.resutlt
-        expMode = 0;
-        gainMode = 0;
         readCmd(expmode, m_pExpAndGain);
         readCmd(gainmode, m_pExpAndGain);
         //emit sndExpGainMode(expMode, gainMode);
-        expValue = 0;
-        gainValue = 0;
         readCmd(exptime, m_pExpAndGain);
         readCmd(curgain, m_pExpAndGain);
         //emit sndExpGainValue(expValue, gainValue);
@@ -2008,7 +2226,7 @@ void MainWidget::rcvExportReg()
 
 void MainWidget::rcvImportReg()
 {
-    if (m_camRunning) {
+    if (cur().bRunning) {
         if (QxHelp::showMsgBoxQuesion(tr("提示"),
                                       tr("状态为采集中，是否停止采集，继续导入数据？"))) {
             emit ui->pushButtonCapture->clicked(false);
@@ -2108,8 +2326,352 @@ void MainWidget::rcvImportReg()
     return;
 }
 
-void MainWidget::rcvFrameInfo(const StCamInfo &info)
+void MainWidget::rcvFrameInfo(int ch, const StCamInfo &info)
 {
-    ui->labelCaptureFps->setText(QString::number(info.fps, 'f', 2));
-    ui->labelRES->setText(QString("%1 ∗ %2").arg(info.width).arg(info.height));
+    if (ch == m_active) {
+        ui->labelCaptureFps->setText(QString::number(info.fps, 'f', 2));
+        ui->labelRES->setText(QString("%1 ∗ %2").arg(info.width).arg(info.height));
+    }
+}
+
+// ===================== 多相机通道管理 =====================
+CameraChannel &MainWidget::cur()
+{
+    if (m_active < 0 || m_active >= MAX_CHANNELS) {
+        m_active = 0;
+    }
+    return m_channels[m_active];
+}
+
+void MainWidget::ensureChannelCamera(int ch)
+{
+    if (ch < 0 || ch >= MAX_CHANNELS) {
+        return;
+    }
+    CameraChannel &c = m_channels[ch];
+    if (!c.cam) {
+        CommDevCfg devCfg;
+        devCfg.cameType = c.camType;
+        devCfg.platform = m_euPlatform;
+        devCfg.channel = ch;
+        c.cam = new Camera(devCfg, this);
+        connect(c.cam, &Camera::sndOptLog, this, &MainWidget::rcvOptLog);
+        connect(c.cam, &Camera::sndCmdRet, this, &MainWidget::rcvCmdRet);
+    }
+}
+
+int MainWidget::pickChannelForDevice(const QString &videoNode)
+{
+    // 已绑定该设备的通道直接复用
+    for (int i = 0; i < MAX_CHANNELS; ++i) {
+        if (m_channels[i].used && m_channels[i].camIndex.video_node == videoNode) {
+            return i;
+        }
+    }
+    // 否则绑定到“当前激活画面”：先点哪个格子，设备就进哪个格子
+    return m_active;
+}
+
+void MainWidget::bindDeviceToChannel(int ch, const StCamIndex &idx)
+{
+    if (ch < 0 || ch >= MAX_CHANNELS) {
+        return;
+    }
+    CameraChannel &c = m_channels[ch];
+    // 目标格上挂的是另一台设备（或残留的旧 Camera 对象）时，先完整拆除：
+    // 停采 + 排空帧队列（否则残留帧的 new[] 缓存永久泄漏）+ 销毁旧 Camera，
+    // 避免沿用上一次的 Capture/寄存器/设备类型状态。
+    if (c.camIndex.video_node != idx.video_node) {
+        teardownChannel(ch);
+    }
+    c.camIndex = idx;
+    c.used = true;
+    c.camParam = StCamParam();
+    c.camParam.videoNode = idx.video_node;
+    c.camParam.subNode = idx.video_subnode;
+}
+
+void MainWidget::teardownChannel(int ch, bool bImmediate)
+{
+    if (ch < 0 || ch >= MAX_CHANNELS) {
+        return;
+    }
+    CameraChannel &c = m_channels[ch];
+    Camera *cam = c.cam;
+    c.cam = nullptr;
+    if (cam) {
+        if (c.bRunning || cam->IsOpen()) {
+            cam->CloseDevice();
+        }
+        c.bRunning = false;
+        c.bShow = false;
+        if (bImmediate) {
+            // 退出阶段：事件循环已停，必须同步销毁，~Camera 才会把两个线程 join 掉
+            delete cam;
+        } else {
+            cam->disconnect(this);
+            cam->deleteLater();
+        }
+    }
+    // 排空未消费的帧，每个 StImgInfo.buf 都是一次 new[]
+    {
+        std::lock_guard<std::mutex> lk(c.mtxPix);
+        while (!c.queueSii.empty()) {
+            StImgInfo tmp = c.queueSii.front();
+            c.queueSii.pop();
+            if (new_buf == tmp.strategy) {
+                delete[] tmp.buf;
+            }
+        }
+    }
+    c.used = false;
+    c.bShow = false;
+    c.bRunning = false;
+    c.camIndex = StCamIndex();
+    c.camType = EuCamType::Unknown;
+}
+
+void MainWidget::pushDevCfgToDialogs(int ch)
+{
+    // 对话框在构造时只拿到一次 devCfg 快照，之后切换通道/探测出 GX 类型并不会自动更新，
+    // 导致 GX 相机一直走 MV 分支（面板、寄存器命令格式全部错）。这里主动下发。
+    CommDevCfg devCfg = {m_channels[ch].camType, m_euPlatform, ch};
+    if (m_pImgAttr) {
+        m_pImgAttr->setDevCfg(devCfg);
+    }
+    if (m_pExpAndGain) {
+        m_pExpAndGain->setDevCfg(devCfg);
+    }
+    if (m_pTrigger) {
+        m_pTrigger->setDevCfg(devCfg);
+    }
+    if (m_pCurAttr) {
+        m_pCurAttr->setDevCfg(devCfg);
+    }
+    if (m_pWhiteBlance) {
+        m_pWhiteBlance->setDevCfg(devCfg);
+    }
+    if (m_pImgProc) {
+        m_pImgProc->setDevCfg(devCfg);
+    }
+    if (m_pRegister) {
+        m_pRegister->setDevCfg(devCfg);
+    }
+}
+
+void MainWidget::setActiveChannel(int ch)
+{
+    if (ch < 0 || ch >= MAX_CHANNELS) {
+        return;
+    }
+    m_active = ch;
+    CameraChannel &c = m_channels[ch];
+
+    if (c.used) {
+        // 先置为未知：探测失败时不会沿用上一个通道的类型（否则会用错寄存器表/错解码格式）
+        m_euCamType = EuCamType::Unknown;
+        setCamIndex(c.camIndex); // 写入只读 lineEdit 镜像 + 探测类型(m_euCamType/m_sysfsPath)
+        c.camType = m_euCamType;
+        if (EuCamType::Unknown != c.camType) {
+            adjustAdaptive(); // 依据类型设置 m_register
+            c.registerJson = m_register;
+            readRegCfg();     // 重新加载寄存器表
+            if (m_pRegister) {
+                m_pRegister->setCfg(m_mapNameRegister, m_mapAddrRegister);
+            }
+        } else {
+            qWarning() << "channel" << ch << "camera type unknown, keep old register config";
+        }
+        ensureChannelCamera(ch);
+    } else {
+        ui->lineEditEntityName->setText("");
+        ui->lineEditI2cBus->setText("");
+        ui->lineEditVideoNode->setText("");
+        ui->lineEditSubNode->setText("");
+        ui->lineEditMediaNode->setText("");
+        ui->label_model->setText("");
+        m_sysfsPath.clear();
+    }
+
+    pushDevCfgToDialogs(ch);
+    updatePanelForActive();
+    applyViewLayout();
+}
+
+void MainWidget::updatePanelForActive()
+{
+    if (EuCamType::MvCamera == m_euCamType) {
+        ui->pushButtonImgProc->hide();
+        ui->pushButtonWhiteBlance->hide();
+    } else {
+        ui->pushButtonImgProc->show();
+        ui->pushButtonWhiteBlance->show();
+    }
+    syncButtonsForActive();
+}
+
+void MainWidget::syncButtonsForActive()
+{
+    CameraChannel &c = cur();
+    if (c.bRunning) {
+        ui->pushButtonCapture->setText(tr("停止采集"));
+        ui->pushButtonCapture->setChecked(true);
+        ui->pushButtonShow->setEnabled(true);
+        ui->pushButtonSaveImg->setEnabled(true);
+    } else {
+        ui->pushButtonCapture->setText(tr("开始采集"));
+        ui->pushButtonCapture->setChecked(false);
+        ui->pushButtonShow->setEnabled(false);
+        ui->pushButtonSaveImg->setEnabled(false);
+    }
+    if (c.bShow) {
+        ui->pushButtonShow->setText(tr("停止显示"));
+        ui->pushButtonShow->setChecked(true);
+    } else {
+        ui->pushButtonShow->setText(tr("开始显示"));
+        ui->pushButtonShow->setChecked(false);
+    }
+}
+
+void MainWidget::applyViewLayout()
+{
+    QGridLayout *g = ui->gridLayoutViews;
+    if (!g) {
+        return;
+    }
+    for (int i = 0; i < MAX_CHANNELS; ++i) {
+        if (m_channels[i].view) {
+            g->removeWidget(m_channels[i].view);
+        }
+    }
+
+    if (m_bFourView) {
+        const int rows[MAX_CHANNELS] = {0, 0, 1, 1};
+        const int cols[MAX_CHANNELS] = {0, 1, 0, 1};
+        for (int i = 0; i < MAX_CHANNELS; ++i) {
+            QGraphicsView *v = m_channels[i].view;
+            if (!v) {
+                continue;
+            }
+            g->addWidget(v, rows[i], cols[i]);
+            v->setVisible(true);
+        }
+    } else {
+        for (int i = 0; i < MAX_CHANNELS; ++i) {
+            if (m_channels[i].view && i != m_active) {
+                m_channels[i].view->setVisible(false);
+            }
+        }
+        QGraphicsView *v = m_channels[m_active].view;
+        if (v) {
+            g->addWidget(v, 0, 0, 2, 2);
+            v->setVisible(true);
+        }
+    }
+
+    for (int i = 0; i < MAX_CHANNELS; ++i) {
+        if (m_channels[i].view && m_channels[i].view->isVisible()) {
+            m_channels[i].gvSize = m_channels[i].view->size();
+        }
+    }
+    // 未显示(未绑定/未开启显示)的可见通道铺背景图
+    for (int i = 0; i < MAX_CHANNELS; ++i) {
+        if (m_channels[i].view && m_channels[i].view->isVisible() && !m_channels[i].bShow) {
+            showChannelBg(i);
+        }
+    }
+    // 高亮当前激活画面：四画面下用醒目边框凸显选中状态（单画面/全屏不画框）
+    for (int i = 0; i < MAX_CHANNELS; ++i) {
+        if (!m_channels[i].view) {
+            continue;
+        }
+        if (!m_bFourView) {
+            m_channels[i].view->setStyleSheet(QString());
+        } else if (i == m_active) {
+            m_channels[i].view->setStyleSheet("QGraphicsView { border: 3px solid #000000; }");
+        } else {
+            m_channels[i].view->setStyleSheet("QGraphicsView { border: 1px solid #6f6f6f; }");
+        }
+    }
+}
+
+void MainWidget::toggleViewLayout()
+{
+    m_bFourView = !m_bFourView;
+    applyViewLayout();
+    ui->pushButtonLayout->setText(m_bFourView ? tr("单画面") : tr("四画面"));
+}
+
+// ===================== 全屏交互 =====================
+void MainWidget::setChromeVisible(bool visible)
+{
+    ui->widgetTitle->setVisible(visible);
+    ui->widgetLeft->setVisible(visible);
+    ui->widgetRight->setVisible(visible);
+    ui->widgetBottom->setVisible(visible);
+    ui->widgetstatus->setVisible(visible);
+}
+
+void MainWidget::enterFullscreenSingle(int ch)
+{
+    if (ch < 0 || ch >= MAX_CHANNELS) {
+        return;
+    }
+    m_prevGeom = saveGeometry();
+    m_prevMax = isMaximized();
+    m_prevFourView = m_bFourView;
+    m_bFourView = false;
+    ui->pushButtonLayout->setText(tr("四画面"));
+    setActiveChannel(ch);
+    setChromeVisible(false);
+    showFullScreen();
+    m_fs = FS_Single;
+}
+
+void MainWidget::enterFullscreenQuad()
+{
+    m_prevGeom = saveGeometry();
+    m_prevMax = isMaximized();
+    m_prevFourView = m_bFourView;
+    m_bFourView = true;
+    ui->pushButtonLayout->setText(tr("单画面"));
+    applyViewLayout();
+    setChromeVisible(false);
+    showFullScreen();
+    m_fs = FS_Quad;
+}
+
+void MainWidget::exitFullscreen()
+{
+    if (m_fs == FS_None) {
+        return;
+    }
+    const bool bWasMax = m_prevMax;
+    setChromeVisible(true);
+    showNormal();
+    if (!m_prevGeom.isEmpty()) {
+        restoreGeometry(m_prevGeom);
+    }
+    // 进入前是最大化窗口时，restoreGeometry 不一定会把最大化状态带回来，显式还原
+    if (bWasMax) {
+        showMaximized();
+    }
+    m_fs = FS_None;
+    m_prevGeom.clear();
+    m_prevMax = false;
+    // 回到进入全屏前的布局：退出全屏不该把用户原来的四画面布局弄没了
+    m_bFourView = m_prevFourView;
+    ui->pushButtonLayout->setText(m_bFourView ? tr("单画面") : tr("四画面"));
+    applyViewLayout();
+}
+
+void MainWidget::toggleFullscreen()
+{
+    if (m_fs != FS_None) {
+        exitFullscreen();
+    } else if (m_bFourView) {
+        enterFullscreenQuad();
+    } else {
+        enterFullscreenSingle(m_active);
+    }
 }

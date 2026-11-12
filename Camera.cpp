@@ -1,8 +1,10 @@
 #include "Camera.h"
+#include <QProcess>
 #include "CaptureMPlane.h"
 #include "CaptureSPlane.h"
 #include "MainWidget.h"
 #include "I2CLock.h"
+#include "QxHelp.h"
 
 #define WRITE_HEAD 0xAB
 #define PRE_READ_HEAD 0xBC
@@ -46,7 +48,7 @@ static int gxcam_readl_reg(int fd, uint8_t i2c_addr, uint16_t reg, int32_t *val)
     msgset.msgs = &msg;
     msgset.nmsgs = 1;
 
-    if (ioctl(fd, I2C_RDWR, &msgset) != msgset.nmsgs) {
+    if (ioctl(fd, I2C_RDWR, &msgset) != static_cast<int>(msgset.nmsgs)) {
         printf("Write i2c err \n");
         return -1;
     }
@@ -70,7 +72,7 @@ static int gxcam_readl_reg(int fd, uint8_t i2c_addr, uint16_t reg, int32_t *val)
     msgset.msgs = msgs;
     msgset.nmsgs = 2;
 
-    if (ioctl(fd, I2C_RDWR, &msgset) != msgset.nmsgs) {
+    if (ioctl(fd, I2C_RDWR, &msgset) != static_cast<int>(msgset.nmsgs)) {
         printf("Read i2c err\n");
         return -1;
     }
@@ -104,7 +106,7 @@ static int gxcam_writel_reg(int fd, uint8_t i2c_addr, uint16_t reg, uint32_t val
     msgset.msgs = &msg;
     msgset.nmsgs = 1;
 
-    if (ioctl(fd, I2C_RDWR, &msgset) != msgset.nmsgs) {
+    if (ioctl(fd, I2C_RDWR, &msgset) != static_cast<int>(msgset.nmsgs)) {
         printf("Write i2c err \n");
         return -1;
     }
@@ -114,7 +116,6 @@ static int gxcam_writel_reg(int fd, uint8_t i2c_addr, uint16_t reg, uint32_t val
 static int mvcam_readl_reg(int fd, uint8_t i2c_addr, uint16_t reg, int32_t *val)
 {
     int err;
-    int i = 0;
     uint8_t buf[2] = {static_cast<uint8_t>(reg >> 8), static_cast<uint8_t>(reg & 0xff)};
     uint8_t bufout[8] = {0};
     struct i2c_rdwr_ioctl_data msgset;
@@ -137,7 +138,7 @@ static int mvcam_readl_reg(int fd, uint8_t i2c_addr, uint16_t reg, int32_t *val)
     msgset.nmsgs = 2;
 
     err = ioctl(fd, I2C_RDWR, &msgset);
-    if (err != msgset.nmsgs) {
+    if (err != static_cast<int>(msgset.nmsgs)) {
         return -1;
     }
     *val = ntohl(*(int32_t *) bufout);
@@ -205,13 +206,21 @@ Camera::Camera(CommDevCfg devCfg, QObject *parent)
     , m_devCfg(devCfg)
 {
     m_bThread = true;
-    std::thread tSave([this]() { cmdThread(); });
-    tSave.detach();
+    // 保存线程句柄，析构时 join（见 ~Camera）
+    m_threadCmd = std::thread([this]() { cmdThread(); });
 }
 
 Camera::~Camera()
 {
+    // 先关设备：采集线程（Capture 本身就是 QThread）必须先 stopStream()+wait() 再销毁，
+    // 否则 deleting a running QThread 会直接崩溃。
+    CloseDevice();
+    // 再置停止标志并 join：cmdThread 单次循环最长耗时为
+    // 一次 i2c 操作(含锁超时) + 最多 100ms 等待，因此 join 不会长时间阻塞 GUI。
     m_bThread = false;
+    if (m_threadCmd.joinable()) {
+        m_threadCmd.join();
+    }
 }
 
 bool Camera::OpenDevice(StCamParam &param)
@@ -238,26 +247,22 @@ bool Camera::OpenDevice(StCamParam &param)
             if (m_capture) {
                 bRet = true;
                 m_capture.get()->setMainWidget(parent());
-                connect((MainWidget *) parent(),
-                        &MainWidget::sndSaveImg,
-                        m_capture.get(),
-                        &Capture::rcvSaveImg);
-                connect((MainWidget *) parent(),
-                        &MainWidget::sndShow,
-                        m_capture.get(),
-                        &Capture::rcvShow);
+                // 多相机：show/save 不再通过 MainWidget 全局信号广播，改由 Camera 转发方法直达本通道 Capture。
+                // 帧信息/状态携带通道号回传，避免多通道互相覆盖。
+                MainWidget *mw = qobject_cast<MainWidget *>(parent());
+                const int ch = m_devCfg.channel;
                 connect(m_capture.get(),
                         &Capture::sndFrameInfo,
-                        qobject_cast<MainWidget *>(parent()),
-                        &MainWidget::rcvFrameInfo);
+                        mw,
+                        [mw, ch](const StCamInfo &info) { mw->rcvFrameInfo(ch, info); });
                 connect(m_capture.get(),
                         &Capture::sndSaveFinish,
-                        qobject_cast<MainWidget *>(parent()),
+                        mw,
                         &MainWidget::rcvSaveFinish);
                 connect(m_capture.get(),
                         &Capture::sndStatus,
-                        qobject_cast<MainWidget *>(parent()),
-                        &MainWidget::onCamStatus);
+                        mw,
+                        [mw, ch](EuCamStatus status) { mw->onCamStatus(ch, status); });
                 m_capture->startStream(m_fd, param);
                 m_refCount++;
             }
@@ -274,8 +279,10 @@ void Camera::CloseDevice()
     if (m_capture) {
         m_capture->stopStream();
         m_capture->disconnect();
-        m_capture.release();
-        m_capture = nullptr;
+        // 以前用 release() 丢弃指针：Capture 作为本对象的 QObject 子对象会一直累积，
+        // 反复“开始/停止采集”会泄漏整个 Capture（及其 QTimer、已结束的线程对象）。
+        // reset() 删除对象，~QObject 会自动把自己从父对象子列表里摘掉，不会重复释放。
+        m_capture.reset();
         m_refCount--;
     }
     if (-1 != m_fd) {
@@ -284,16 +291,55 @@ void Camera::CloseDevice()
     }
 }
 
+void Camera::setShow(bool bShow)
+{
+    // Capture 对象与 MainWidget 同属 GUI 线程，直接调用等价于原 Queued 信号
+    if (m_capture) {
+        m_capture->rcvShow(bShow);
+    }
+}
+
+void Camera::saveImg(QString strPath, int count)
+{
+    if (m_capture) {
+        m_capture->rcvSaveImg(strPath, count);
+    }
+}
+
 void Camera::runSystemCmd(QString strCmd)
 {
-    int nLen = 1024;
-    char szBuf[1024] = {0};
+    // 以前这条路径是 system() + /bin/sh + 固定名临时文件 + sprintf 拼接到 256 字节栈缓冲区，
+    // 命令里携带的 ROI/分辨率/设备名均来自界面输入或相机上报的拓扑 JSON，存在注入与栈溢出风险。
+    // 现在自己分词后用 QProcess 直接执行，不经过 shell，也不再把输出重定向到临时文件。
+    const QStringList argv = QxHelp::splitCmdLine(strCmd);
+    if (argv.size() < 2) {
+        emit sndOptLog(-1, strCmd);
+        return;
+    }
+
+    int ret = -1;
+    QString output;
     m_mtxCmd.lock();
-    int ret = runSystem((char *) strCmd.toStdString().c_str(), szBuf, nLen);
+    QProcess process;
+    process.setProcessChannelMode(QProcess::MergedChannels);
+    process.start(argv.first(), argv.mid(1));
+    if (!process.waitForStarted(3000)) {
+        output = QStringLiteral("start failed: ") + argv.first();
+        ret = -1;
+    } else if (!process.waitForFinished(20000)) {
+        process.kill();
+        process.waitForFinished(1000);
+        output = QStringLiteral("timeout: ") + strCmd;
+        ret = -2;
+    } else {
+        output = QString::fromLocal8Bit(process.readAll()).trimmed();
+        ret = process.exitCode();
+    }
     m_mtxCmd.unlock();
+
     emit sndOptLog(ret, strCmd);
-    if (0 != ret) {
-        emit sndOptLog(ret, szBuf);
+    if (0 != ret && !output.isEmpty()) {
+        emit sndOptLog(ret, output);
     }
 }
 
@@ -405,133 +451,6 @@ int Camera::writeData(StI2CCmd &cmd)
         qDebug() << strMsg;
     }
     return ret;
-}
-
-void Camera::systemCmd(QString strCmd)
-{
-    int code = system(strCmd.toStdString().c_str());
-    emit sndOptLog(code, strCmd);
-    if (0 != code) {
-        emit sndOptLog(code, strerror(errno));
-    }
-}
-//system函数扩展，加入超时值(0表示永久等待)超时时返回-2，其他情况返回不变。
-int Camera::system_ex(const char *cmdstring, unsigned int timeout)
-{
-    pid_t pid;
-    int status;
-    struct sigaction ignore, saveintr, savequit;
-    sigset_t chldmask, savemask;
-
-    //精度换成十分之一秒
-    timeout *= 10;
-    if (timeout == 0)
-        timeout = 0xFFFFFFFF;
-
-    if (cmdstring == NULL)
-        return (1); /* always a command processor with UNIX */
-
-    ignore.sa_handler = SIG_IGN; /* ignore SIGINT and SIGQUIT */
-    sigemptyset(&ignore.sa_mask);
-    ignore.sa_flags = 0;
-    if (sigaction(SIGINT, &ignore, &saveintr) < 0)
-        return (-1);
-    if (sigaction(SIGQUIT, &ignore, &savequit) < 0)
-        return (-1);
-    sigemptyset(&chldmask); /* now block SIGCHLD */
-    sigaddset(&chldmask, SIGCHLD);
-    if (sigprocmask(SIG_BLOCK, &chldmask, &savemask) < 0)
-        return (-1);
-
-    if ((pid = fork()) < 0) {
-        return -1;         /* probably out of processes */
-    } else if (pid == 0) { /* child */
-        /* restore previous signal actions & reset signal mask */
-        sigaction(SIGINT, &saveintr, NULL);
-        sigaction(SIGQUIT, &savequit, NULL);
-        sigprocmask(SIG_SETMASK, &savemask, NULL);
-        /*通常exec会放在fork() 函数的子进程部分, 来替代子进程执行啦, 执行成功后子程序就会消失,  但是执行失败的话, 必须用exit()函数来让子进程退出!*/
-        execl("/bin/sh",
-              "sh",
-              "-c",
-              cmdstring,
-              (char *) 0); /*exec函数会取代执行它的进程,  也就是说, 一旦exec函数执行成功, 它就不会返回了, 进程结束.   但是如果exec函数执行失败, 它会返回失败的信息,  而且进程继续执行后面的代码!*/
-        _exit(127);        /* exec error */
-    }
-
-    /* parent */
-    int ret = 0;
-    while (timeout-- > 0 && (ret = waitpid(pid, &status, WNOHANG)) == 0)
-        usleep(100 * 1000);
-
-    /* restore previous signal actions & reset signal mask */
-    if (sigaction(SIGINT, &saveintr, NULL) < 0)
-        return (-1);
-    if (sigaction(SIGQUIT, &savequit, NULL) < 0)
-        return (-1);
-    if (sigprocmask(SIG_SETMASK, &savemask, NULL) < 0)
-        return (-1);
-
-    if (ret < 0)
-        return -1;
-
-    if (ret > 0)
-        return status;
-
-    kill(pid, SIGKILL);
-    waitpid(pid, &status, 0);
-    return -2;
-}
-
-int Camera::runSystem(const char *cmdstring, char *buff, int size)
-{
-    char cmd_string[256] = {0};
-    char tmpfile[200] = {0};
-    char tmp_buf[100] = {0};
-    int fd;
-    int tmp_fd;
-    int nbytes;
-
-    memset(buff, 0, size);
-
-    if ((cmdstring == NULL) || (strlen(cmdstring) > (sizeof(tmpfile) + 8))
-        || ((strlen(cmdstring) + strlen(tmpfile) + 5) > sizeof(cmd_string))) {
-        printf("cmd is too long or NULL!\n");
-        return -1;
-    }
-    sscanf(cmdstring, "%[a-Z]", tmp_buf);
-    sprintf(tmpfile, "/tmp/%s-XXXXXX", tmp_buf);
-
-    tmp_fd = mkstemp(tmpfile);
-    if (tmp_fd < 0) {
-        printf("mkstemp failed\n");
-        return -1;
-    }
-    close(tmp_fd);
-
-    sprintf(cmd_string, "%s > %s 2>&1", cmdstring, tmpfile);
-    if (system_ex(cmd_string, 20) < 0) {
-        printf("run \"%s\" ret < 0!\n", cmd_string);
-    }
-
-    fd = open(tmpfile, O_RDONLY);
-    if (fd < 0) {
-        printf("open %s failed!\n", tmpfile);
-        nbytes = -1;
-    } else {
-        nbytes = read(fd, buff, size - 1);
-        close(fd);
-    }
-
-    if ('\n' == buff[nbytes - 1]) {
-        buff[nbytes - 1] = '\0';
-    }
-
-    memset(cmd_string, 0, sizeof(cmd_string));
-    sprintf(cmd_string, "rm -rf /tmp/%s-*", tmp_buf);
-    system_ex(cmd_string, 20);
-
-    return nbytes;
 }
 
 void Camera::cmdSleep(int n, bool bReal)

@@ -7,8 +7,8 @@
 
 RegisterDlg::RegisterDlg(CommDevCfg devCfg, QWidget *parent)
     : QDialog(parent)
-    , m_devCfg(devCfg)
     , ui(new Ui::RegisterDlg)
+    , m_devCfg(devCfg)
 {
     ui->setupUi(this);
     //initCfg();

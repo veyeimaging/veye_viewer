@@ -2,6 +2,8 @@
 #define I2CLOCK_H
 
 #include <string>
+#include <cerrno>
+#include <cstring>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/file.h>
@@ -38,14 +40,30 @@ public:
         , m_locked(false)
     {
         // Extract bus number from I2C path, e.g., "/dev/i2c-1" -> "1"
+        // Parse by hand: std::stoi throws on non-numeric input, and the exception would
+        // propagate straight out of a Qt slot and terminate the whole application.
         size_t pos = m_i2cBus.rfind('-');
-        if (pos != std::string::npos) {
-            std::string busNum = m_i2cBus.substr(pos + 1);
-            int busNumber = std::stoi(busNum);
-            
+        bool bNumberOk = (pos != std::string::npos) && ((pos + 1) < m_i2cBus.size());
+        long busNumber = 0;
+        if (bNumberOk) {
+            const std::string busNum = m_i2cBus.substr(pos + 1);
+            for (char c : busNum) {
+                if ((c < '0') || (c > '9')) {
+                    bNumberOk = false;
+                    break;
+                }
+                busNumber = busNumber * 10 + (c - '0');
+                if (busNumber > 4096) { // absurd value, treat as invalid
+                    bNumberOk = false;
+                    break;
+                }
+            }
+        }
+
+        if (bNumberOk) {
             // Format lock file path using template
             char lockPath[256];
-            snprintf(lockPath, sizeof(lockPath), I2C_LOCK_PATH_TEMPLATE, busNumber);
+            snprintf(lockPath, sizeof(lockPath), I2C_LOCK_PATH_TEMPLATE, (int) busNumber);
             m_lockFile = lockPath;
         } else {
             qWarning() << "Invalid I2C bus path:" << QString::fromStdString(m_i2cBus);
@@ -72,7 +90,11 @@ public:
         }
         
         // Open or create the lock file
-        m_lockFd = ::open(m_lockFile.c_str(), O_RDWR | O_CREAT, 0666);
+        // O_CLOEXEC: 不然任何子进程（v4l2-ctl/media-ctl/探测脚本）会继承这个 fd 并把锁一直带上，
+        //            造成总线“被自己卡住”。
+        // O_NOFOLLOW: /tmp 下的可预测路径不能跟随符号链接。
+        // 0666 保留：这把锁的用途就是跨进程/跨工具互斥，收紧权限会让其他工具无法上锁。
+        m_lockFd = ::open(m_lockFile.c_str(), O_RDWR | O_CREAT | O_CLOEXEC | O_NOFOLLOW, 0666);
         if (m_lockFd < 0) {
             qWarning() << "Failed to open lock file:" << QString::fromStdString(m_lockFile) 
                          << "error:" << strerror(errno);
@@ -86,9 +108,13 @@ public:
             const int retryInterval = 10; // Retry every 10ms
             
             while (elapsed < m_timeoutMs) {
-                if (::flock(m_lockFd, LOCK_EX | LOCK_NB) == 0) {
+                int ret = ::flock(m_lockFd, LOCK_EX | LOCK_NB);
+                if (0 == ret) {
                     m_locked = true;
                     return true;
+                }
+                if (EINTR == errno) {
+                    continue; // 被信号打断：不计入超时，直接重试
                 }
                 
                 // If lock acquisition fails, wait before retrying

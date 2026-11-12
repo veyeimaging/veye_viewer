@@ -6,8 +6,8 @@
 
 ImgProcDlg::ImgProcDlg(CommDevCfg devCfg, QWidget *parent)
     : QDialog(parent)
-    , m_devCfg(devCfg)
     , ui(new Ui::ImgProcDlg)
+    , m_devCfg(devCfg)
 {
     ui->setupUi(this);
     setupUi();

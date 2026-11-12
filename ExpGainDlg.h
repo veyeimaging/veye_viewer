@@ -16,6 +16,11 @@ class ExpGainDlg : public QDialog
 public:
     explicit ExpGainDlg(CommDevCfg devCfg, QWidget *parent = nullptr);
     ~ExpGainDlg();
+    // 设备类型/平台/通道号会随“选设备、切通道”变化，不能只在构造时快照一次
+    void setDevCfg(CommDevCfg devCfg)
+    {
+        m_devCfg = devCfg;
+    }
 signals:
     void sndCmd(EuCMD cmd, uint32_t data, bool bShow = true);
     void sndOneAEAG(int nAemaxtime, int nAgmaxgain, int nAatarget);

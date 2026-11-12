@@ -34,9 +34,13 @@ public slots:
 
 public:
     void setGxMode(bool bRoiMode);
+    // 设备类型会在“选设备/切通道”时才探测出来，不能只在构造时快照一次
+    void setDevCfg(CommDevCfg devCfg);
 
 protected:
     void setupUi();
+    // 按当前设备类型切换 MV/GX 面板可见性
+    void applyCamType();
 
     std::pair<uint16_t, uint16_t> parseWidthHeight(uint32_t data);
     std::pair<uint8_t, uint16_t> getParam(uint32_t data);

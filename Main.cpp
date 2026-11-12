@@ -21,7 +21,10 @@ void cleanExpiredLogFiles(const QString &logDirPath, int keepDays = 7)
     }
 
     QStringList filter;
-    filter << "????-??-??.log";
+    // 日志名按日期过滤，模式由 4 个问号 + 减号 + 2 个问号 + 减号 + 2 个问号 + .log 组成。
+    // 直接把这种串写成字面量时，“两个问号紧接一个减号”会被编译器当成 trigraph 处理（即使是在注释里也会），
+    // 因此这里把两个减号写成 \x2d 转义，从源头上不出现这个三字符序列
+    filter << "????\x2d??\x2d??.log";
     logDir.setNameFilters(filter);
 
     QDate currentDate = QDate::currentDate();
@@ -114,10 +117,9 @@ void logMessageHandler(QtMsgType type, const QMessageLogContext &context, const 
     QString lineStr = (context.line > 0) ? QString("%1").arg(context.line, 4, 10, QChar('0'))
                                          : "----";
 
-    // 4. 强化去引号逻辑（全局替换日期中的引号）
+    // 4. 日志正文（不再删改引号：以前全局去掉所有 " 会把相机上报的引号信息弄坏，
+    // 而且 runSystemCmd 会把执行失败连同输出写进日志，引号就是诊断信息的一部分）
     QString cleanMsg = msg.trimmed();
-    // 关键：全局替换所有双引号为空字符串（解决中间嵌套引号问题）
-    cleanMsg.replace("\"", "");
 
     // 5. 构建日志字符串（文件日志+控制台日志）
     QString fileLogLine = QString("[%1][%2][%3:%4] %5")
@@ -194,7 +196,9 @@ int main(int argc, char *argv[])
         cleanExpiredLogFiles(LOG_PATH, cleanExpiredDay);
     });
     logCleanTimer->start();
-    QThread::currentThread()->setPriority(QThread::TimeCriticalPriority);
+    // GUI 主线程用 High 即可：Qt 在无实时调度权限（RLIMIT_RTPRIO=0）时不会真的提升
+    // TimeCritical，而一旦给了 RT 权限，把做渲染/事件循环的主线程提到最高会反过来饿死采集线程。
+    QThread::currentThread()->setPriority(QThread::HighPriority);
     QFont font("Noto Sans CJK SC"); // 指定简体中文字体
     a.setFont(font);
     QxHelp::SetStyle("app");

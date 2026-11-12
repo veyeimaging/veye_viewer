@@ -17,6 +17,13 @@ for media in /dev/media*; do
     media_node="$media"
 
     entry=$(echo "$media_output" | gawk -v media_node="$media_node" '
+        function jesc(s) {
+            # 来自内核拓扑的字符串写 JSON 前先转义，避免引号/反斜杠把 JSON 弄坏
+            gsub(/\\/, "\\\\", s); gsub(/"/, "\\\"", s)
+            gsub(/\t/, " ", s); gsub(/\r/, "", s); gsub(/\n/, " ", s)
+            return s
+        }
+
         BEGIN {
             RS = "";
             OFS = "";
@@ -53,7 +60,7 @@ for media in /dev/media*; do
         END {
             if (sensor_name != "" && i2c_bus != "" && subdev_node != "" && chn0_video_node != "") {
                 printf("{\"media_node\": \"%s\", \"video_node\": \"%s\", \"video_subnode\": \"%s\", \"media_entity_name\": \"%s\", \"i2c_bus\": \"%s\"}\n",
-                    media_node, chn0_video_node, subdev_node, sensor_name, i2c_bus);
+                    jesc(media_node), jesc(chn0_video_node), jesc(subdev_node), jesc(sensor_name), jesc(i2c_bus));
             }
         }
     ')

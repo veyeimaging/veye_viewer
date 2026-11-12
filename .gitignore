@@ -51,3 +51,11 @@ compile_commands.json
 *creator.user*
 
 *_qmlcache.qrc
+
+# CMake 生成物：Version.h 由 configure_file 生成到构建目录，
+# 源码树里如果又冒出一份旧的副本，会因为 #include "Version.h" 的搜索顺序而盖掉新生成的
+/Version.h
+
+# 翻译只在 config/ 下维护一份（仓库根目录的旧副本已删除）
+/veye_viewer_*.ts
+/veye_viewer_*.qm
