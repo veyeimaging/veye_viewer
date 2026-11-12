@@ -1,6 +1,8 @@
 # veye_viewer Version Change Log
 
-## v1.3.0 (2026-11-12)
+## v1.3.1 (2026-11-12)
+
+> Version note: v1.3.0 was never released and never tagged; the multi-camera work drafted under it ships in this release together with the full-range and performance changes.
 
 ### New Features
 
@@ -9,6 +11,47 @@
 - New Single View / Quad View / Fullscreen layout buttons (localized in both Chinese and English)
 - Quad View opens by clicking Start Capture in each cell; Fullscreen restores the layout and maximized state it came from
 - Channel switching now pushes the current device type/platform to every open dialog, so dialogs no longer keep the device configuration captured at construction time
+
+### Performance
+
+#### GX preview path: UYVY -> RGB conversion rewritten (about 2.8x faster) and shown in true full range
+
+**Background**:
+- The whole conversion happened in a single per-pixel loop in `MainWidget::uyvyToQImage()`: six signed divisions per pixel pair, `qBound()` clamping and a `qWarning()` branch inside the innermost loop, which also blocked auto-vectorization
+- Measured on RK3588S: 20.1 ms/frame on a big core, 36.1 ms/frame on an LITTLE core. Quad View serializes four channels through one worker thread, so ~92 ms/frame gave roughly 10 fps against a 33 ms budget
+
+**Changes**:
+- New `UyvyConvert` module (`UyvyConvert.h` / `UyvyConvert.cpp`): all chroma terms are precomputed as Q4 fixed-point lookup tables, so the hot loop contains no division at all; an NEON path processes 8 pixels per iteration and falls back to the scalar path for the row tail
+- Output switched from `Format_RGB888` to `Format_RGB32`, which removes the per-pixel 24-to-32-bit expansion inside `QPixmap::fromImage()` and the unaligned 3-byte writes in the conversion itself
+- GX sensors emit full-range UYVY, so the limited-range interpretation is gone: `Y` is no longer clamped to 16-235, `U`/`V` are no longer clamped to 16-240 and the `*255/224` stretch is dropped. Preview now shows what the camera actually outputs
+- `fillRgb32()` takes a row range and indexes rows by absolute line number, which is the hook for converting a single frame on several threads later
+
+**Verification** (real frames captured from a GX camera):
+- NEON and scalar results are byte-identical over the full 8294400-byte frame; both match a double-precision full-range reference within 1 LSB on 2073600 sampled pixels
+- Split-row calls reproduce the whole-frame call exactly; odd widths (1917/1918/5) are handled by the scalar tail without overrun (ASAN)
+- The `QImage` + `bits()` / `bytesPerLine()` wiring used by the app produces byte-identical output to the direct call
+- 7.2-7.8 ms/frame at 1920x1080, versus 20.1 ms before; 77% of pixels had their luma flattened by the old limited-range clamping
+
+#### Frame processing: one worker thread per camera channel (Quad View is no longer serialized)
+
+**Background**:
+- All four channels shared a single `workThread()`, which popped one frame per channel in a `for` loop. Conversion is pure compute, so four channels cost 4x the time of one, no matter how many cores the board has
+
+**Changes**:
+- `workThread()` became `workThread(int ch)` and `MainWidget` now runs `MAX_CHANNELS` threads, one per channel; each only touches its own `queueSii` / `mtxPix` / `Camera`, so the four conversions happen at the same time
+- Cross-thread control flags are now atomic: `m_setFps` and `m_scale` were plain variables read by the worker and written by the GUI thread
+- `CameraChannel::gvSize` is now read and written under `mtxPix` (new `setGvSize()`); the worker takes the frame and the view size in one lock so it can no longer read a half-written width/height during a resize
+- All worker threads are joined in `~MainWidget()` before the channels are torn down
+- Side benefit: the four pixmaps are no longer delivered as a burst on one shared timer tick, so they are phased independently
+
+**Verification** (full app chain per thread: `fillRgb32` + `QPixmap::fromImage` + `scaled`):
+- 1 thread: 7.52 ms conversion / 9.7 ms per frame = 103 fps
+- 2 threads: 7.59 ms conversion / 9.4 ms per frame = 213 fps
+- 4 threads: 7.60 ms conversion / 9.4 ms per frame = 426 fps
+- Throughput scales linearly and per-frame cost does not grow, so the limit is compute, not memory bandwidth
+- Worst case of landing on four A55 cores instead of A76: 13.15 ms conversion / 18.4 ms per frame for 4 threads, still under the 33 ms budget for 30 fps
+- Before this change the same four channels cost 4 x 9.4 = 38 ms (big cores) or 4 x 18.4 = 74 ms (little cores), which is what capped Quad View near 10 fps
+- Startup check on the board: process now shows 4 idle worker threads at 0.8% CPU each instead of one, and the app runs normally
 
 ### Security & Robustness Fixes
 
@@ -24,7 +67,7 @@
 
 ### Build & Release
 
-- Version bumped to 1.3.0; `Version.h` is now generated into the build directory only, so it no longer keeps dirtying the source tree
+- Version bumped to 1.3.1; `Version.h` is now generated into the build directory only, so it no longer keeps dirtying the source tree
 - Translation sources live in `config/` only (the duplicated copies in the repository root were removed). `.qm` files are regenerated at build time with `lrelease`; `lupdate` moved to an explicit `update_translations` target so builds no longer rewrite the source tree
 - Dropped `-ffast-math` (relaxed IEEE semantics for no measurable gain in this application)
 - Dropped `QT_NO_DEBUG_OUTPUT` / `QT_NO_WARNING_OUTPUT`, which compiled all `qDebug()`/`qWarning()` output away and left the log file essentially empty

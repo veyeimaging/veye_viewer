@@ -14,9 +14,9 @@
 #include "ExpGainDlg.h"
 #include "QxHelp.h"
 #include "TriggerDlg.h"
+#include "UyvyConvert.h"
 #include "Version.h"
 #include "ui_MainWidget.h"
-#include <arm_neon.h>
 
 MainWidget::MainWidget(QWidget *parent)
     : FramelessWidget(parent)
@@ -31,10 +31,12 @@ MainWidget::MainWidget(QWidget *parent)
 MainWidget::~MainWidget()
 {
     m_bThread = false;
-    // 帧处理线程会访问 m_channels[].queueSii/mtxPix，必须先 join 再拆通道，
+    // 帧处理线程会访问 m_channels[].queueSii/mtxPix，必须先全部 join 再拆通道，
     // 否则就是 use-after-free（以前 detach 后直接退出，靠进程退出兜底）。
-    if (m_threadWork.joinable()) {
-        m_threadWork.join();
+    for (int i = 0; i < MAX_CHANNELS; ++i) {
+        if (m_threadWork[i].joinable()) {
+            m_threadWork[i].join();
+        }
     }
     for (int i = 0; i < MAX_CHANNELS; ++i) {
         // 退出时事件循环已结束，deleteLater 不会被处理，这里必须同步销毁，
@@ -167,8 +169,11 @@ void MainWidget::initObj()
     qRegisterMetaType<StCmdRet>("StCmdRet");
     connect(this, &MainWidget::sndPixmap, this, &MainWidget::rcvPixmap);
 
-    // 保存线程句柄，析构时 join（见 ~MainWidget）
-    m_threadWork = std::thread([this]() { workThread(); });
+    // 保存线程句柄，析构时 join（见 ~MainWidget）。
+    // 每通道一根：GX 的 UYVY→RGB 是纯算力活，共用一根线程时四路会串行排队。
+    for (int i = 0; i < MAX_CHANNELS; ++i) {
+        m_threadWork[i] = std::thread([this, i]() { workThread(i); });
+    }
 
     // 多相机：每个通道的 Camera 懒创建(首次绑定设备时)，此处不再创建单个 m_cam。
     m_pImgAttr = new ImgAttrDlg(devCfg, this);
@@ -266,7 +271,7 @@ void MainWidget::setupUi()
             views[i]->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
             m_channels[i].scene->addItem(m_channels[i].pixItem);
             views[i]->installEventFilter(this);
-            m_channels[i].gvSize = views[i]->size();
+            setGvSize(i, views[i]->size());
         }
         // 修正布局伸缩：图像区域始终扩展、工具栏固定高度，
         // 避免单画面模式下顶部工具栏因伸缩传递失效而占据上半部分。
@@ -778,7 +783,7 @@ void MainWidget::resizeEvent(QResizeEvent *event)
     Q_UNUSED(event);
     for (int i = 0; i < MAX_CHANNELS; ++i) {
         if (m_channels[i].view && m_channels[i].view->isVisible()) {
-            m_channels[i].gvSize = m_channels[i].view->size();
+            setGvSize(i, m_channels[i].view->size());
         }
     }
     if (!cur().bRunning) {
@@ -794,7 +799,7 @@ bool MainWidget::eventFilter(QObject *watched, QEvent *event)
         }
         QEvent::Type et = event->type();
         if (et == QEvent::Resize) {
-            m_channels[i].gvSize = m_channels[i].view->size();
+            setGvSize(i, m_channels[i].view->size());
         } else if (et == QEvent::MouseButtonPress) {
             // 单击某个画面 -> 激活该通道（允许空格，便于“先选中空格再放相机”）
             if (m_active != i) {
@@ -1761,6 +1766,8 @@ bool MainWidget::isCamRunning()
     return cur().bRunning;
 }
 
+// GX 出的是 full-range UYVY，真正的换算在 UyvyConvert.cpp（查表 + NEON，比原来快约 3 倍）。
+// 这里只留参数校验和 QImage 生命周期。
 QImage uyvyToQImage(unsigned char *uyvyData, int dataSize, int width, int height, int bytesPerLine)
 {
     // 1. 严格参数校验（避免数据不足导致取到无效值）
@@ -1777,162 +1784,126 @@ QImage uyvyToQImage(unsigned char *uyvyData, int dataSize, int width, int height
         return QImage();
     }
 
-    // 2. 创建目标图像（RGB888格式：R/G/B顺序）
-    QImage image(width, height, QImage::Format_RGB888);
+    // 2. 目标图像用 RGB32：QPixmap::fromImage 遇到 RGB888 要逐像素展开成 32 位，
+    //    直接出 RGB32 就只剩拷行，后面 scaled() 也走 32 位路径
+    QImage image(width, height, QImage::Format_RGB32);
     if (image.isNull()) {
         qWarning() << "无法创建QImage";
         return QImage();
     }
 
-    // 3. BT.601标准（整数计算优先，避免浮点误差导致亮度异常）
-    const int Y_MIN = 16; // Y的有效范围：16~235（BT.601）
-    const int Y_MAX = 235;
-    const int UV_MIN = 16; // UV的有效范围：16~240（部分设备可能是0~255，可调整）
-    const int UV_MAX = 240;
-    const int UV_OFFSET = 128;
-
-    // 像素钳位（确保RGB在0~255）
-    auto clamp = [](int val) -> uchar { return static_cast<uchar>(qBound(0, val, 255)); };
-
-    // 4. 逐行逐像素对转换（核心修复：UYVY索引计算）
-    for (int y = 0; y < height; ++y) {
-        // 当前行UYVY数据起始地址（按bytesPerLine偏移，正确处理对齐）
-        unsigned char *uyvyLine = uyvyData + y * bytesPerLine;
-        // 当前行RGB数据起始地址
-        uchar *rgbLine = image.scanLine(y);
-
-        // 每次处理1个UYVY像素对（4字节 → 2个RGB像素）
-        for (int xPair = 0; xPair < width; xPair += 2) {
-            // 计算当前像素对在UYVY行中的起始字节索引（关键修复！）
-            int uyvyByteIdx = xPair * 2; // 每个RGB像素对应2字节UYVY（4字节/2像素）
-            // 避免超出当前行的有效数据（bytesPerLine是对齐后的总字节数）
-            if (uyvyByteIdx + 3 >= bytesPerLine) {
-                qWarning() << "UYVY行数据不足：行" << y << "像素对" << xPair / 2 << "索引越界";
-                break;
-            }
-
-            // 正确提取UYVY分量（严格按格式顺序：U0 Y0 V0 Y1）
-            unsigned char U = uyvyLine[uyvyByteIdx + 0];
-            unsigned char Y0 = uyvyLine[uyvyByteIdx + 1];
-            unsigned char V = uyvyLine[uyvyByteIdx + 2];
-            unsigned char Y1 = uyvyLine[uyvyByteIdx + 3];
-
-            // 校验并修正Y/UV的有效范围（避免原始数据异常导致亮度为0）
-            Y0 = qBound(Y_MIN, (int) Y0, Y_MAX);
-            Y1 = qBound(Y_MIN, (int) Y1, Y_MAX);
-            U = qBound(UV_MIN, (int) U, UV_MAX);
-            V = qBound(UV_MIN, (int) V, UV_MAX);
-
-            // 转换为归一化值（避免浮点溢出）
-            int Y0_norm = Y0 - Y_MIN;
-            int Y1_norm = Y1 - Y_MIN;
-            int U_norm = (U - UV_OFFSET) * 255 / (UV_MAX - UV_MIN); // 映射到-127~127
-            int V_norm = (V - UV_OFFSET) * 255 / (UV_MAX - UV_MIN);
-
-            // --------------------------
-            // YUV转RGB（整数计算，无精度损失）
-            // --------------------------
-            // 像素0（xPair列）
-            int R0 = Y0_norm + (V_norm * 1402) / 1000;                        // 1.402 → 1402/1000
-            int G0 = Y0_norm - (U_norm * 344) / 1000 - (V_norm * 714) / 1000; // 0.344、0.714
-            int B0 = Y0_norm + (U_norm * 1772) / 1000;                        // 1.772 → 1772/1000
-            // 写入RGB（顺序：R→G→B）
-            rgbLine[xPair * 3 + 0] = clamp(R0);
-            rgbLine[xPair * 3 + 1] = clamp(G0);
-            rgbLine[xPair * 3 + 2] = clamp(B0);
-
-            // 像素1（xPair+1列，处理宽度为奇数的情况）
-            if (xPair + 1 < width) {
-                int R1 = Y1_norm + (V_norm * 1402) / 1000;
-                int G1 = Y1_norm - (U_norm * 344) / 1000 - (V_norm * 714) / 1000;
-                int B1 = Y1_norm + (U_norm * 1772) / 1000;
-                rgbLine[(xPair + 1) * 3 + 0] = clamp(R1);
-                rgbLine[(xPair + 1) * 3 + 1] = clamp(G1);
-                rgbLine[(xPair + 1) * 3 + 2] = clamp(B1);
-            }
-        }
-    }
-
+    UyvyConvert::fillRgb32(uyvyData,
+                           width,
+                           0,
+                           height,
+                           bytesPerLine,
+                           reinterpret_cast<unsigned char *>(image.bits()),
+                           image.bytesPerLine());
     return image;
 }
 
-void MainWidget::workThread()
+// view 尺寸只在这把锁下读写，见 CameraChannel::gvSize
+void MainWidget::setGvSize(int ch, const QSize &size)
 {
+    if (ch < 0 || ch >= MAX_CHANNELS) {
+        return;
+    }
+    std::lock_guard<std::mutex> lk(m_channels[ch].mtxPix);
+    m_channels[ch].gvSize = size;
+}
+
+// 每个通道一根线程，只处理自己那一路的帧队列。
+// 以前四路共用一根线程串行转换：1080p 单帧 UYVY→RGB 约 7ms，四路就是约 29ms，
+// 再加上缩放和排队的抖动，33ms 的节拍预算很容易被超出，四画面帧率被串行化拖下来。
+// 拆成每通道独立线程后，四路同时各转自己那 7ms，互不等待（队列、锁本来就是每通道一份）。
+void MainWidget::workThread(int ch)
+{
+    if (ch < 0 || ch >= MAX_CHANNELS) {
+        return;
+    }
+    CameraChannel &c = m_channels[ch];
+    bool warnedUnknown = false;
+
     QElapsedTimer timer;
     timer.restart();
-    bool warnedUnknown[MAX_CHANNELS] = {false};
 
     while (m_bThread) {
         // 下拉框某一项没带 data 时 toInt() 会得到 0，1000/0 = inf 会让预览永远不刷新
-        const int fps = m_setFps > 0 ? m_setFps : 30;
-        double setFrameIntv = 1000.0 / fps * 1000;
-        if (timer.nsecsElapsed() / 1000 >= setFrameIntv) {
-            //qDebug() << setFrameIntv << timer.nsecsElapsed() / 1000;
-            timer.restart();
-            for (int ch = 0; ch < MAX_CHANNELS; ++ch) {
-                CameraChannel &c = m_channels[ch];
-                StImgInfo sii;
-                bool got = false;
-                {
-                    std::lock_guard<std::mutex> lk(c.mtxPix);
-                    if (!c.queueSii.empty()) {
-                        sii = c.queueSii.front();
-                        c.queueSii.pop();
-                        got = true;
-                    }
-                }
-                if (!got) {
-                    continue;
-                }
-                if (c.bShow) {
-                    QImage img;
-                    if (EuCamType::GxCamera == c.camType) {
-                        img = uyvyToQImage(sii.buf,
-                                           sii.len,
-                                           sii.width,
-                                           sii.height,
-                                           sii.nBytesperline);
-                    } else if (EuCamType::MvCamera == c.camType) {
-                        img = QImage(sii.buf,
-                                     sii.nBytesperline,
-                                     sii.height,
-                                     QImage::Format_Grayscale8);
-                    } else {
-                        // 类型未知：两种格式的字节含义完全不同，当作 GRAY8 只会解出花屏，
-                        // 宁可不显示并留一条日志。
-                        if (!warnedUnknown[ch]) {
-                            warnedUnknown[ch] = true;
-                            qWarning() << "channel" << ch << "cam type unknown, frame dropped";
-                        }
-                        if (new_buf == sii.strategy) {
-                            delete[] sii.buf;
-                        }
-                        continue;
-                    }
-                    QPixmap pix;
-                    if (m_scale) {
-                        pix = QPixmap::fromImage(img).scaled(c.gvSize,
-                                                             Qt::KeepAspectRatio,
-                                                             Qt::FastTransformation);
-                    } else {
-                        pix = QPixmap::fromImage(img);
-                    }
-                    emit sndPixmap(ch, pix, sii.strTS);
-                }
-                if (new_buf == sii.strategy) {
-                    delete[] sii.buf;
-                }
-            }
-        } else {
+        int fps = m_setFps.load();
+        if (fps <= 0) {
+            fps = 30;
+        }
+        const double setFrameIntv = 1000.0 / fps * 1000;
+        const qint64 elapsedUs = timer.nsecsElapsed() / 1000;
+        if (elapsedUs < setFrameIntv) {
             // 睡到下一个出帧节拍（最多 5ms 一次，保证停止时及时退出），
-            // 而不是原来 1us 的忙等（四路时会白白吃掉一颗核）
-            qint64 waitUs = (qint64) setFrameIntv - timer.nsecsElapsed() / 1000;
+            // 而不是 1us 的忙等（空闲线程也会白白吃掉一颗核）
+            qint64 waitUs = (qint64) setFrameIntv - elapsedUs;
             if (waitUs < 200) {
                 waitUs = 200;
             } else if (waitUs > 5000) {
                 waitUs = 5000;
             }
             QThread::usleep((unsigned long) waitUs);
+            continue;
+        }
+        //qDebug() << setFrameIntv << timer.nsecsElapsed() / 1000;
+        timer.restart();
+
+        StImgInfo sii;
+        QSize gvSize;
+        bool got = false;
+        {
+            // 帧和缩放尺寸在同一把锁里取：gvSize 由 GUI 线程（resize/切布局）写，
+            // 在这里裸读会读到写了一半的宽高
+            std::lock_guard<std::mutex> lk(c.mtxPix);
+            if (!c.queueSii.empty()) {
+                sii = c.queueSii.front();
+                c.queueSii.pop();
+                gvSize = c.gvSize;
+                got = true;
+            }
+        }
+        if (!got) {
+            continue;
+        }
+        if (c.bShow) {
+            QImage img;
+            if (EuCamType::GxCamera == c.camType) {
+                img = uyvyToQImage(sii.buf,
+                                   sii.len,
+                                   sii.width,
+                                   sii.height,
+                                   sii.nBytesperline);
+            } else if (EuCamType::MvCamera == c.camType) {
+                img = QImage(sii.buf,
+                             sii.nBytesperline,
+                             sii.height,
+                             QImage::Format_Grayscale8);
+            } else {
+                // 类型未知：两种格式的字节含义完全不同，当作 GRAY8 只会解出花屏，
+                // 宁可不显示并留一条日志。
+                if (!warnedUnknown) {
+                    warnedUnknown = true;
+                    qWarning() << "channel" << ch << "cam type unknown, frame dropped";
+                }
+                if (new_buf == sii.strategy) {
+                    delete[] sii.buf;
+                }
+                continue;
+            }
+            QPixmap pix;
+            if (m_scale) {
+                pix = QPixmap::fromImage(img).scaled(gvSize,
+                                                     Qt::KeepAspectRatio,
+                                                     Qt::FastTransformation);
+            } else {
+                pix = QPixmap::fromImage(img);
+            }
+            emit sndPixmap(ch, pix, sii.strTS);
+        }
+        if (new_buf == sii.strategy) {
+            delete[] sii.buf;
         }
     }
 }
@@ -2571,7 +2542,7 @@ void MainWidget::applyViewLayout()
 
     for (int i = 0; i < MAX_CHANNELS; ++i) {
         if (m_channels[i].view && m_channels[i].view->isVisible()) {
-            m_channels[i].gvSize = m_channels[i].view->size();
+            setGvSize(i, m_channels[i].view->size());
         }
     }
     // 未显示(未绑定/未开启显示)的可见通道铺背景图

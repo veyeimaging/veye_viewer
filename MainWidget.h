@@ -49,9 +49,9 @@ struct CameraChannel {
     QGraphicsView *view = nullptr;
     QGraphicsScene *scene = nullptr;
     QGraphicsPixmapItem *pixItem = nullptr;
-    QSize gvSize; // 该 view 当前尺寸(用于缩放)
+    QSize gvSize; // 该 view 当前尺寸(用于缩放)，和帧队列一起用 mtxPix 保护
 
-    // 帧队列
+    // 帧队列（每通道独立，由该通道的帧处理线程消费）
     std::mutex mtxPix;
     std::queue<StImgInfo> queueSii;
 };
@@ -180,7 +180,11 @@ protected:
     void showCtrlWidget();
 
 protected:
-    void workThread();
+    // 每通道一根帧处理线程，ch 就是 m_channels 下标
+    void workThread(int ch);
+    // view 尺寸：GUI 线程写、帧处理线程在 mtxPix 下读，所以写也必须走同一把锁，
+    // 否则可能读到只写了一半的宽高
+    void setGvSize(int ch, const QSize &size);
 
 protected:
     virtual void resizeEvent(QResizeEvent *event) override;
@@ -225,12 +229,13 @@ protected:
 
 protected:
     bool m_bAuthorize = false;
-    // 帧处理线程：标志必须原子可见，且必须在析构时 join
+    // 帧处理线程：每通道一根（见 workThread），标志必须原子可见，析构时全部 join
     std::atomic<bool> m_bThread{true};
-    std::thread m_threadWork;
+    std::thread m_threadWork[MAX_CHANNELS];
     QTranslator m_translator;
     int m_nChachFrameSize = 3;
-    int m_setFps = 30;
+    // 下面两个由 GUI 线程写、四根帧处理线程读，跨线程必须原子
+    std::atomic<int> m_setFps{30};
     int m_showFps = 0;
 
 protected:
@@ -265,7 +270,7 @@ private:
     int m_lblFps = 0;
     volatile bool m_bFps = false;
     int m_seconds = 1;
-    bool m_scale = true;
+    std::atomic<bool> m_scale{true}; // GUI 线程写，帧处理线程读
     QTimer *m_timer = nullptr;
     QString m_i2cAddr = "0x3b";
     std::deque<qint64> timestamps;
