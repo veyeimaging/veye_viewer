@@ -1,84 +1,95 @@
+[English](README.md) | [中文](README.cn.md)
+
 # veye_viewer
 
 ### 简介
-veye_viewer是一个开源的，基于QT的，为VEYE IMAGING的相机模组而专门开发的客户端软件。其UI采用Qt5进行交互，视频获取基于v4l2接口。
+veye_viewer 是一个开源的、基于 Qt 的、为 VEYE IMAGING 相机模组专门开发的客户端软件。其 UI 采用 Qt5 实现交互，视频获取基于 V4L2 接口。
 
 ### 兼容性
 
-兼容MV系列相机，RAW系列相机和GX系列相机模组。
+兼容 MV 系列、RAW 系列和 GX 系列相机模组。
 
-支持平台RK3566/RK3568/RK3588 系列、Jetson Orin 和 Xavier 系列、raspberry4、5 系列。
+支持平台：RK3566/RK3568/RK3588 系列、Jetson Orin 和 Xavier 系列、Raspberry Pi 4/5 系列。
 
 ### 下载和运行
 
-可以直接从本项目的release包中下载可执行文件，也可以选择从源码开始编译。
+可以直接从本项目的 release 包中下载可执行文件，也可以选择从源码编译（见[源码编译](#源码编译)）。
 
-#### 安装依赖项
+#### 1. 安装依赖
 
-```bash
-    sudo apt update
-    sudo apt install gawk
-	sudo apt install v4l-utils 
-	sudo apt install libqt5opengl5
-```
-
-#### 运行
+项目提供 `setup.sh` 一键安装依赖。默认只安装运行程序所需的**运行时**依赖：
 
 ```bash
-    cd veye_viewer
-    chmod +x ./*
-	chmod 755 ./config/*.sh
-    ./start_veye_viewer.sh
+cd veye_viewer
+chmod +x ./setup.sh
+./setup.sh
 ```
 
-### 使用说明
-使用中，请注意界面下方的日志提示，如果遇到i2c-num没有访问权限的情况，请手动添加。
+它会安装 `gawk`、`v4l-utils`（提供 `media-ctl` / `v4l2-ctl`）以及 Qt5 运行时库，并自动给启动/探测脚本加上可执行权限，同时尝试把当前用户加入 `i2c` 组。
+
+`setup.sh` 参数说明：
+
+| 参数 | 说明 |
+| ---- | ---- |
+| （无参数） | 只安装运行时依赖（日常使用推荐） |
+| `--build` | 额外安装编译工具链（Qt5 开发库、cmake、g++、make、gdb） |
+| `--ide` | 额外安装 Qt Creator |
+| `--no-i2c` | 跳过把当前用户加入 `i2c` 组的步骤 |
+| `--help` | 查看帮助 |
+
+> 如果只是下载现成的可执行文件，默认执行 `./setup.sh` 即可。
+
+#### 2. 运行
+
+```bash
+./start_veye_viewer.sh
 ```
+
+首次运行会自动检测平台，执行对应的 `config/probe_camera_info-*.sh` 脚本生成 `config/auto_camera_index.json`，然后启动 `veye_viewer`。
+
+#### 使用说明
+使用中请注意界面下方的日志提示。如果出现访问 `/dev/i2c-*` 没有权限的情况，请重新登录（或重启）让 `i2c` 组生效，或手动授权：
+
+```bash
 sudo chmod 777 /dev/i2c-*
 ```
 
-### 使用限制
-对于MV和RAW系列相机支持RAW8数据格式。
+#### 使用限制
+MV 和 RAW 系列相机仅支持 RAW8 数据格式。
 
 ### 源码编译
 
-源码采用CMake进行构建，如果需要编译源码，可以采用以下两种方式进行编译，在编译之前需要安装基础环境和脚本授权，以免影响运行。
+源码采用 CMake 构建，可使用命令行或 Qt Creator 进行编译。
 
-#### 基础环境安装 
+#### 1. 安装编译环境
 
-```bash
-    sudo apt update
-    sudo apt-get install gawk
-    sudo apt-get install qtcreator
-    sudo apt-get install qtbase5-dev
-    sudo apt-get install qttools5-dev 
-    sudo apt-get install libqt5opengl5-dev
-    sudo apt-get install cmake
-    sudo apt-get install g++
-    sudo apt-get install gdb
-```
-
-#### CMake编译运行
+在运行时依赖之外，额外安装编译工具链：
 
 ```bash
-    mkdir build
-    cd build
-    cmake ..
-    make
+cd veye_viewer
+./setup.sh --build
 ```
 
-#### qtcreator编译
+会安装：`cmake`、`g++`、`make`、`gdb`、`qtbase5-dev`、`libqt5opengl5-dev`、`qttools5-dev` / `qttools5-dev-tools`（提供 `lupdate` / `lrelease`）。如果还需要 Qt Creator，加上 `--ide`。
 
-1. 启动 Qt Creator：打开 Qt Creator。
-2. 打开项目：在 Qt Creator 中，选择 File > Open File or Project，然后浏览到你的 CMakeLists.txt 文件的位置。确保选择的是项目根目录下的 CMakeLists.txt 文件。
-3. 选择 Kit：在打开项目之前，Qt Creator 会要求你选择一个 Kit。Kit 是指开发环境中预配置的一组工具链，包括编译器和 Qt 版本。如果你还没有配置 Kit，你可以点击 Manage Kits... 来添加或配置新的 Kit。通常，你需要至少配置一个包含正确编译器和 Qt 版本的 Kit。
-4. 配置项目：选择 Kit 后，Qt Creator 将尝试加载项目。如果一切设置正确，它将自动识别为 CMake 项目
-5. 构建和运行：配置完成后，你可以点击左下角的绿色播放按钮来构建并运行你的项目。
-
-#### 源码编译完成之后的运行
+#### 2. CMake 编译运行
 
 ```bash
-	cd veye_viewer/build
-	chmod 755 ./config/*.sh   
-    ./start_veye_viewer.sh
+mkdir -p build
+cd build
+cmake ..
+make
+./start_veye_viewer.sh
 ```
+
+> `cmake`/`make` 会把 `start_veye_viewer.sh` 和 `config/` 目录复制到 `build/` 下，因此要在 `build/` 目录里运行启动脚本。
+
+#### 3. Qt Creator 编译
+
+1. 启动 Qt Creator。
+2. 打开项目：选择 **File > Open File or Project**，选中项目根目录下的 `CMakeLists.txt`。
+3. 选择 Kit：Qt Creator 会要求选择一个 Kit（即包含编译器和 Qt 版本的一组预配置工具链）。若尚未配置，可点击 **Manage Kits...** 配置一个包含正确编译器和 Qt5 版本的 Kit。
+4. 配置项目：选择 Kit 后，Qt Creator 会加载项目并自动识别为 CMake 项目。
+5. 构建和运行：点击左下角的绿色运行按钮。
+
+> **注意：** 使用 Qt Creator 编译时，首次编译完成后请通过 `./start_veye_viewer.sh`（在构建目录中）运行，以便正确加载探测脚本和配置。

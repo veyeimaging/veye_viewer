@@ -3,71 +3,93 @@
 # veye_viewer
 
 ### Introduction
-veye_viewer is an open-source, Qt-based client application specifically developed for VEYE IMAGING camera modules. Its user interface is built with Qt5, and video acquisition is implemented via the V4L2 interface.
+veye_viewer is an open-source, Qt-based client application developed specifically for VEYE IMAGING camera modules. Its user interface is built with Qt5, and video acquisition is implemented through the V4L2 interface.
 
 #### Compatibility
 
 Compatible with MV-series, RAW-series, and GX-series camera modules.
 
-Supported platforms include RK3566/RK3568/RK3588 series, Jetson Orin and Xavier series, and Raspberry Pi 4/5 series.
+Supported platforms: RK3566/RK3568/RK3588 series, Jetson Orin and Xavier series, and Raspberry Pi 4/5 series.
 
-#### Download and Execution
+### Download and Run
 
-You can either download the executable directly from the release packages of this project or choose to compile it from source code.
+You can either download a pre-built executable from this project's releases, or compile from source (see [Build from Source](#build-from-source)).
 
-#### Install Dependencies
+#### 1. Install dependencies
 
-```bash
-sudo apt update
-sudo apt install gawk
-sudo apt install v4l-utils 
-sudo apt install libqt5opengl5
-```
-#### Run the Application
+A helper script `setup.sh` installs everything for you. By default it only installs the **runtime** dependencies needed to launch the app:
 
 ```bash
 cd veye_viewer
-chmod +x ./
-chmod 755 ./config/*.sh
+chmod +x ./setup.sh
+./setup.sh
+```
+
+This installs `gawk`, `v4l-utils` (provides `media-ctl` / `v4l2-ctl`), and the Qt5 runtime libraries, marks the start/probe scripts executable, and tries to add your user to the `i2c` group.
+
+`setup.sh` options:
+
+| Option | Description |
+| ------ | ----------- |
+| *(none)* | Install runtime dependencies only (recommended for normal use) |
+| `--build` | Additionally install the compile toolchain (Qt5 dev headers, cmake, g++, make, gdb) |
+| `--ide` | Additionally install Qt Creator |
+| `--no-i2c` | Skip adding the current user to the `i2c` group |
+| `--help` | Show usage |
+
+> If you only downloaded a pre-built binary, the default `./setup.sh` is enough.
+
+#### 2. Run the application
+
+```bash
 ./start_veye_viewer.sh
 ```
-#### Usage Instructions
-During use, please pay attention to the log messages displayed at the bottom of the interface. If you encounter permission issues accessing i2c-num, manually grant permissions as follows:
+
+The first launch automatically detects the platform and runs the matching `config/probe_camera_info-*.sh` script to generate `config/auto_camera_index.json`, then starts `veye_viewer`.
+
+#### Usage notes
+Watch the log messages at the bottom of the interface. If you see a "no permission on /dev/i2c-*" error, re-login (or reboot) so the `i2c` group takes effect, or grant access manually:
 
 ```bash
 sudo chmod 777 /dev/i2c-*
 ```
 
-#### Usage Limitations
-For MV and RAW series cameras, only the RAW8 data format is supported.
+#### Limitations
+MV and RAW series cameras support the RAW8 data format only.
 
-### Compilation Tutorial
-The source code is built using CMake. If you need to compile the source code, you can use the following two methods for compilation. Before compiling, you need to install the basic environment and script authorization to avoid affecting the operation.
+### Build from Source
 
-#### Basic Environment Installation
-    sudo apt update
-    sudo apt-get install gawk
-    sudo apt-get install qtcreator
-    sudo apt-get install qtbase5-dev
-    sudo apt-get install qttools5-dev 
-    sudo apt-get install libqt5opengl5-dev
-    sudo apt-get install cmake
-    sudo apt-get install g++
-    sudo apt-get install gdb
-#### Script Authorization
-    cd veye_viewer
-    chmod 755 
-    ./config/*.sh
-#### CMake Compilation and Execution
-    cd build
-    cmake ..
-    make
-    ./start_veye_viewer.sh
-#### Qt Creator Compilation
-1. Launch Qt Creator: Open Qt Creator.
-2. Open Project: In Qt Creator, select File > Open File or Project, then navigate to the location of your CMakeLists.txt file. Make sure to select the CMakeLists.txt file in the root directory of the project.
-3. Choose Kit: Before opening the project, Qt Creator will ask you to select a Kit. A Kit refers to a set of pre-configured toolchains in the development environment, including compilers and Qt versions. If you haven't configured a Kit yet, you can click Manage Kits... to add or configure a new Kit. Typically, you need to configure at least one Kit with the correct compiler and Qt version.
-4. Configure Project: After selecting a Kit, Qt Creator will try to load the project. If everything is set up correctly, it will automatically recognize it as a CMake project.
-5. Build and Run: Once configured, you can click the green play button in the lower left corner to build and run your project.
+The project is built with CMake. You can build from the command line or with Qt Creator.
 
-#### Special Note: When compiling the source code using qtcreator, after the first compilation is complete, you need to use `./start_veye_viewer.sh` to run.
+#### 1. Install the build environment
+
+Install the compile toolchain in addition to the runtime dependencies:
+
+```bash
+cd veye_viewer
+./setup.sh --build
+```
+
+This installs: `cmake`, `g++`, `make`, `gdb`, `qtbase5-dev`, `libqt5opengl5-dev`, `qttools5-dev` / `qttools5-dev-tools` (for `lupdate` / `lrelease`). Add `--ide` if you want Qt Creator as well.
+
+#### 2. CMake build and run
+
+```bash
+mkdir -p build
+cd build
+cmake ..
+make
+./start_veye_viewer.sh
+```
+
+> `cmake`/`make` copy `start_veye_viewer.sh` and the `config/` directory into `build/`, so run the start script from inside `build/`.
+
+#### 3. Qt Creator build
+
+1. Launch Qt Creator.
+2. Open project: choose **File > Open File or Project** and select the `CMakeLists.txt` in the project root.
+3. Choose a Kit: Qt Creator asks you to pick a Kit (a pre-configured toolchain with compiler and Qt version). If none exists, click **Manage Kits...** to configure one with a valid compiler and the Qt5 version.
+4. Configure: once a Kit is selected, Qt Creator loads the project and recognizes it as a CMake project.
+5. Build and run: click the green run button in the lower-left corner.
+
+> **Note:** when building with Qt Creator, after the first successful build, run the app via `./start_veye_viewer.sh` (from the build directory) so the probe scripts and config are picked up correctly.
